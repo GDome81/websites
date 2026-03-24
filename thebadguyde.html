@@ -1,0 +1,2335 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Bad Guyde — Genova come non l'hai mai vista</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700&family=DM+Sans:wght@300;400;500&family=Cormorant+Garamond:ital,wght@0,300;0,600;1,300;1,600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --marine: #0a1628;
+    --deep: #061020;
+    --gold: #c9922a;
+    --gold-light: #e8b84b;
+    --cream: #f5ede0;
+    --rust: #8b3a2a;
+    --teal: #2a7b8c;
+    --teal-light: #4ab5c8;
+    --white: #faf8f4;
+    --text-muted: rgba(245,237,224,0.55);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--deep);
+    color: var(--cream);
+    font-family: 'DM Sans', sans-serif;
+    overflow-x: hidden;
+    cursor: none;
+  }
+
+  body.default-cursor {
+    cursor: auto;
+  }
+
+  /* CUSTOM CURSOR */
+  .cursor {
+    position: fixed;
+    width: 12px; height: 12px;
+    background: var(--gold);
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 10000;
+    transition: transform 0.15s ease, opacity 0.2s;
+    mix-blend-mode: difference;
+  }
+  .cursor-ring {
+    position: fixed;
+    width: 36px; height: 36px;
+    border: 1px solid var(--gold-light);
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 9999;
+    transition: transform 0.4s cubic-bezier(.23,1,.32,1), opacity 0.3s;
+    opacity: 0.6;
+  }
+
+  /* NOISE OVERLAY */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='1'/%3E%3C/svg%3E");
+    opacity: 0.03;
+    pointer-events: none;
+    z-index: 9998;
+  }
+
+  /* NAV */
+  nav {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 1000;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 24px 48px;
+    mix-blend-mode: normal;
+    transition: background 0.4s, padding 0.3s;
+  }
+  nav.scrolled {
+    background: rgba(6,16,32,0.92);
+    backdrop-filter: blur(20px);
+    padding: 16px 48px;
+    border-bottom: 1px solid rgba(201,146,42,0.15);
+  }
+  .nav-logo {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.1rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    color: var(--gold-light);
+    text-decoration: none;
+  }
+  .nav-logo span { color: var(--cream); font-weight: 400; font-style: italic; }
+  .nav-links {
+    display: flex;
+    gap: 36px;
+    list-style: none;
+  }
+  .nav-panel {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+  }
+  .nav-links a {
+    color: var(--text-muted);
+    text-decoration: none;
+    font-size: 0.8rem;
+    font-weight: 500;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    transition: color 0.3s;
+  }
+  .nav-links a:hover { color: var(--gold-light); }
+  .nav-cta {
+    background: transparent;
+    border: 1px solid var(--gold);
+    color: var(--gold);
+    padding: 10px 24px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.75rem;
+    font-weight: 500;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    cursor: none;
+    transition: all 0.3s;
+    text-decoration: none;
+  }
+  .nav-cta:hover {
+    background: var(--gold);
+    color: var(--deep);
+  }
+
+  /* HERO */
+  #hero {
+    position: relative;
+    height: 100vh;
+    min-height: 700px;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    overflow: hidden;
+  }
+
+  .hero-bg {
+    position: absolute;
+    inset: 0;
+    background:
+      linear-gradient(to bottom, rgba(6,16,32,0.3) 0%, rgba(6,16,32,0.0) 30%, rgba(6,16,32,0.6) 70%, rgba(6,16,32,1) 100%),
+      linear-gradient(135deg, #0a1628 0%, #1a3050 30%, #0d2540 60%, #061020 100%);
+  }
+
+  /* Genova skyline SVG background */
+  .hero-city {
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    height: 65%;
+    opacity: 0.18;
+  }
+
+  .hero-particles {
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+  }
+  .particle {
+    position: absolute;
+    width: 2px; height: 2px;
+    background: var(--gold-light);
+    border-radius: 50%;
+    opacity: 0;
+    animation: float-particle linear infinite;
+  }
+
+  @keyframes float-particle {
+    0% { transform: translateY(100vh) rotate(0deg); opacity: 0; }
+    10% { opacity: 0.6; }
+    90% { opacity: 0.3; }
+    100% { transform: translateY(-100px) rotate(720deg); opacity: 0; }
+  }
+
+  .hero-content {
+    position: relative;
+    z-index: 10;
+    padding: 0 80px 80px;
+    max-width: 900px;
+  }
+
+  .hero-tag {
+    display: inline-block;
+    font-size: 0.7rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--gold);
+    border: 1px solid rgba(201,146,42,0.4);
+    padding: 6px 16px;
+    margin-bottom: 32px;
+    opacity: 0;
+    animation: fadeUp 0.8s ease 0.3s forwards;
+  }
+
+  .hero-title {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(3.5rem, 8vw, 7rem);
+    font-weight: 900;
+    line-height: 0.95;
+    margin-bottom: 32px;
+    opacity: 0;
+    animation: fadeUp 0.9s ease 0.5s forwards;
+  }
+  .hero-title em {
+    font-style: italic;
+    color: var(--gold-light);
+    display: block;
+  }
+
+  .hero-sub {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.3rem;
+    font-weight: 300;
+    font-style: italic;
+    color: var(--text-muted);
+    max-width: 480px;
+    line-height: 1.6;
+    margin-bottom: 48px;
+    opacity: 0;
+    animation: fadeUp 0.9s ease 0.7s forwards;
+  }
+
+  .hero-actions {
+    display: flex;
+    gap: 20px;
+    align-items: center;
+    opacity: 0;
+    animation: fadeUp 0.9s ease 0.9s forwards;
+  }
+
+  .btn-primary {
+    display: inline-block;
+    background: var(--gold);
+    color: var(--deep);
+    padding: 16px 40px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.8rem;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    text-decoration: none;
+    transition: all 0.3s;
+    position: relative;
+    overflow: hidden;
+  }
+  .btn-primary::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: var(--gold-light);
+    transform: translateX(-101%);
+    transition: transform 0.3s;
+  }
+  .btn-primary:hover::after { transform: translateX(0); }
+  .btn-primary span { position: relative; z-index: 1; }
+
+  .btn-ghost {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    color: var(--cream);
+    text-decoration: none;
+    font-size: 0.8rem;
+    font-weight: 400;
+    letter-spacing: 0.05em;
+    transition: color 0.3s;
+  }
+  .btn-ghost:hover { color: var(--gold-light); }
+  .btn-ghost svg { transition: transform 0.3s; }
+  .btn-ghost:hover svg { transform: translateX(4px); }
+
+  .hero-scroll {
+    position: absolute;
+    bottom: 40px; right: 60px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    opacity: 0;
+    animation: fadeIn 1s ease 1.5s forwards;
+  }
+  .hero-scroll span {
+    writing-mode: vertical-rl;
+    font-size: 0.65rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+  }
+  .scroll-line {
+    width: 1px;
+    height: 60px;
+    background: linear-gradient(to bottom, var(--gold), transparent);
+    animation: scroll-pulse 2s ease infinite;
+  }
+  @keyframes scroll-pulse {
+    0%, 100% { opacity: 0.4; transform: scaleY(1); }
+    50% { opacity: 1; transform: scaleY(1.2); }
+  }
+
+  /* STATS STRIP */
+  .stats-strip {
+    background: var(--gold);
+    display: flex;
+    justify-content: center;
+    gap: 0;
+    overflow: hidden;
+  }
+  .stat-item {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 20px 48px;
+    border-right: 1px solid rgba(6,16,32,0.15);
+  }
+  .stat-item:last-child { border-right: none; }
+  .stat-num {
+    font-family: 'Playfair Display', serif;
+    font-size: 2rem;
+    font-weight: 900;
+    color: var(--deep);
+    line-height: 1;
+  }
+  .stat-label {
+    font-size: 0.7rem;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: rgba(6,16,32,0.7);
+  }
+
+  /* MANIFESTO SECTION */
+  #manifesto {
+    padding: 140px 80px;
+    max-width: 1400px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 100px;
+    align-items: center;
+  }
+
+  .manifesto-label {
+    font-size: 0.65rem;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 28px;
+  }
+
+  .manifesto-title {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(2.5rem, 4vw, 3.8rem);
+    font-weight: 700;
+    line-height: 1.1;
+    margin-bottom: 32px;
+  }
+  .manifesto-title em {
+    font-style: italic;
+    color: var(--gold-light);
+  }
+
+  .manifesto-text {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.2rem;
+    font-weight: 300;
+    line-height: 1.8;
+    color: rgba(245,237,224,0.75);
+    margin-bottom: 20px;
+  }
+
+  .manifesto-visual {
+    position: relative;
+  }
+
+  .portrait-frame {
+    position: relative;
+    aspect-ratio: 3/4;
+    overflow: hidden;
+    background: linear-gradient(135deg, var(--teal) 0%, var(--marine) 50%, var(--rust) 100%);
+  }
+
+  .portrait-frame::before {
+    content: '';
+    position: absolute;
+    inset: 16px;
+    border: 1px solid rgba(201,146,42,0.3);
+    z-index: 2;
+    pointer-events: none;
+  }
+
+  .portrait-bg {
+    position: absolute;
+    inset: 0;
+    background:
+      radial-gradient(circle at 40% 30%, rgba(42,123,140,0.4) 0%, transparent 60%),
+      radial-gradient(circle at 80% 80%, rgba(139,58,42,0.3) 0%, transparent 50%),
+      linear-gradient(180deg, #0d2540 0%, #1a3050 40%, #0a2030 100%);
+  }
+
+  /* Stylized Genova map elements in portrait */
+  .portrait-genova {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1;
+  }
+
+  .portrait-text-overlay {
+    position: absolute;
+    bottom: 40px; left: 40px; right: 40px;
+    z-index: 3;
+  }
+
+  .portrait-name {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.8rem;
+    font-weight: 900;
+    color: var(--cream);
+    line-height: 1;
+  }
+  .portrait-role {
+    font-size: 0.75rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-top: 6px;
+  }
+
+  .portrait-badge {
+    position: absolute;
+    top: -20px; right: -20px;
+    width: 90px; height: 90px;
+    background: var(--gold);
+    border-radius: 50%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    z-index: 5;
+    animation: rotate-badge 20s linear infinite;
+  }
+  @keyframes rotate-badge {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+  }
+  .badge-inner {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    animation: rotate-badge 20s linear infinite reverse;
+  }
+  .badge-inner span {
+    font-size: 0.55rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--deep);
+    line-height: 1.3;
+    text-align: center;
+  }
+
+  /* GENOVA GRID */
+  #genova-grid {
+    padding: 0 40px 140px;
+    max-width: 1400px;
+    margin: 0 auto;
+  }
+
+  .section-header {
+    text-align: center;
+    margin-bottom: 80px;
+  }
+
+  .section-eyebrow {
+    font-size: 0.65rem;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 16px;
+  }
+
+  .section-title {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(2rem, 3.5vw, 3rem);
+    font-weight: 700;
+    line-height: 1.15;
+  }
+  .section-title em { font-style: italic; color: var(--gold-light); }
+
+  .places-grid {
+    display: grid;
+    grid-template-columns: repeat(12, 1fr);
+    grid-template-rows: auto;
+    gap: 16px;
+  }
+
+  .place-card {
+    position: relative;
+    overflow: hidden;
+    cursor: none;
+    group: true;
+  }
+
+  .place-card:nth-child(1) { grid-column: span 7; grid-row: span 2; aspect-ratio: unset; min-height: 500px; }
+  .place-card:nth-child(2) { grid-column: span 5; min-height: 240px; }
+  .place-card:nth-child(3) { grid-column: span 5; min-height: 240px; }
+  .place-card:nth-child(4) { grid-column: span 4; min-height: 320px; }
+  .place-card:nth-child(5) { grid-column: span 4; min-height: 320px; }
+  .place-card:nth-child(6) { grid-column: span 4; min-height: 320px; }
+
+  .place-bg {
+    position: absolute;
+    inset: 0;
+    transition: transform 0.7s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  }
+  .place-card:hover .place-bg { transform: scale(1.06); }
+
+  .place-overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to top, rgba(6,16,32,0.9) 0%, rgba(6,16,32,0.3) 50%, transparent 100%);
+    transition: opacity 0.4s;
+  }
+  .place-card:hover .place-overlay { opacity: 0.85; }
+
+  .place-info {
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    padding: 32px;
+    transform: translateY(10px);
+    transition: transform 0.4s ease;
+  }
+  .place-card:hover .place-info { transform: translateY(0); }
+
+  .place-cat {
+    font-size: 0.6rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 8px;
+  }
+  .place-name {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.5rem;
+    font-weight: 700;
+    line-height: 1.2;
+    margin-bottom: 12px;
+  }
+  .place-desc {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1rem;
+    color: rgba(245,237,224,0.7);
+    line-height: 1.5;
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.5s ease;
+  }
+  .place-card:hover .place-desc { max-height: 80px; }
+
+  /* Gradient backgrounds for cards */
+  .bg-caruggi {
+    background: linear-gradient(160deg, #1a0e05 0%, #3d2010 30%, #2a1a0a 60%, #0a0503 100%);
+  }
+  .bg-porto {
+    background: linear-gradient(160deg, #051520 0%, #0a2540 30%, #153050 60%, #051015 100%);
+  }
+  .bg-staglieno {
+    background: linear-gradient(160deg, #151515 0%, #2a2020 40%, #1a1010 70%, #050505 100%);
+  }
+  .bg-lanterna {
+    background: linear-gradient(160deg, #051020 0%, #0a1a30 40%, #152040 70%, #051015 100%);
+  }
+  .bg-nervi {
+    background: linear-gradient(160deg, #051a10 0%, #0a2a1a 40%, #082015 70%, #030f08 100%);
+  }
+  .bg-boccadasse {
+    background: linear-gradient(160deg, #101a25 0%, #1a2d3d 40%, #0d2030 70%, #050f18 100%);
+  }
+
+  /* Decorative SVG city silhouettes in each card */
+
+  /* TOURS SECTION */
+  #tours {
+    background: linear-gradient(180deg, var(--deep) 0%, #0d1e35 50%, var(--deep) 100%);
+    padding: 140px 80px;
+  }
+
+  .tours-inner {
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+
+  .tours-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 2px;
+    margin-top: 80px;
+    border: 1px solid rgba(201,146,42,0.15);
+  }
+
+  .tour-card {
+    padding: 56px 40px;
+    border-right: 1px solid rgba(201,146,42,0.1);
+    position: relative;
+    overflow: hidden;
+    transition: background 0.4s;
+    cursor: none;
+  }
+  .tour-card:last-child { border-right: none; }
+  .tour-card::before {
+    content: '';
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    height: 2px;
+    background: var(--gold);
+    transform: scaleX(0);
+    transition: transform 0.4s ease;
+  }
+  .tour-card:hover::before { transform: scaleX(1); }
+  .tour-card:hover { background: rgba(201,146,42,0.04); }
+
+  .tour-number {
+    font-family: 'Playfair Display', serif;
+    font-size: 5rem;
+    font-weight: 900;
+    color: rgba(201,146,42,0.08);
+    line-height: 1;
+    margin-bottom: -20px;
+    transition: color 0.4s;
+  }
+  .tour-card:hover .tour-number { color: rgba(201,146,42,0.15); }
+
+  .tour-icon {
+    font-size: 2rem;
+    margin-bottom: 20px;
+  }
+  .tour-name {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.4rem;
+    font-weight: 700;
+    margin-bottom: 16px;
+    line-height: 1.2;
+  }
+  .tour-desc {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1rem;
+    color: rgba(245,237,224,0.65);
+    line-height: 1.7;
+    margin-bottom: 28px;
+  }
+  .tour-detail {
+    display: flex;
+    gap: 20px;
+    flex-wrap: wrap;
+    margin-bottom: 32px;
+  }
+  .tour-badge {
+    font-size: 0.65rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--gold);
+    border: 1px solid rgba(201,146,42,0.3);
+    padding: 4px 12px;
+  }
+  .tour-cta {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--cream);
+    font-size: 0.75rem;
+    font-weight: 500;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    text-decoration: none;
+    transition: color 0.3s;
+  }
+  .tour-cta:hover { color: var(--gold); }
+  .tour-cta-arrow {
+    width: 24px; height: 1px;
+    background: currentColor;
+    transition: width 0.3s;
+    position: relative;
+  }
+  .tour-cta:hover .tour-cta-arrow { width: 36px; }
+  .tour-cta-arrow::after {
+    content: '';
+    position: absolute;
+    right: 0; top: -3px;
+    width: 7px; height: 7px;
+    border-right: 1px solid currentColor;
+    border-top: 1px solid currentColor;
+    transform: rotate(45deg);
+  }
+
+  /* QUOTE SECTION */
+  #quote {
+    padding: 160px 80px;
+    position: relative;
+    overflow: hidden;
+    text-align: center;
+  }
+
+  #quote::before {
+    content: '';
+    position: absolute;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    width: 600px; height: 600px;
+    background: radial-gradient(circle, rgba(42,123,140,0.12) 0%, transparent 70%);
+    pointer-events: none;
+  }
+
+  .quote-mark {
+    font-family: 'Playfair Display', serif;
+    font-size: 12rem;
+    font-weight: 900;
+    color: rgba(201,146,42,0.06);
+    line-height: 0.8;
+    margin-bottom: -40px;
+  }
+
+  .quote-text {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(1.6rem, 3vw, 2.5rem);
+    font-weight: 300;
+    font-style: italic;
+    line-height: 1.5;
+    max-width: 800px;
+    margin: 0 auto 40px;
+    color: var(--cream);
+  }
+
+  .quote-attr {
+    font-size: 0.7rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--gold);
+  }
+
+  /* INSTAGRAM SECTION */
+  #instagram {
+    padding: 0 0 140px;
+    max-width: 1400px;
+    margin: 0 auto;
+    padding-left: 40px;
+    padding-right: 40px;
+  }
+
+  .instagram-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    margin-bottom: 48px;
+  }
+
+  .instagram-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    color: var(--gold);
+    text-decoration: none;
+    font-size: 0.8rem;
+    font-weight: 500;
+    letter-spacing: 0.08em;
+    transition: gap 0.3s;
+  }
+  .instagram-link:hover { gap: 16px; }
+
+  .ig-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 4px;
+  }
+
+  .ig-post {
+    aspect-ratio: 1;
+    position: relative;
+    overflow: hidden;
+    cursor: none;
+  }
+
+  .ig-post-bg {
+    position: absolute;
+    inset: 0;
+    transition: transform 0.5s ease;
+  }
+  .ig-post:hover .ig-post-bg { transform: scale(1.08); }
+
+  .ig-post-overlay {
+    position: absolute;
+    inset: 0;
+    background: rgba(6,16,32,0.7);
+    opacity: 0;
+    transition: opacity 0.3s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .ig-post:hover .ig-post-overlay { opacity: 1; }
+
+  .ig-heart { font-size: 1.5rem; }
+  .ig-caption {
+    font-size: 0.7rem;
+    letter-spacing: 0.06em;
+    color: var(--cream);
+    text-align: center;
+    padding: 0 20px;
+    font-family: 'Cormorant Garamond', serif;
+    font-style: italic;
+  }
+
+  /* Colors for IG posts */
+  .ig-bg-1 { background: linear-gradient(135deg, #0d1a2e, #1a3050, #0a2040); }
+  .ig-bg-2 { background: linear-gradient(135deg, #1a0e05, #3d2010, #2a1a0a); }
+  .ig-bg-3 { background: linear-gradient(135deg, #051a10, #0a2a1a, #082015); }
+  .ig-bg-4 { background: linear-gradient(135deg, #1a1010, #2a1a15, #150e0a); }
+  .ig-bg-5 { background: linear-gradient(135deg, #051015, #0a1a25, #081520); }
+  .ig-bg-6 { background: linear-gradient(135deg, #0f0f0f, #1e1a10, #151010); }
+  .ig-bg-7 { background: linear-gradient(135deg, #0a1e30, #152840, #0d2035); }
+  .ig-bg-8 { background: linear-gradient(135deg, #1a0a0a, #2a1010, #1a0808); }
+
+  /* CONTACT SECTION */
+  #contact {
+    background: var(--marine);
+    padding: 140px 80px;
+    border-top: 1px solid rgba(201,146,42,0.1);
+  }
+
+  .contact-inner {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 100px;
+    align-items: start;
+  }
+
+  .contact-left h2 {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(2.5rem, 4vw, 3.5rem);
+    font-weight: 700;
+    line-height: 1.1;
+    margin-bottom: 24px;
+  }
+  .contact-left h2 em { font-style: italic; color: var(--gold-light); }
+
+  .contact-left p {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.15rem;
+    font-weight: 300;
+    color: rgba(245,237,224,0.7);
+    line-height: 1.7;
+    margin-bottom: 48px;
+  }
+
+  .contact-details {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+
+  .contact-item {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 20px;
+    border: 1px solid rgba(201,146,42,0.1);
+    transition: border-color 0.3s, background 0.3s;
+  }
+  .contact-item:hover {
+    border-color: rgba(201,146,42,0.3);
+    background: rgba(201,146,42,0.03);
+  }
+
+  .contact-item-icon {
+    font-size: 1.4rem;
+    width: 40px;
+    text-align: center;
+    flex-shrink: 0;
+  }
+  .contact-item-label {
+    font-size: 0.65rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 4px;
+  }
+  .contact-item-value {
+    font-size: 0.95rem;
+    color: var(--cream);
+  }
+  .contact-item-value a {
+    color: inherit;
+    text-decoration: none;
+    transition: color 0.3s;
+  }
+  .contact-item-value a:hover { color: var(--gold-light); }
+
+  .contact-form {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+
+  .form-group {
+    position: relative;
+  }
+
+  .form-group label {
+    display: block;
+    font-size: 0.65rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 8px;
+  }
+
+  .form-group input,
+  .form-group textarea,
+  .form-group select {
+    width: 100%;
+    background: rgba(255,255,255,0.03);
+    border: 1px solid rgba(201,146,42,0.2);
+    color: var(--cream);
+    padding: 14px 18px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.9rem;
+    transition: border-color 0.3s, background 0.3s;
+    outline: none;
+    -webkit-appearance: none;
+  }
+  .form-group input:focus,
+  .form-group textarea:focus,
+  .form-group select:focus {
+    border-color: var(--gold);
+    background: rgba(201,146,42,0.04);
+  }
+  .form-group select option { background: var(--marine); }
+  .form-group textarea { resize: vertical; min-height: 120px; }
+
+  .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+
+  .btn-submit {
+    background: var(--gold);
+    color: var(--deep);
+    border: none;
+    padding: 18px 40px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.8rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    cursor: none;
+    transition: all 0.3s;
+    position: relative;
+    overflow: hidden;
+  }
+  .btn-submit:hover { background: var(--gold-light); transform: translateY(-2px); }
+
+  /* FOOTER */
+  footer {
+    background: var(--deep);
+    padding: 60px 80px;
+    border-top: 1px solid rgba(201,146,42,0.08);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .footer-logo {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.4rem;
+    font-weight: 900;
+    color: var(--cream);
+  }
+  .footer-logo span { color: var(--gold); }
+
+  .footer-copy {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    letter-spacing: 0.06em;
+  }
+
+  .footer-socials {
+    display: flex;
+    gap: 20px;
+  }
+  .footer-socials a {
+    width: 40px; height: 40px;
+    border: 1px solid rgba(201,146,42,0.2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--gold);
+    text-decoration: none;
+    font-size: 1rem;
+    transition: all 0.3s;
+  }
+  .footer-socials a:hover {
+    background: var(--gold);
+    color: var(--deep);
+    border-color: var(--gold);
+  }
+
+  /* SCROLL ANIMATIONS */
+  .reveal {
+    opacity: 0;
+    transform: translateY(40px);
+    transition: opacity 0.8s ease, transform 0.8s ease;
+  }
+  .reveal.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  .reveal-left {
+    opacity: 0;
+    transform: translateX(-40px);
+    transition: opacity 0.8s ease, transform 0.8s ease;
+  }
+  .reveal-left.visible { opacity: 1; transform: translateX(0); }
+  .reveal-right {
+    opacity: 0;
+    transform: translateX(40px);
+    transition: opacity 0.8s ease, transform 0.8s ease;
+  }
+  .reveal-right.visible { opacity: 1; transform: translateX(0); }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(30px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+
+  /* MARQUEE */
+  .marquee-section {
+    overflow: hidden;
+    padding: 0;
+    background: transparent;
+    border-top: 1px solid rgba(201,146,42,0.08);
+    border-bottom: 1px solid rgba(201,146,42,0.08);
+  }
+  .marquee-track {
+    display: flex;
+    animation: marquee 30s linear infinite;
+    white-space: nowrap;
+  }
+  .marquee-item {
+    flex-shrink: 0;
+    padding: 20px 60px;
+    font-family: 'Playfair Display', serif;
+    font-size: 1rem;
+    font-style: italic;
+    color: rgba(201,146,42,0.4);
+    letter-spacing: 0.05em;
+  }
+  .marquee-dot {
+    display: inline-block;
+    width: 4px; height: 4px;
+    background: var(--gold);
+    border-radius: 50%;
+    margin: 0 30px;
+    vertical-align: middle;
+    opacity: 0.4;
+  }
+  @keyframes marquee {
+    from { transform: translateX(0); }
+    to { transform: translateX(-50%); }
+  }
+
+  /* Genova city SVG decorations */
+  .city-decoration {
+    position: absolute;
+    opacity: 0.04;
+    pointer-events: none;
+  }
+
+  /* LANG SWITCHER */
+  .lang-switcher {
+    display: flex;
+    gap: 4px;
+    align-items: center;
+  }
+  .lang-btn {
+    font-size: 0.65rem;
+    letter-spacing: 0.1em;
+    color: var(--text-muted);
+    background: none;
+    border: none;
+    cursor: none;
+    padding: 2px 6px;
+    transition: color 0.2s;
+  }
+  .lang-btn.active, .lang-btn:hover { color: var(--gold); }
+  .lang-sep { color: rgba(201,146,42,0.3); font-size: 0.6rem; }
+
+  /* MOBILE MENU */
+  .menu-toggle {
+    display: none;
+    flex-direction: column;
+    gap: 5px;
+    cursor: none;
+    background: none;
+    border: none;
+    padding: 4px;
+  }
+  .menu-toggle span {
+    width: 24px; height: 1px;
+    background: var(--cream);
+    transition: all 0.3s;
+  }
+
+  @media (hover: none), (pointer: coarse) {
+    body {
+      cursor: auto;
+    }
+
+    .cursor,
+    .cursor-ring {
+      display: none;
+    }
+
+    a,
+    button,
+    .nav-cta,
+    .tour-card,
+    .ig-post,
+    .place-card {
+      cursor: pointer;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    html {
+      scroll-behavior: auto;
+    }
+
+    *,
+    *::before,
+    *::after {
+      animation: none !important;
+      transition: none !important;
+    }
+
+    body {
+      cursor: auto;
+    }
+
+    .cursor,
+    .cursor-ring {
+      display: none;
+    }
+  }
+
+  @media (max-width: 1100px) {
+    .tours-grid { grid-template-columns: 1fr; }
+    .tour-card { border-right: none; border-bottom: 1px solid rgba(201,146,42,0.1); }
+    #manifesto { grid-template-columns: 1fr; gap: 60px; }
+    .contact-inner { grid-template-columns: 1fr; gap: 60px; }
+    .ig-grid { grid-template-columns: repeat(2, 1fr); }
+    .place-card:nth-child(1) { grid-column: span 12; min-height: 400px; }
+    .place-card:nth-child(2), .place-card:nth-child(3) { grid-column: span 6; }
+    .place-card:nth-child(4), .place-card:nth-child(5), .place-card:nth-child(6) { grid-column: span 4; }
+    nav {
+      padding: 20px 24px;
+      flex-wrap: wrap;
+      align-items: flex-start;
+      gap: 16px;
+    }
+    .nav-links, .nav-cta { display: none; }
+    .menu-toggle { display: flex; }
+    .nav-panel {
+      display: none;
+      width: 100%;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 16px;
+      padding: 16px 0 4px;
+      border-top: 1px solid rgba(201,146,42,0.12);
+    }
+    nav.menu-open {
+      background: rgba(6,16,32,0.96);
+      backdrop-filter: blur(20px);
+      border-bottom: 1px solid rgba(201,146,42,0.15);
+    }
+    nav.menu-open .nav-panel { display: flex; }
+    nav.menu-open .nav-links {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      width: 100%;
+    }
+    nav.menu-open .nav-cta { display: inline-flex; }
+    .hero-content { padding: 0 24px 60px; }
+    #manifesto, #tours, #contact { padding-left: 24px; padding-right: 24px; }
+    #genova-grid, #instagram { padding-left: 16px; padding-right: 16px; }
+    .stats-strip { flex-direction: column; }
+    .stat-item { border-right: none; border-bottom: 1px solid rgba(6,16,32,0.15); justify-content: center; }
+    footer { flex-direction: column; gap: 24px; text-align: center; padding: 40px 24px; }
+  }
+
+  @media (max-width: 700px) {
+    .place-card:nth-child(n) { grid-column: span 12; }
+    .tours-grid { grid-template-columns: 1fr; }
+    .form-row { grid-template-columns: 1fr; }
+    .ig-grid { grid-template-columns: repeat(2, 1fr); }
+    #quote { padding: 80px 24px; }
+    .quote-text { font-size: 1.3rem; }
+  }
+</style>
+</head>
+<body>
+
+<!-- CUSTOM CURSOR -->
+<div class="cursor" id="cursor"></div>
+<div class="cursor-ring" id="cursorRing"></div>
+
+<!-- NAVIGATION -->
+<nav id="navbar">
+  <a href="#" class="nav-logo">The Bad <span>Guyde</span></a>
+  <ul class="nav-links">
+    <li><a href="#genova-grid">Genova</a></li>
+    <li><a href="#tours">Tours</a></li>
+    <li><a href="#instagram">Instagram</a></li>
+    <li><a href="#contact">Contatti</a></li>
+  </ul>
+  <div class="nav-panel">
+    <div class="lang-switcher">
+      <button class="lang-btn active">IT</button>
+      <span class="lang-sep">·</span>
+      <button class="lang-btn">EN</button>
+      <span class="lang-sep">·</span>
+      <button class="lang-btn">ES</button>
+    </div>
+    <a href="#contact" class="nav-cta">Prenota ora</a>
+  </div>
+  <button class="menu-toggle" aria-label="Menu" aria-expanded="false">
+    <span></span><span></span><span></span>
+  </button>
+</nav>
+
+<!-- HERO -->
+<section id="hero">
+  <div class="hero-bg"></div>
+  
+  <!-- Particle system -->
+  <div class="hero-particles" id="particles"></div>
+
+  <!-- Genova skyline silhouette SVG -->
+  <svg class="hero-city" viewBox="0 0 1400 600" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMax meet">
+    <!-- Layered city silhouette with lighthouse, lanterna, palazzi, porto -->
+    <g fill="var(--cream)">
+      <!-- Mountains in background -->
+      <polygon points="0,600 200,200 400,350 600,180 800,280 1000,150 1200,250 1400,180 1400,600" opacity="0.4"/>
+      <!-- City layer -->
+      <rect x="50" y="380" width="30" height="220"/>
+      <rect x="90" y="340" width="50" height="260"/>
+      <rect x="110" y="310" width="20" height="70"/>
+      <rect x="155" y="360" width="40" height="240"/>
+      <rect x="205" y="330" width="60" height="270"/>
+      <rect x="220" y="300" width="25" height="40"/>
+      <rect x="275" y="350" width="35" height="250"/>
+      <rect x="320" y="370" width="45" height="230"/>
+      <rect x="375" y="340" width="55" height="260"/>
+      <rect x="440" y="310" width="70" height="290"/>
+      <rect x="455" y="270" width="30" height="50"/>
+      <rect x="520" y="355" width="40" height="245"/>
+      <rect x="570" y="320" width="60" height="280"/>
+      <rect x="640" y="290" width="80" height="310"/>
+      <rect x="655" y="250" width="40" height="50"/>
+      <rect x="730" y="340" width="50" height="260"/>
+      <rect x="790" y="310" width="70" height="290"/>
+      <rect x="870" y="355" width="45" height="245"/>
+      <rect x="925" y="330" width="55" height="270"/>
+      <rect x="990" y="300" width="65" height="300"/>
+      <rect x="1005" y="260" width="30" height="50"/>
+      <rect x="1065" y="345" width="50" height="255"/>
+      <rect x="1125" y="360" width="40" height="240"/>
+      <rect x="1175" y="330" width="60" height="270"/>
+      <rect x="1245" y="310" width="75" height="290"/>
+      <rect x="1330" y="345" width="55" height="255"/>
+      <!-- Lanterna (lighthouse) -->
+      <rect x="750" y="100" width="18" height="250"/>
+      <rect x="744" y="95" width="30" height="20"/>
+      <rect x="747" y="75" width="24" height="25"/>
+      <rect x="750" y="60" width="18" height="20"/>
+      <rect x="754" y="45" width="10" height="20"/>
+      <!-- Antenna/tower -->
+      <rect x="900" y="180" width="8" height="180"/>
+      <rect x="896" y="175" width="16" height="12"/>
+      <!-- Porto cranes -->
+      <line x1="1100" y1="300" x2="1100" y2="500" stroke="var(--cream)" stroke-width="4"/>
+      <line x1="1100" y1="310" x2="1160" y2="310" stroke="var(--cream)" stroke-width="3"/>
+      <line x1="1160" y1="310" x2="1160" y2="400" stroke="var(--cream)" stroke-width="2"/>
+      <line x1="1200" y1="280" x2="1200" y2="480" stroke="var(--cream)" stroke-width="4"/>
+      <line x1="1200" y1="290" x2="1250" y2="290" stroke="var(--cream)" stroke-width="3"/>
+      <line x1="1250" y1="290" x2="1250" y2="390" stroke="var(--cream)" stroke-width="2"/>
+    </g>
+  </svg>
+
+  <div class="hero-content">
+    <div class="hero-tag">Guida Turistica Abilitata · Genova · Dal 2020</div>
+    <h1 class="hero-title">
+      Genova<br>
+      <em>come non<br>l'hai mai vista.</em>
+    </h1>
+    <p class="hero-sub">
+      I segreti di una città eterna, raccontati da chi la conosce come le proprie tasche — e te li svela con passione autentica.
+    </p>
+    <div class="hero-actions">
+      <a href="#tours" class="btn-primary"><span>Esplora i tours</span></a>
+      <a href="#manifesto" class="btn-ghost">
+        Chi è Mike
+        <svg width="20" height="10" viewBox="0 0 20 10" fill="none">
+          <line x1="0" y1="5" x2="18" y2="5" stroke="currentColor" stroke-width="1"/>
+          <polyline points="13,1 18,5 13,9" fill="none" stroke="currentColor" stroke-width="1"/>
+        </svg>
+      </a>
+    </div>
+  </div>
+
+  <div class="hero-scroll">
+    <div class="scroll-line"></div>
+    <span>Scorri</span>
+  </div>
+</section>
+
+<!-- STATS STRIP -->
+<div class="stats-strip">
+  <div class="stat-item">
+    <div>
+      <div class="stat-num">79K+</div>
+      <div class="stat-label">Follower Instagram</div>
+    </div>
+  </div>
+  <div class="stat-item">
+    <div>
+      <div class="stat-num">12+</div>
+      <div class="stat-label">Anni di esperienza</div>
+    </div>
+  </div>
+  <div class="stat-item">
+    <div>
+      <div class="stat-num">3</div>
+      <div class="stat-label">Lingue parlate</div>
+    </div>
+  </div>
+  <div class="stat-item">
+    <div>
+      <div class="stat-num">∞</div>
+      <div class="stat-label">Passione per Genova</div>
+    </div>
+  </div>
+</div>
+
+<!-- MARQUEE -->
+<div class="marquee-section">
+  <div class="marquee-track">
+    <span class="marquee-item">I Caruggi</span><span class="marquee-dot"></span>
+    <span class="marquee-item">La Lanterna</span><span class="marquee-dot"></span>
+    <span class="marquee-item">Porto Antico</span><span class="marquee-dot"></span>
+    <span class="marquee-item">Boccadasse</span><span class="marquee-dot"></span>
+    <span class="marquee-item">Staglieno</span><span class="marquee-dot"></span>
+    <span class="marquee-item">Nervi</span><span class="marquee-dot"></span>
+    <span class="marquee-item">Pesto Genovese</span><span class="marquee-dot"></span>
+    <span class="marquee-item">Farinata</span><span class="marquee-dot"></span>
+    <span class="marquee-item">Focaccia</span><span class="marquee-dot"></span>
+    <span class="marquee-item">Anello dei Forti</span><span class="marquee-dot"></span>
+    <span class="marquee-item">Funicolare</span><span class="marquee-dot"></span>
+    <span class="marquee-item">Palazzi dei Rolli</span><span class="marquee-dot"></span>
+    <!-- Repeat -->
+    <span class="marquee-item">I Caruggi</span><span class="marquee-dot"></span>
+    <span class="marquee-item">La Lanterna</span><span class="marquee-dot"></span>
+    <span class="marquee-item">Porto Antico</span><span class="marquee-dot"></span>
+    <span class="marquee-item">Boccadasse</span><span class="marquee-dot"></span>
+    <span class="marquee-item">Staglieno</span><span class="marquee-dot"></span>
+    <span class="marquee-item">Nervi</span><span class="marquee-dot"></span>
+    <span class="marquee-item">Pesto Genovese</span><span class="marquee-dot"></span>
+    <span class="marquee-item">Farinata</span><span class="marquee-dot"></span>
+    <span class="marquee-item">Focaccia</span><span class="marquee-dot"></span>
+    <span class="marquee-item">Anello dei Forti</span><span class="marquee-dot"></span>
+    <span class="marquee-item">Funicolare</span><span class="marquee-dot"></span>
+    <span class="marquee-item">Palazzi dei Rolli</span><span class="marquee-dot"></span>
+  </div>
+</div>
+
+<!-- MANIFESTO / CHI È MIKE -->
+<section id="manifesto">
+  <div class="reveal-left">
+    <p class="manifesto-label">· Chi è The Bad Guyde ·</p>
+    <h2 class="manifesto-title">
+      La guida turistica<br>
+      <em>più matta<br>della Liguria.</em>
+    </h2>
+    <p class="manifesto-text">
+      Mi chiamo Mike Lorefice. Lavoro nell'ospitalità da oltre 12 anni e da allora non ho smesso di innamorarmi ogni giorno di questa città che la maggior parte del mondo non capisce ancora.
+    </p>
+    <p class="manifesto-text">
+      Genova è bella, complessa, stratificata — come i suoi caruggi. Non si rivela ai distratti. Si racconta a chi ha voglia di ascoltare, di camminare, di perdersi. E io sono qui per guidarti in questo labirinto meraviglioso.
+    </p>
+    <p class="manifesto-text">
+      Guida turistica abilitata · Influencer · Storyteller · Appassionato. Collaboro con il Comune di Genova e le principali istituzioni culturali della città.
+    </p>
+  </div>
+  <div class="manifesto-visual reveal-right">
+    <div class="portrait-frame">
+      <div class="portrait-bg"></div>
+      <div class="portrait-genova">
+        <!-- Decorative geometric Genova map shape -->
+        <svg width="100%" height="100%" viewBox="0 0 400 500" xmlns="http://www.w3.org/2000/svg">
+          <!-- Stylized Genova coastline -->
+          <path d="M 50 400 Q 150 350 200 300 Q 250 260 300 240 Q 350 220 380 200" 
+                fill="none" stroke="rgba(201,146,42,0.15)" stroke-width="1.5"/>
+          <path d="M 30 420 Q 130 370 180 320 Q 230 280 280 260 Q 330 240 360 220" 
+                fill="none" stroke="rgba(201,146,42,0.08)" stroke-width="1"/>
+          <!-- Grid pattern -->
+          <line x1="0" y1="100" x2="400" y2="100" stroke="rgba(201,146,42,0.05)" stroke-width="1"/>
+          <line x1="0" y1="200" x2="400" y2="200" stroke="rgba(201,146,42,0.05)" stroke-width="1"/>
+          <line x1="0" y1="300" x2="400" y2="300" stroke="rgba(201,146,42,0.05)" stroke-width="1"/>
+          <line x1="0" y1="400" x2="400" y2="400" stroke="rgba(201,146,42,0.05)" stroke-width="1"/>
+          <line x1="100" y1="0" x2="100" y2="500" stroke="rgba(201,146,42,0.05)" stroke-width="1"/>
+          <line x1="200" y1="0" x2="200" y2="500" stroke="rgba(201,146,42,0.05)" stroke-width="1"/>
+          <line x1="300" y1="0" x2="300" y2="500" stroke="rgba(201,146,42,0.05)" stroke-width="1"/>
+          <!-- Compass rose -->
+          <g transform="translate(200, 250)" opacity="0.12">
+            <line x1="0" y1="-60" x2="0" y2="60" stroke="var(--gold)" stroke-width="1"/>
+            <line x1="-60" y1="0" x2="60" y2="0" stroke="var(--gold)" stroke-width="1"/>
+            <line x1="-42" y1="-42" x2="42" y2="42" stroke="var(--gold)" stroke-width="0.5"/>
+            <line x1="42" y1="-42" x2="-42" y2="42" stroke="var(--gold)" stroke-width="0.5"/>
+            <polygon points="0,-60 -8,-20 0,-10 8,-20" fill="var(--gold)"/>
+            <circle cx="0" cy="0" r="8" fill="none" stroke="var(--gold)" stroke-width="1"/>
+            <circle cx="0" cy="0" r="3" fill="var(--gold)"/>
+            <text x="-4" y="-70" fill="var(--gold)" font-size="10" font-family="serif">N</text>
+          </g>
+          <!-- Genova label -->
+          <text x="200" y="460" 
+                fill="rgba(201,146,42,0.2)" 
+                font-family="'Playfair Display', serif" 
+                font-size="28" 
+                font-style="italic"
+                text-anchor="middle">Genova</text>
+          <!-- Mike silhouette placeholder -->
+          <circle cx="200" cy="180" r="70" fill="rgba(42,123,140,0.12)"/>
+          <circle cx="200" cy="140" r="35" fill="rgba(42,123,140,0.18)"/>
+          <path d="M 130 250 Q 200 220 270 250 L 270 350 Q 200 380 130 350 Z" fill="rgba(42,123,140,0.12)"/>
+          <!-- Stars decoration -->
+          <text x="60" y="60" fill="rgba(201,146,42,0.3)" font-size="14">★</text>
+          <text x="320" y="80" fill="rgba(201,146,42,0.2)" font-size="10">★</text>
+          <text x="340" y="440" fill="rgba(201,146,42,0.25)" font-size="12">★</text>
+          <text x="50" y="420" fill="rgba(201,146,42,0.2)" font-size="9">★</text>
+        </svg>
+      </div>
+      <div class="portrait-text-overlay">
+        <div class="portrait-name">Mike Lorefice</div>
+        <div class="portrait-role">@thebadguyde · Guida Abilitata</div>
+      </div>
+      <div class="portrait-badge">
+        <div class="badge-inner">
+          <span>Guida</span>
+          <span>★</span>
+          <span>Ufficiale</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- GENOVA PLACES GRID -->
+<section id="genova-grid">
+  <div class="section-header reveal">
+    <p class="section-eyebrow">· I luoghi dell'anima ·</p>
+    <h2 class="section-title">
+      Genova, <em>un'emozione<br>ad ogni angolo.</em>
+    </h2>
+  </div>
+
+  <div class="places-grid">
+    <!-- Card 1: Caruggi - large -->
+    <div class="place-card">
+      <div class="place-bg bg-caruggi">
+        <svg width="100%" height="100%" viewBox="0 0 700 500" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice">
+          <!-- Caruggi perspective effect -->
+          <defs>
+            <radialGradient id="g1" cx="50%" cy="40%" r="60%">
+              <stop offset="0%" stop-color="#c9922a" stop-opacity="0.08"/>
+              <stop offset="100%" stop-color="#1a0e05" stop-opacity="0"/>
+            </radialGradient>
+            <linearGradient id="wall1" x1="0%" y1="0%" x2="0%" y2="100%">
+              <stop offset="0%" stop-color="#3d2010"/>
+              <stop offset="100%" stop-color="#1a0a03"/>
+            </linearGradient>
+          </defs>
+          <!-- Sky/light at end of alley -->
+          <ellipse cx="350" cy="80" rx="120" ry="200" fill="rgba(201,146,42,0.06)"/>
+          <!-- Left wall -->
+          <polygon points="0,0 280,0 350,500 0,500" fill="url(#wall1)" opacity="0.9"/>
+          <!-- Right wall -->
+          <polygon points="700,0 420,0 350,500 700,500" fill="url(#wall1)" opacity="0.7"/>
+          <!-- Windows left -->
+          <rect x="40" y="60" width="70" height="50" fill="rgba(201,146,42,0.15)" rx="2"/>
+          <rect x="40" y="160" width="70" height="50" fill="rgba(201,146,42,0.1)" rx="2"/>
+          <rect x="40" y="260" width="70" height="50" fill="rgba(201,146,42,0.12)" rx="2"/>
+          <rect x="40" y="360" width="70" height="50" fill="rgba(201,146,42,0.08)" rx="2"/>
+          <rect x="130" y="80" width="50" height="40" fill="rgba(201,146,42,0.08)" rx="2"/>
+          <rect x="130" y="200" width="50" height="40" fill="rgba(201,146,42,0.1)" rx="2"/>
+          <rect x="130" y="320" width="50" height="40" fill="rgba(201,146,42,0.07)" rx="2"/>
+          <!-- Windows right -->
+          <rect x="590" y="60" width="70" height="50" fill="rgba(201,146,42,0.12)" rx="2"/>
+          <rect x="590" y="160" width="70" height="50" fill="rgba(201,146,42,0.08)" rx="2"/>
+          <rect x="590" y="260" width="70" height="50" fill="rgba(201,146,42,0.15)" rx="2"/>
+          <rect x="590" y="360" width="70" height="50" fill="rgba(201,146,42,0.1)" rx="2"/>
+          <rect x="520" y="80" width="50" height="40" fill="rgba(201,146,42,0.08)" rx="2"/>
+          <rect x="520" y="200" width="50" height="40" fill="rgba(201,146,42,0.1)" rx="2"/>
+          <!-- Floor perspective lines -->
+          <line x1="350" y1="80" x2="0" y2="500" stroke="rgba(201,146,42,0.06)" stroke-width="1"/>
+          <line x1="350" y1="80" x2="700" y2="500" stroke="rgba(201,146,42,0.06)" stroke-width="1"/>
+          <line x1="350" y1="80" x2="350" y2="500" stroke="rgba(201,146,42,0.04)" stroke-width="1"/>
+          <!-- Laundry lines (iconic caruggi detail) -->
+          <line x1="80" y1="140" x2="240" y2="120" stroke="rgba(245,237,224,0.1)" stroke-width="0.8"/>
+          <rect x="100" y="125" width="20" height="30" fill="rgba(139,58,42,0.3)" rx="1"/>
+          <rect x="140" y="120" width="15" height="25" fill="rgba(42,123,140,0.3)" rx="1"/>
+          <rect x="170" y="118" width="25" height="35" fill="rgba(245,237,224,0.15)" rx="1"/>
+          <line x1="460" y1="110" x2="620" y2="130" stroke="rgba(245,237,224,0.1)" stroke-width="0.8"/>
+          <rect x="480" y="95" width="18" height="28" fill="rgba(201,146,42,0.2)" rx="1"/>
+          <rect x="520" y="98" width="22" height="32" fill="rgba(245,237,224,0.15)" rx="1"/>
+          <rect x="560" y="103" width="16" height="22" fill="rgba(139,58,42,0.25)" rx="1"/>
+          <!-- Light beam -->
+          <rect fill="url(#g1)" width="700" height="500"/>
+        </svg>
+      </div>
+      <div class="place-overlay"></div>
+      <div class="place-info">
+        <p class="place-cat">Centro Storico</p>
+        <h3 class="place-name">I Caruggi</h3>
+        <p class="place-desc">Il cuore pulsante di Genova, tra vicoli medievali, botteghe artigiane e profumi di farinata. Il più grande centro storico d'Europa.</p>
+      </div>
+    </div>
+
+    <!-- Card 2: Porto Antico -->
+    <div class="place-card">
+      <div class="place-bg bg-porto">
+        <svg width="100%" height="100%" viewBox="0 0 400 240" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice">
+          <!-- Water -->
+          <rect width="400" height="240" fill="#051520"/>
+          <!-- Sky gradient -->
+          <rect width="400" height="140" fill="#0a2540" opacity="0.8"/>
+          <!-- Sun/light on water -->
+          <ellipse cx="200" cy="100" rx="200" ry="60" fill="rgba(201,146,42,0.05)"/>
+          <!-- Water reflections -->
+          <path d="M0,140 Q100,130 200,140 Q300,150 400,140 L400,240 L0,240 Z" fill="#061a2f"/>
+          <!-- Reflection shimmer -->
+          <line x1="50" y1="160" x2="120" y2="155" stroke="rgba(201,146,42,0.15)" stroke-width="1.5"/>
+          <line x1="180" y1="165" x2="260" y2="158" stroke="rgba(201,146,42,0.12)" stroke-width="1.5"/>
+          <line x1="300" y1="170" x2="370" y2="162" stroke="rgba(201,146,42,0.1)" stroke-width="1.5"/>
+          <!-- Bigo crane (Porto Antico symbol) -->
+          <line x1="180" y1="140" x2="180" y2="30" stroke="rgba(245,237,224,0.5)" stroke-width="2.5"/>
+          <line x1="180" y1="50" x2="250" y2="60" stroke="rgba(245,237,224,0.4)" stroke-width="2"/>
+          <line x1="250" y1="60" x2="250" y2="130" stroke="rgba(245,237,224,0.3)" stroke-width="1.5"/>
+          <line x1="180" y1="45" x2="280" y2="55" stroke="rgba(245,237,224,0.35)" stroke-width="1.5"/>
+          <!-- Buildings -->
+          <rect x="0" y="90" width="60" height="60" fill="rgba(10,37,64,0.8)"/>
+          <rect x="10" y="80" width="40" height="20" fill="rgba(10,37,64,0.9)"/>
+          <rect x="70" y="100" width="80" height="50" fill="rgba(8,30,55,0.9)"/>
+          <rect x="80" y="85" width="30" height="20" fill="rgba(10,37,64,0.8)"/>
+          <!-- Windows lit up -->
+          <rect x="20" y="100" width="12" height="10" fill="rgba(201,146,42,0.4)"/>
+          <rect x="38" y="100" width="12" height="10" fill="rgba(201,146,42,0.3)"/>
+          <rect x="85" y="108" width="10" height="8" fill="rgba(201,146,42,0.35)"/>
+          <rect x="100" y="108" width="10" height="8" fill="rgba(201,146,42,0.4)"/>
+          <rect x="115" y="108" width="10" height="8" fill="rgba(201,146,42,0.25)"/>
+          <!-- Aquarium sphere -->
+          <circle cx="310" cy="110" r="30" fill="none" stroke="rgba(74,181,200,0.3)" stroke-width="2"/>
+          <circle cx="310" cy="110" r="24" fill="rgba(42,123,140,0.15)"/>
+          <!-- Stars -->
+          <circle cx="80" cy="20" r="1" fill="rgba(245,237,224,0.6)"/>
+          <circle cx="150" cy="40" r="0.8" fill="rgba(245,237,224,0.5)"/>
+          <circle cx="350" cy="25" r="1.2" fill="rgba(245,237,224,0.7)"/>
+          <circle cx="280" cy="15" r="0.8" fill="rgba(245,237,224,0.5)"/>
+        </svg>
+      </div>
+      <div class="place-overlay"></div>
+      <div class="place-info">
+        <p class="place-cat">Porto Antico</p>
+        <h3 class="place-name">Il Mare di Genova</h3>
+        <p class="place-desc">Il porto più importante d'Italia, dove la storia incontra la modernità progettata da Renzo Piano.</p>
+      </div>
+    </div>
+
+    <!-- Card 3: Staglieno -->
+    <div class="place-card">
+      <div class="place-bg bg-staglieno">
+        <svg width="100%" height="100%" viewBox="0 0 400 240" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice">
+          <!-- Dark gothic atmosphere -->
+          <rect width="400" height="240" fill="#0f0a0a"/>
+          <ellipse cx="200" cy="0" rx="200" ry="120" fill="rgba(245,237,224,0.04)"/>
+          <!-- Columns -->
+          <rect x="60" y="40" width="15" height="200" fill="rgba(245,237,224,0.12)"/>
+          <rect x="55" y="35" width="25" height="12" fill="rgba(245,237,224,0.15)"/>
+          <rect x="55" y="225" width="25" height="15" fill="rgba(245,237,224,0.12)"/>
+          <rect x="140" y="60" width="12" height="180" fill="rgba(245,237,224,0.1)"/>
+          <rect x="136" y="55" width="20" height="10" fill="rgba(245,237,224,0.12)"/>
+          <rect x="240" y="55" width="12" height="185" fill="rgba(245,237,224,0.1)"/>
+          <rect x="236" y="50" width="20" height="10" fill="rgba(245,237,224,0.12)"/>
+          <rect x="325" y="40" width="15" height="200" fill="rgba(245,237,224,0.12)"/>
+          <rect x="320" y="35" width="25" height="12" fill="rgba(245,237,224,0.15)"/>
+          <!-- Angel sculpture silhouette -->
+          <ellipse cx="200" cy="100" rx="20" ry="25" fill="rgba(245,237,224,0.15)"/>
+          <path d="M185,130 Q200,125 215,130 L215,180 Q200,185 185,180 Z" fill="rgba(245,237,224,0.12)"/>
+          <!-- Wings -->
+          <path d="M185,140 Q160,120 150,150 Q170,160 185,155 Z" fill="rgba(245,237,224,0.08)"/>
+          <path d="M215,140 Q240,120 250,150 Q230,160 215,155 Z" fill="rgba(245,237,224,0.08)"/>
+          <!-- Crosses -->
+          <rect x="90" y="100" width="3" height="30" fill="rgba(245,237,224,0.12)"/>
+          <rect x="84" y="108" width="15" height="3" fill="rgba(245,237,224,0.12)"/>
+          <rect x="290" y="90" width="3" height="30" fill="rgba(245,237,224,0.12)"/>
+          <rect x="284" y="98" width="15" height="3" fill="rgba(245,237,224,0.12)"/>
+          <!-- Ground mist -->
+          <ellipse cx="200" cy="230" rx="200" ry="20" fill="rgba(245,237,224,0.03)"/>
+        </svg>
+      </div>
+      <div class="place-overlay"></div>
+      <div class="place-info">
+        <p class="place-cat">Arte & Cultura</p>
+        <h3 class="place-name">Staglieno</h3>
+        <p class="place-desc">Il cimitero più bello del mondo. Un museo a cielo aperto di sculture monumentali che ha ispirato Oscar Wilde e Mark Twain.</p>
+      </div>
+    </div>
+
+    <!-- Card 4: Lanterna -->
+    <div class="place-card">
+      <div class="place-bg bg-lanterna">
+        <svg width="100%" height="100%" viewBox="0 0 320 320" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice">
+          <rect width="320" height="320" fill="#051020"/>
+          <!-- Night sky gradient -->
+          <radialGradient id="sky" cx="50%" cy="30%" r="60%">
+            <stop offset="0%" stop-color="#0d2040"/>
+            <stop offset="100%" stop-color="#020810"/>
+          </radialGradient>
+          <rect width="320" height="320" fill="url(#sky)"/>
+          <!-- Stars -->
+          <circle cx="50" cy="30" r="1" fill="rgba(245,237,224,0.8)"/>
+          <circle cx="120" cy="20" r="0.8" fill="rgba(245,237,224,0.6)"/>
+          <circle cx="200" cy="40" r="1.2" fill="rgba(245,237,224,0.9)"/>
+          <circle cx="270" cy="25" r="0.8" fill="rgba(245,237,224,0.7)"/>
+          <circle cx="30" cy="70" r="0.6" fill="rgba(245,237,224,0.5)"/>
+          <circle cx="290" cy="60" r="1" fill="rgba(245,237,224,0.6)"/>
+          <circle cx="160" cy="15" r="0.7" fill="rgba(245,237,224,0.8)"/>
+          <!-- Lanterna lighthouse -->
+          <rect x="148" y="80" width="24" height="160" fill="rgba(245,237,224,0.85)"/>
+          <!-- Lanterna details -->
+          <rect x="142" y="80" width="36" height="12" fill="rgba(245,237,224,0.9)"/>
+          <rect x="145" y="60" width="30" height="25" fill="rgba(245,237,224,0.8)"/>
+          <rect x="148" y="50" width="24" height="15" fill="rgba(245,237,224,0.85)"/>
+          <rect x="150" y="40" width="20" height="14" fill="rgba(245,237,224,0.9)"/>
+          <rect x="152" y="28" width="16" height="16" fill="rgba(201,146,42,0.9)"/>
+          <rect x="154" y="18" width="12" height="12" fill="rgba(245,237,224,0.9)"/>
+          <rect x="157" y="8" width="6" height="12" fill="rgba(245,237,224,0.95)"/>
+          <!-- Light beam -->
+          <path d="M160,25 L100,100 L220,100 Z" fill="rgba(201,146,42,0.08)"/>
+          <path d="M160,25 L60,120 L260,120 Z" fill="rgba(201,146,42,0.04)"/>
+          <!-- Base -->
+          <rect x="120" y="230" width="80" height="30" fill="rgba(245,237,224,0.6)"/>
+          <rect x="100" y="255" width="120" height="20" fill="rgba(245,237,224,0.5)"/>
+          <!-- Sea -->
+          <path d="M0,260 Q80,250 160,260 Q240,270 320,260 L320,320 L0,320 Z" fill="rgba(10,37,64,0.8)"/>
+          <!-- Water reflection of light -->
+          <path d="M130,270 Q160,265 190,270 Q175,290 160,310 Q145,290 130,270 Z" fill="rgba(201,146,42,0.05)"/>
+        </svg>
+      </div>
+      <div class="place-overlay"></div>
+      <div class="place-info">
+        <p class="place-cat">Simbolo di Genova</p>
+        <h3 class="place-name">La Lanterna</h3>
+        <p class="place-desc">Il faro più antico del mondo ancora in funzione. 117 metri di storia, simbolo indelebile dell'identità genovese.</p>
+      </div>
+    </div>
+
+    <!-- Card 5: Nervi -->
+    <div class="place-card">
+      <div class="place-bg bg-nervi">
+        <svg width="100%" height="100%" viewBox="0 0 320 320" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice">
+          <rect width="320" height="320" fill="#051a10"/>
+          <!-- Lush green gradient -->
+          <radialGradient id="nervi" cx="30%" cy="40%" r="70%">
+            <stop offset="0%" stop-color="#0d3020"/>
+            <stop offset="100%" stop-color="#030e08"/>
+          </radialGradient>
+          <rect width="320" height="320" fill="url(#nervi)"/>
+          <!-- Sea in distance -->
+          <path d="M0,200 Q160,185 320,200 L320,320 L0,320 Z" fill="rgba(10,40,64,0.7)"/>
+          <!-- Cliff/rocks -->
+          <polygon points="0,220 60,180 130,200 180,170 250,190 320,175 320,320 0,320" fill="rgba(20,50,30,0.7)"/>
+          <!-- Trees -->
+          <circle cx="40" cy="160" r="30" fill="rgba(20,80,40,0.5)"/>
+          <circle cx="80" cy="145" r="25" fill="rgba(25,90,45,0.4)"/>
+          <circle cx="120" cy="155" r="35" fill="rgba(15,70,35,0.5)"/>
+          <circle cx="180" cy="140" r="28" fill="rgba(20,80,40,0.45)"/>
+          <circle cx="240" cy="150" r="32" fill="rgba(18,75,38,0.5)"/>
+          <circle cx="290" cy="145" r="24" fill="rgba(22,85,42,0.4)"/>
+          <!-- Walkway path -->
+          <path d="M0,240 Q80,230 160,240 Q240,250 320,240" fill="none" stroke="rgba(201,146,42,0.2)" stroke-width="2"/>
+          <!-- Flowers -->
+          <circle cx="50" cy="235" r="4" fill="rgba(201,146,42,0.4)"/>
+          <circle cx="100" cy="233" r="3" fill="rgba(245,100,100,0.3)"/>
+          <circle cx="160" cy="238" r="4" fill="rgba(245,237,224,0.3)"/>
+          <circle cx="220" cy="235" r="3" fill="rgba(201,146,42,0.35)"/>
+          <circle cx="280" cy="237" r="4" fill="rgba(245,100,100,0.25)"/>
+          <!-- Sun -->
+          <circle cx="270" cy="60" r="25" fill="rgba(201,146,42,0.12)"/>
+          <circle cx="270" cy="60" r="15" fill="rgba(201,146,42,0.08)"/>
+          <!-- Light rays -->
+          <line x1="270" y1="25" x2="270" y2="20" stroke="rgba(201,146,42,0.1)" stroke-width="2"/>
+          <line x1="296" y1="34" x2="300" y2="30" stroke="rgba(201,146,42,0.1)" stroke-width="2"/>
+        </svg>
+      </div>
+      <div class="place-overlay"></div>
+      <div class="place-info">
+        <p class="place-cat">Natura & Panorami</p>
+        <h3 class="place-name">Nervi</h3>
+        <p class="place-desc">Il passeggiata a mare più scenografica della Liguria, tra profumi di fiori, scogliere e verde rigoglioso.</p>
+      </div>
+    </div>
+
+    <!-- Card 6: Boccadasse -->
+    <div class="place-card">
+      <div class="place-bg bg-boccadasse">
+        <svg width="100%" height="100%" viewBox="0 0 320 320" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice">
+          <rect width="320" height="320" fill="#101a25"/>
+          <radialGradient id="bocca" cx="50%" cy="30%" r="70%">
+            <stop offset="0%" stop-color="#1a3050"/>
+            <stop offset="100%" stop-color="#050f18"/>
+          </radialGradient>
+          <rect width="320" height="320" fill="url(#bocca)"/>
+          <!-- Sea/bay -->
+          <path d="M0,200 Q160,180 320,200 L320,320 L0,320 Z" fill="rgba(10,35,60,0.8)"/>
+          <!-- Colorful fishermen houses -->
+          <rect x="20" y="140" width="50" height="90" fill="rgba(139,58,42,0.7)"/>
+          <rect x="20" y="135" width="50" height="10" fill="rgba(160,70,50,0.7)"/>
+          <rect x="80" y="130" width="55" height="100" fill="rgba(42,123,140,0.5)"/>
+          <rect x="80" y="124" width="55" height="10" fill="rgba(50,140,160,0.5)"/>
+          <rect x="145" y="145" width="50" height="85" fill="rgba(180,140,40,0.5)"/>
+          <rect x="145" y="139" width="50" height="10" fill="rgba(200,160,50,0.5)"/>
+          <rect x="205" y="135" width="55" height="95" fill="rgba(80,120,60,0.5)"/>
+          <rect x="205" y="129" width="55" height="10" fill="rgba(90,135,70,0.5)"/>
+          <rect x="270" y="150" width="50" height="80" fill="rgba(139,58,42,0.6)"/>
+          <!-- Windows -->
+          <rect x="30" y="155" width="14" height="14" fill="rgba(201,146,42,0.4)"/>
+          <rect x="50" y="155" width="14" height="14" fill="rgba(201,146,42,0.3)"/>
+          <rect x="30" y="180" width="14" height="14" fill="rgba(201,146,42,0.35)"/>
+          <rect x="90" y="148" width="14" height="14" fill="rgba(201,146,42,0.3)"/>
+          <rect x="112" y="148" width="14" height="14" fill="rgba(201,146,42,0.4)"/>
+          <rect x="90" y="170" width="14" height="14" fill="rgba(201,146,42,0.25)"/>
+          <!-- Boats in bay -->
+          <ellipse cx="100" cy="250" rx="30" ry="8" fill="rgba(245,237,224,0.3)"/>
+          <path d="M75,250 L100,230 L125,250 Z" fill="rgba(245,237,224,0.2)"/>
+          <ellipse cx="220" cy="260" rx="25" ry="7" fill="rgba(201,146,42,0.3)"/>
+          <path d="M198,260 L220,240 L242,260 Z" fill="rgba(201,146,42,0.2)"/>
+          <!-- Cobblestones -->
+          <path d="M0,200 Q80,210 160,200 Q240,190 320,200" fill="none" stroke="rgba(201,146,42,0.08)" stroke-width="1"/>
+          <!-- Sky and light -->
+          <ellipse cx="160" cy="80" rx="100" ry="80" fill="rgba(201,146,42,0.04)"/>
+        </svg>
+      </div>
+      <div class="place-overlay"></div>
+      <div class="place-info">
+        <p class="place-cat">Borghi di Mare</p>
+        <h3 class="place-name">Boccadasse</h3>
+        <p class="place-desc">Il piccolo borgo dei pescatori nel cuore della città. Case colorate, barche e il sapore del vero gelato genovese.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- QUOTE -->
+<section id="quote">
+  <div class="quote-mark">"</div>
+  <p class="quote-text reveal">
+    Genova è una città che non si svela subito. Bisogna meritarsela. E quando lo fa, ti entra dentro per sempre.
+  </p>
+  <p class="quote-attr reveal">— Mike Lorefice · @thebadguyde</p>
+</section>
+
+<!-- TOURS -->
+<section id="tours">
+  <div class="tours-inner">
+    <div class="section-header reveal">
+      <p class="section-eyebrow">· Esperienze su misura ·</p>
+      <h2 class="section-title">
+        Scegli il tuo<br><em>modo di vivere Genova.</em>
+      </h2>
+    </div>
+
+    <div class="tours-grid reveal">
+
+      <div class="tour-card">
+        <div class="tour-number">01</div>
+        <div class="tour-icon">🏛️</div>
+        <h3 class="tour-name">Caruggi & Palazzi dei Rolli</h3>
+        <p class="tour-desc">
+          Un viaggio nel centro storico medievale più grande d'Europa. Storie di dogi, mercanti e artisti tra vicoli segreti e corti dimenticate. Dal 2006 Patrimonio UNESCO.
+        </p>
+        <div class="tour-detail">
+          <span class="tour-badge">2–3 ore</span>
+          <span class="tour-badge">IT / EN / ES</span>
+          <span class="tour-badge">Max 10 persone</span>
+        </div>
+        <a href="#contact" class="tour-cta">
+          Prenota
+          <span class="tour-cta-arrow"></span>
+        </a>
+      </div>
+
+      <div class="tour-card">
+        <div class="tour-number">02</div>
+        <div class="tour-icon">🍴</div>
+        <h3 class="tour-name">Food Tour: Sapori di Genova</h3>
+        <p class="tour-desc">
+          Focaccia calda, pesto pestato al mortaio, farinata croccante, pansoti al sugo di noci — le eccellenze gastronomiche di una delle cucine regionali più amate d'Italia.
+        </p>
+        <div class="tour-detail">
+          <span class="tour-badge">3–4 ore</span>
+          <span class="tour-badge">Degustazioni incluse</span>
+          <span class="tour-badge">Max 8 persone</span>
+        </div>
+        <a href="#contact" class="tour-cta">
+          Prenota
+          <span class="tour-cta-arrow"></span>
+        </a>
+      </div>
+
+      <div class="tour-card">
+        <div class="tour-number">03</div>
+        <div class="tour-icon">🎨</div>
+        <h3 class="tour-name">Tour Privato su Misura</h3>
+        <p class="tour-desc">
+          Arte, panorami, storia, gastronomia, natura — costruiamo insieme il percorso perfetto per te, per la tua famiglia o per il tuo gruppo. Ogni tour è un'opera unica.
+        </p>
+        <div class="tour-detail">
+          <span class="tour-badge">Durata flessibile</span>
+          <span class="tour-badge">Privato</span>
+          <span class="tour-badge">100% personalizzato</span>
+        </div>
+        <a href="#contact" class="tour-cta">
+          Richiedi un preventivo
+          <span class="tour-cta-arrow"></span>
+        </a>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- MARQUEE 2 -->
+<div class="marquee-section">
+  <div class="marquee-track" style="animation-direction: reverse;">
+    <span class="marquee-item">Patrimonio UNESCO</span><span class="marquee-dot"></span>
+    <span class="marquee-item">Guida Abilitata</span><span class="marquee-dot"></span>
+    <span class="marquee-item">79K Follower</span><span class="marquee-dot"></span>
+    <span class="marquee-item">12 anni di esperienza</span><span class="marquee-dot"></span>
+    <span class="marquee-item">Collab. Comune di Genova</span><span class="marquee-dot"></span>
+    <span class="marquee-item">Italiano · English · Español</span><span class="marquee-dot"></span>
+    <span class="marquee-item">Patrimonio UNESCO</span><span class="marquee-dot"></span>
+    <span class="marquee-item">Guida Abilitata</span><span class="marquee-dot"></span>
+    <span class="marquee-item">79K Follower</span><span class="marquee-dot"></span>
+    <span class="marquee-item">12 anni di esperienza</span><span class="marquee-dot"></span>
+    <span class="marquee-item">Collab. Comune di Genova</span><span class="marquee-dot"></span>
+    <span class="marquee-item">Italiano · English · Español</span><span class="marquee-dot"></span>
+  </div>
+</div>
+
+<!-- INSTAGRAM -->
+<section id="instagram">
+  <div class="instagram-header reveal">
+    <div>
+      <p class="section-eyebrow">· Social ·</p>
+      <h2 class="section-title" style="font-size:2rem;">
+        Genova vista da<br><em>@thebadguyde</em>
+      </h2>
+    </div>
+    <a href="https://www.instagram.com/thebadguyde/" target="_blank" rel="noopener noreferrer" class="instagram-link">
+      Seguimi su Instagram →
+    </a>
+  </div>
+
+  <div class="ig-grid reveal">
+    <div class="ig-post">
+      <div class="ig-post-bg ig-bg-1">
+        <svg width="100%" height="100%" viewBox="0 0 300 300" xmlns="http://www.w3.org/2000/svg">
+          <!-- Caruggi night -->
+          <rect width="300" height="300" fill="#0d1a2e"/>
+          <polygon points="0,0 120,0 150,300 0,300" fill="#1a2e4a" opacity="0.7"/>
+          <polygon points="300,0 180,0 150,300 300,300" fill="#152438" opacity="0.6"/>
+          <ellipse cx="150" cy="30" rx="60" ry="80" fill="rgba(201,146,42,0.08)"/>
+          <rect x="20" y="50" width="40" height="30" fill="rgba(201,146,42,0.2)" rx="1"/>
+          <rect x="240" y="70" width="35" height="25" fill="rgba(201,146,42,0.15)" rx="1"/>
+          <line x1="150" y1="30" x2="0" y2="300" stroke="rgba(201,146,42,0.05)" stroke-width="1"/>
+          <line x1="150" y1="30" x2="300" y2="300" stroke="rgba(201,146,42,0.05)" stroke-width="1"/>
+        </svg>
+      </div>
+      <div class="ig-post-overlay">
+        <span class="ig-heart">❤️</span>
+        <p class="ig-caption">I caruggi di notte...</p>
+      </div>
+    </div>
+    <div class="ig-post">
+      <div class="ig-post-bg ig-bg-2">
+        <svg width="100%" height="100%" viewBox="0 0 300 300" xmlns="http://www.w3.org/2000/svg">
+          <rect width="300" height="300" fill="#1a0e05"/>
+          <ellipse cx="150" cy="150" rx="100" ry="80" fill="rgba(201,146,42,0.1)"/>
+          <!-- Focaccia texture -->
+          <rect x="50" y="100" width="200" height="120" fill="rgba(180,120,30,0.3)" rx="5"/>
+          <circle cx="90" cy="140" r="6" fill="rgba(201,146,42,0.2)"/>
+          <circle cx="130" cy="155" r="5" fill="rgba(201,146,42,0.2)"/>
+          <circle cx="170" cy="135" r="7" fill="rgba(201,146,42,0.2)"/>
+          <circle cx="210" cy="150" r="5" fill="rgba(201,146,42,0.2)"/>
+          <circle cx="110" cy="175" r="6" fill="rgba(201,146,42,0.15)"/>
+          <circle cx="190" cy="170" r="5" fill="rgba(201,146,42,0.18)"/>
+          <!-- Text overlay -->
+          <text x="150" y="250" fill="rgba(201,146,42,0.3)" font-size="14" font-family="serif" text-anchor="middle" font-style="italic">Focaccia</text>
+        </svg>
+      </div>
+      <div class="ig-post-overlay">
+        <span class="ig-heart">❤️</span>
+        <p class="ig-caption">La vera focaccia genovese</p>
+      </div>
+    </div>
+    <div class="ig-post">
+      <div class="ig-post-bg ig-bg-3">
+        <svg width="100%" height="100%" viewBox="0 0 300 300" xmlns="http://www.w3.org/2000/svg">
+          <rect width="300" height="300" fill="#051a10"/>
+          <!-- Nervi greenery -->
+          <ellipse cx="80" cy="120" rx="70" ry="60" fill="rgba(20,90,40,0.5)"/>
+          <ellipse cx="200" cy="110" rx="80" ry="65" fill="rgba(15,80,35,0.5)"/>
+          <ellipse cx="270" cy="140" rx="60" ry="50" fill="rgba(18,85,38,0.4)"/>
+          <path d="M0,220 Q150,200 300,220 L300,300 L0,300 Z" fill="rgba(10,40,64,0.8)"/>
+          <path d="M0,240 Q150,225 300,240" fill="none" stroke="rgba(201,146,42,0.15)" stroke-width="2"/>
+        </svg>
+      </div>
+      <div class="ig-post-overlay">
+        <span class="ig-heart">❤️</span>
+        <p class="ig-caption">Passeggiata di Nervi</p>
+      </div>
+    </div>
+    <div class="ig-post">
+      <div class="ig-post-bg ig-bg-4">
+        <svg width="100%" height="100%" viewBox="0 0 300 300" xmlns="http://www.w3.org/2000/svg">
+          <rect width="300" height="300" fill="#1a1010"/>
+          <!-- Staglieno angel -->
+          <ellipse cx="150" cy="110" rx="28" ry="32" fill="rgba(245,237,224,0.2)"/>
+          <path d="M125,150 Q150,140 175,150 L175,230 Q150,240 125,230 Z" fill="rgba(245,237,224,0.18)"/>
+          <path d="M125,165 Q90,140 75,175 Q100,185 125,178 Z" fill="rgba(245,237,224,0.12)"/>
+          <path d="M175,165 Q210,140 225,175 Q200,185 175,178 Z" fill="rgba(245,237,224,0.12)"/>
+          <rect x="60" y="50" width="10" height="80" fill="rgba(245,237,224,0.15)"/>
+          <rect x="56" y="45" width="18" height="8" fill="rgba(245,237,224,0.18)"/>
+          <rect x="230" y="55" width="10" height="75" fill="rgba(245,237,224,0.15)"/>
+          <rect x="226" y="50" width="18" height="8" fill="rgba(245,237,224,0.18)"/>
+        </svg>
+      </div>
+      <div class="ig-post-overlay">
+        <span class="ig-heart">❤️</span>
+        <p class="ig-caption">Staglieno, il museo eterno</p>
+      </div>
+    </div>
+    <div class="ig-post">
+      <div class="ig-post-bg ig-bg-5">
+        <svg width="100%" height="100%" viewBox="0 0 300 300" xmlns="http://www.w3.org/2000/svg">
+          <rect width="300" height="300" fill="#051015"/>
+          <!-- Lanterna at sunset -->
+          <radialGradient id="sunset" cx="50%" cy="60%" r="70%">
+            <stop offset="0%" stop-color="#c9922a" stop-opacity="0.2"/>
+            <stop offset="100%" stop-color="#051015" stop-opacity="0"/>
+          </radialGradient>
+          <rect width="300" height="300" fill="url(#sunset)"/>
+          <rect x="140" y="60" width="20" height="180" fill="rgba(245,237,224,0.75)"/>
+          <rect x="134" y="60" width="32" height="12" fill="rgba(245,237,224,0.8)"/>
+          <rect x="136" y="44" width="28" height="20" fill="rgba(245,237,224,0.75)"/>
+          <rect x="138" y="32" width="24" height="16" fill="rgba(201,146,42,0.9)"/>
+          <rect x="140" y="22" width="20" height="12" fill="rgba(245,237,224,0.8)"/>
+          <path d="M150,28 L100,90 L200,90 Z" fill="rgba(201,146,42,0.1)"/>
+          <path d="M0,200 Q150,185 300,200 L300,300 L0,300 Z" fill="rgba(10,30,50,0.8)"/>
+        </svg>
+      </div>
+      <div class="ig-post-overlay">
+        <span class="ig-heart">❤️</span>
+        <p class="ig-caption">La Lanterna al tramonto</p>
+      </div>
+    </div>
+    <div class="ig-post">
+      <div class="ig-post-bg ig-bg-6">
+        <svg width="100%" height="100%" viewBox="0 0 300 300" xmlns="http://www.w3.org/2000/svg">
+          <rect width="300" height="300" fill="#0f0f0f"/>
+          <!-- Palazzo dei Rolli facade -->
+          <rect x="30" y="40" width="240" height="240" fill="rgba(245,237,224,0.06)"/>
+          <rect x="30" y="40" width="240" height="25" fill="rgba(245,237,224,0.1)"/>
+          <!-- Arches -->
+          <path d="M50,180 L50,120 Q50,100 70,100 Q90,100 90,120 L90,180 Z" fill="rgba(245,237,224,0.12)"/>
+          <path d="M120,180 L120,120 Q120,100 140,100 Q160,100 160,120 L160,180 Z" fill="rgba(245,237,224,0.12)"/>
+          <path d="M190,180 L190,120 Q190,100 210,100 Q230,100 230,120 L230,180 Z" fill="rgba(245,237,224,0.12)"/>
+          <!-- Windows upper floor -->
+          <rect x="55" y="58" width="28" height="20" fill="rgba(201,146,42,0.2)" rx="1"/>
+          <rect x="126" y="58" width="28" height="20" fill="rgba(201,146,42,0.2)" rx="1"/>
+          <rect x="197" y="58" width="28" height="20" fill="rgba(201,146,42,0.2)" rx="1"/>
+          <!-- Frieze details -->
+          <line x1="30" y1="100" x2="270" y2="100" stroke="rgba(201,146,42,0.1)" stroke-width="1"/>
+          <line x1="30" y1="185" x2="270" y2="185" stroke="rgba(201,146,42,0.08)" stroke-width="1"/>
+        </svg>
+      </div>
+      <div class="ig-post-overlay">
+        <span class="ig-heart">❤️</span>
+        <p class="ig-caption">Palazzi dei Rolli UNESCO</p>
+      </div>
+    </div>
+    <div class="ig-post">
+      <div class="ig-post-bg ig-bg-7">
+        <svg width="100%" height="100%" viewBox="0 0 300 300" xmlns="http://www.w3.org/2000/svg">
+          <rect width="300" height="300" fill="#0a1e30"/>
+          <!-- Boccadasse colorful houses -->
+          <rect x="10" y="120" width="45" height="100" fill="rgba(139,58,42,0.7)"/>
+          <rect x="60" y="110" width="50" height="110" fill="rgba(42,123,140,0.6)"/>
+          <rect x="115" y="125" width="45" height="95" fill="rgba(180,140,40,0.6)"/>
+          <rect x="165" y="115" width="50" height="105" fill="rgba(80,120,60,0.6)"/>
+          <rect x="220" y="120" width="55" height="100" fill="rgba(139,58,42,0.65)"/>
+          <!-- Sea -->
+          <path d="M0,200 Q150,185 300,200 L300,300 L0,300 Z" fill="rgba(15,50,90,0.8)"/>
+          <!-- Boats -->
+          <ellipse cx="90" cy="235" rx="25" ry="7" fill="rgba(245,237,224,0.35)"/>
+          <ellipse cx="200" cy="245" rx="20" ry="6" fill="rgba(201,146,42,0.4)"/>
+          <!-- Windows -->
+          <rect x="20" y="138" width="12" height="12" fill="rgba(201,146,42,0.4)"/>
+          <rect x="70" y="130" width="12" height="12" fill="rgba(201,146,42,0.35)"/>
+          <rect x="88" y="130" width="12" height="12" fill="rgba(201,146,42,0.3)"/>
+          <rect x="123" y="142" width="12" height="12" fill="rgba(201,146,42,0.35)"/>
+        </svg>
+      </div>
+      <div class="ig-post-overlay">
+        <span class="ig-heart">❤️</span>
+        <p class="ig-caption">Boccadasse, il borgo nascosto</p>
+      </div>
+    </div>
+    <div class="ig-post">
+      <div class="ig-post-bg ig-bg-8">
+        <svg width="100%" height="100%" viewBox="0 0 300 300" xmlns="http://www.w3.org/2000/svg">
+          <rect width="300" height="300" fill="#1a0a0a"/>
+          <!-- Pesto bowl overhead -->
+          <circle cx="150" cy="150" r="100" fill="rgba(20,80,30,0.4)"/>
+          <circle cx="150" cy="150" r="80" fill="rgba(25,90,35,0.5)"/>
+          <!-- Basil leaves -->
+          <ellipse cx="130" cy="140" rx="18" ry="12" fill="rgba(30,110,40,0.7)" transform="rotate(-20,130,140)"/>
+          <ellipse cx="170" cy="145" rx="15" ry="10" fill="rgba(35,120,45,0.7)" transform="rotate(15,170,145)"/>
+          <ellipse cx="150" cy="125" rx="20" ry="13" fill="rgba(28,105,38,0.7)" transform="rotate(-5,150,125)"/>
+          <ellipse cx="140" cy="165" rx="16" ry="11" fill="rgba(32,115,42,0.7)" transform="rotate(25,140,165)"/>
+          <ellipse cx="165" cy="130" rx="14" ry="9" fill="rgba(30,110,40,0.65)" transform="rotate(-30,165,130)"/>
+          <!-- Pine nuts -->
+          <ellipse cx="155" cy="155" rx="6" ry="4" fill="rgba(220,180,100,0.6)"/>
+          <ellipse cx="142" cy="158" rx="5" ry="3" fill="rgba(215,175,95,0.55)"/>
+          <!-- Text -->
+          <text x="150" y="270" fill="rgba(201,146,42,0.35)" font-size="13" font-family="serif" text-anchor="middle" font-style="italic">Pesto Genovese</text>
+        </svg>
+      </div>
+      <div class="ig-post-overlay">
+        <span class="ig-heart">❤️</span>
+        <p class="ig-caption">Il pesto genovese originale</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CONTACT -->
+<section id="contact">
+  <div class="contact-inner">
+    <div class="contact-left reveal-left">
+      <h2>Parliami del<br><em>tuo viaggio.</em></h2>
+      <p>
+        Scrivimi con date, interessi e tempo a disposizione — costruiamo insieme un'esperienza che ricorderai per sempre. Tour privati, famiglie, gruppi, eventi speciali.
+      </p>
+      <div class="contact-details">
+        <div class="contact-item">
+          <div class="contact-item-icon">📞</div>
+          <div>
+            <div class="contact-item-label">Telefono & WhatsApp</div>
+            <div class="contact-item-value">
+              <a href="tel:+393407248059">+39 340 724 8059</a>
+            </div>
+          </div>
+        </div>
+        <div class="contact-item">
+          <div class="contact-item-icon">📧</div>
+          <div>
+            <div class="contact-item-label">Email</div>
+            <div class="contact-item-value">
+              <a href="mailto:genoatourguide@gmail.com">genoatourguide@gmail.com</a>
+            </div>
+          </div>
+        </div>
+        <div class="contact-item">
+          <div class="contact-item-icon">📸</div>
+          <div>
+            <div class="contact-item-label">Instagram</div>
+            <div class="contact-item-value">
+              <a href="https://www.instagram.com/thebadguyde/" target="_blank" rel="noopener noreferrer">@thebadguyde</a>
+            </div>
+          </div>
+        </div>
+        <div class="contact-item">
+          <div class="contact-item-icon">🌍</div>
+          <div>
+            <div class="contact-item-label">Lingue</div>
+            <div class="contact-item-value">Italiano · English · Español</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="reveal-right">
+      <div class="contact-form">
+        <div class="form-row">
+          <div class="form-group">
+            <label for="nome">Nome *</label>
+            <input type="text" id="nome" placeholder="Il tuo nome">
+          </div>
+          <div class="form-group">
+            <label for="email">Email *</label>
+            <input type="email" id="email" placeholder="La tua email">
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label for="data">Data preferita</label>
+            <input type="date" id="data">
+          </div>
+          <div class="form-group">
+            <label for="persone">N° persone</label>
+            <input type="number" id="persone" placeholder="Es. 4" min="1">
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="tour">Tour di interesse</label>
+          <select id="tour">
+            <option value="">Seleziona un tour</option>
+            <option>Caruggi & Palazzi dei Rolli</option>
+            <option>Food Tour: Sapori di Genova</option>
+            <option>Tour Privato su Misura</option>
+            <option>Non so ancora, aiutami tu!</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="messaggio">Il tuo messaggio *</label>
+          <textarea id="messaggio" placeholder="Raccontami dei tuoi interessi, del tempo a disposizione, di cosa vorresti portarti a casa da Genova..."></textarea>
+        </div>
+        <button class="btn-submit">Invia richiesta →</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-logo">THE BAD <span>GUYDE</span></div>
+  <p class="footer-copy">© 2026 Mike Lorefice · Guida Turistica Abilitata · Genova, Italia</p>
+  <div class="footer-socials">
+    <a href="https://www.instagram.com/thebadguyde/" target="_blank" rel="noopener noreferrer" title="Instagram">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+        <rect x="2" y="2" width="20" height="20" rx="5" ry="5"/>
+        <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/>
+        <line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/>
+      </svg>
+    </a>
+    <a href="https://www.facebook.com/thebadguyde/" target="_blank" rel="noopener noreferrer" title="Facebook">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+        <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/>
+      </svg>
+    </a>
+    <a href="https://www.tiktok.com/@thebadguyde" target="_blank" rel="noopener noreferrer" title="TikTok">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+        <path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-2.88 2.5 2.89 2.89 0 0 1-2.89-2.89 2.89 2.89 0 0 1 2.89-2.89c.28 0 .54.04.79.1V9.01a6.34 6.34 0 0 0-.79-.05 6.34 6.34 0 0 0-6.34 6.34 6.34 6.34 0 0 0 6.34 6.34 6.34 6.34 0 0 0 6.33-6.34V8.69a8.19 8.19 0 0 0 4.78 1.52V6.76a4.85 4.85 0 0 1-1.01-.07z"/>
+      </svg>
+    </a>
+  </div>
+</footer>
+
+<script>
+  const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const supportsCustomCursor = window.matchMedia('(hover: hover) and (pointer: fine)').matches && !prefersReducedMotion;
+  const supportsHeroParallax = !prefersReducedMotion && window.matchMedia('(min-width: 701px)').matches;
+
+  // Custom cursor
+  const cursor = document.getElementById('cursor');
+  const ring = document.getElementById('cursorRing');
+  let mouseX = 0, mouseY = 0;
+  let ringX = 0, ringY = 0;
+  if (supportsCustomCursor) {
+    document.addEventListener('mousemove', (e) => {
+      mouseX = e.clientX;
+      mouseY = e.clientY;
+      cursor.style.left = mouseX - 6 + 'px';
+      cursor.style.top = mouseY - 6 + 'px';
+    });
+
+    function animateRing() {
+      ringX += (mouseX - ringX - 18) * 0.12;
+      ringY += (mouseY - ringY - 18) * 0.12;
+      ring.style.left = ringX + 'px';
+      ring.style.top = ringY + 'px';
+      requestAnimationFrame(animateRing);
+    }
+    animateRing();
+
+    document.querySelectorAll('a, button').forEach(el => {
+      el.addEventListener('mouseenter', () => {
+        cursor.style.transform = 'scale(2)';
+        ring.style.transform = 'scale(1.4)';
+      });
+      el.addEventListener('mouseleave', () => {
+        cursor.style.transform = 'scale(1)';
+        ring.style.transform = 'scale(1)';
+      });
+    });
+  } else {
+    document.body.classList.add('default-cursor');
+    cursor.style.display = 'none';
+    ring.style.display = 'none';
+  }
+
+  // Nav scroll effect
+  const navbar = document.getElementById('navbar');
+  const menuToggle = document.querySelector('.menu-toggle');
+  window.addEventListener('scroll', () => {
+    if (window.scrollY > 60) navbar.classList.add('scrolled');
+    else navbar.classList.remove('scrolled');
+  });
+
+  if (menuToggle) {
+    menuToggle.addEventListener('click', () => {
+      const isOpen = navbar.classList.toggle('menu-open');
+      menuToggle.setAttribute('aria-expanded', String(isOpen));
+    });
+
+    document.querySelectorAll('nav a[href^="#"]').forEach(link => {
+      link.addEventListener('click', () => {
+        navbar.classList.remove('menu-open');
+        menuToggle.setAttribute('aria-expanded', 'false');
+      });
+    });
+
+    window.addEventListener('resize', () => {
+      if (window.innerWidth > 1100) {
+        navbar.classList.remove('menu-open');
+        menuToggle.setAttribute('aria-expanded', 'false');
+      }
+    });
+  }
+
+  // Particles
+  const particlesContainer = document.getElementById('particles');
+  function createParticle() {
+    const p = document.createElement('div');
+    p.classList.add('particle');
+    p.style.left = Math.random() * 100 + '%';
+    p.style.animationDuration = (8 + Math.random() * 12) + 's';
+    p.style.animationDelay = Math.random() * 8 + 's';
+    p.style.width = (1 + Math.random() * 3) + 'px';
+    p.style.height = p.style.width;
+    p.style.opacity = Math.random() * 0.6;
+    particlesContainer.appendChild(p);
+    setTimeout(() => p.remove(), 20000);
+  }
+  if (!prefersReducedMotion) {
+    setInterval(createParticle, 600);
+    for (let i = 0; i < 15; i++) createParticle();
+  }
+
+  // Scroll reveal
+  const reveals = document.querySelectorAll('.reveal, .reveal-left, .reveal-right');
+  if ('IntersectionObserver' in window) {
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach((entry, i) => {
+        if (entry.isIntersecting) {
+          setTimeout(() => entry.target.classList.add('visible'), i * 80);
+        }
+      });
+    }, { threshold: 0.1 });
+    reveals.forEach(el => observer.observe(el));
+  } else {
+    reveals.forEach(el => el.classList.add('visible'));
+  }
+
+  // Form submit feedback
+  document.querySelector('.btn-submit').addEventListener('click', function() {
+    const nome = document.getElementById('nome').value;
+    const email = document.getElementById('email').value;
+    const messaggio = document.getElementById('messaggio').value;
+    if (!nome || !email || !messaggio) {
+      this.textContent = 'Compila i campi obbligatori ⚠️';
+      setTimeout(() => this.textContent = 'Invia richiesta →', 2000);
+      return;
+    }
+    this.textContent = 'Richiesta inviata! ✓';
+    this.style.background = '#2a7b4f';
+    setTimeout(() => {
+      this.textContent = 'Invia richiesta →';
+      this.style.background = '';
+    }, 3000);
+  });
+
+  // Smooth parallax on hero
+  if (supportsHeroParallax) {
+    window.addEventListener('scroll', () => {
+      const hero = document.getElementById('hero');
+      const scrolled = window.scrollY;
+      if (scrolled < window.innerHeight) {
+        hero.style.transform = `translateY(${scrolled * 0.3}px)`;
+      }
+    });
+  }
+</script>
+</body>
+</html>
