@@ -14,6 +14,20 @@ function cleanDir(dir) {
   ensureDir(dir);
 }
 
+function copyDir(source, target) {
+  if (!fs.existsSync(source)) return;
+  ensureDir(target);
+  for (const entry of fs.readdirSync(source, { withFileTypes: true })) {
+    const sourcePath = path.join(source, entry.name);
+    const targetPath = path.join(target, entry.name);
+    if (entry.isDirectory()) {
+      copyDir(sourcePath, targetPath);
+    } else {
+      fs.copyFileSync(sourcePath, targetPath);
+    }
+  }
+}
+
 function escapeHtml(value) {
   return value
     .replace(/&/g, '&amp;')
@@ -203,6 +217,7 @@ if (htmlFiles.length === 0) {
 }
 
 cleanDir(distDir);
+copyDir(path.join(rootDir, 'assets'), path.join(distDir, 'assets'));
 
 const items = htmlFiles.map((fileName) => {
   const sourcePath = path.join(sourceDir, fileName);

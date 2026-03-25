@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Carmine 1 | Boutique stay nel cuore di Genova</title>
+  <meta name="description" content="Carmine 1 e un rifugio luminoso nel cuore di Genova: travi a vista, accesso indipendente e vista sulla piazza del Carmine.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Manrope:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root{--bg:#07131d;--bg2:#0b1b28;--panel:rgba(10,24,37,.82);--line:rgba(244,235,218,.14);--sand:#f4ebda;--muted:rgba(244,235,218,.74);--gold:#ca9b54;--shadow:0 28px 70px rgba(0,0,0,.28);--r:26px}
+    *{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;font-family:"Manrope",sans-serif;color:var(--sand);background:radial-gradient(circle at top,rgba(49,98,137,.25),transparent 26%),linear-gradient(180deg,#07131d 0%,#08131b 52%,#061018 100%);overflow-x:hidden}
+    img{display:block;max-width:100%}a{color:inherit}.wrap{width:min(1220px,calc(100% - 40px));margin:0 auto}.eyebrow{margin:0 0 20px;display:flex;align-items:center;gap:12px;color:var(--gold);font-size:.74rem;letter-spacing:.28em;text-transform:uppercase}.eyebrow:before{content:"";width:34px;height:1px;background:currentColor}
+    h1,h2,.quote,.brand{font-family:"Playfair Display",serif;font-weight:500;letter-spacing:-.03em}.section-title{margin:0;font-size:clamp(2.3rem,5vw,4.2rem);line-height:.98}.section-title em,h1 em,.quote em{color:var(--gold);font-style:italic}.copy{margin:22px 0 0;max-width:680px;color:var(--muted);line-height:1.85}
+    .chips{display:flex;flex-wrap:wrap;gap:12px;margin:28px 0 0;padding:0;list-style:none}.chips li{padding:11px 15px;border:1px solid var(--line);border-radius:999px;background:rgba(255,255,255,.03);color:var(--muted);font-size:.88rem}
+    nav{position:fixed;top:0;left:0;right:0;z-index:20;padding:18px 0;background:linear-gradient(180deg,rgba(6,15,23,.88),rgba(6,15,23,.28));backdrop-filter:blur(16px)}.nav{display:flex;align-items:center;justify-content:space-between;gap:18px}.brand{text-decoration:none;font-size:1.35rem}.brand span{color:var(--gold)}.nav-links{display:flex;gap:24px}.nav-links a,.nav-cta,.btn{font-size:.8rem;letter-spacing:.16em;text-transform:uppercase;text-decoration:none}.nav-links a{color:var(--muted)}.nav-cta,.btn{display:inline-flex;align-items:center;justify-content:center;min-height:52px;padding:0 22px;border-radius:999px;transition:transform .25s ease}.nav-cta{border:1px solid rgba(202,155,84,.34);background:rgba(202,155,84,.08)}
+    .hero{position:relative;min-height:100vh;display:flex;align-items:flex-end;padding:118px 0 50px}.hero-bg{position:absolute;inset:0;overflow:hidden}.hero-bg:before{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(6,15,23,.15) 0%,rgba(6,15,23,.28) 35%,rgba(6,15,23,.94) 100%),radial-gradient(circle at 75% 20%,rgba(202,155,84,.22),transparent 34%);z-index:1}.hero-bg img{width:100%;height:100%;object-fit:cover;transform:scale(1.03)}
+    .hero-grid{position:relative;z-index:2;display:grid;grid-template-columns:minmax(0,1.18fr) minmax(320px,.82fr);gap:34px;align-items:end}.hero-copy{padding:24px 0 12px}.hero-title{margin:0;font-size:clamp(3.6rem,8vw,6.8rem);line-height:.93}.hero-sub{margin:26px 0 0;max-width:700px;color:var(--muted);font-size:1.06rem;line-height:1.9}
+    .actions{display:flex;flex-wrap:wrap;gap:14px;margin-top:32px}.btn-primary{background:linear-gradient(135deg,#d8aa60,#c58f41);color:#09131d;box-shadow:0 16px 34px rgba(202,155,84,.26)}.btn-secondary{border:1px solid var(--line);background:rgba(255,255,255,.05)}.btn:hover,.nav-cta:hover{transform:translateY(-2px)}
+    .panel{border:1px solid var(--line);border-radius:var(--r);background:linear-gradient(180deg,rgba(10,24,37,.9),rgba(10,24,37,.74));box-shadow:var(--shadow)}.hero-card{padding:28px}.topline{display:flex;justify-content:space-between;gap:16px;margin-bottom:20px}.label{font-size:.72rem;letter-spacing:.22em;text-transform:uppercase;color:var(--gold)}.rating{text-align:right;color:var(--muted);font-size:.88rem}.rating strong{display:block;color:var(--sand);font-size:1.32rem}
+    .stats{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}.stat{padding:15px;border:1px solid var(--line);border-radius:20px;background:rgba(255,255,255,.04)}.stat strong{display:block;margin-bottom:6px}.stat span{color:var(--muted);font-size:.86rem;line-height:1.6}
+    .strip{border-top:1px solid var(--line);border-bottom:1px solid var(--line);background:rgba(6,15,23,.7)}.strip-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr))}.tile{padding:24px 18px;border-left:1px solid var(--line)}.tile:first-child{border-left:none}.tile .label{margin-bottom:8px}.tile strong{display:block;margin-bottom:6px}.tile span{color:var(--muted);font-size:.92rem;line-height:1.6}
+    section{padding:110px 0}.two{display:grid;grid-template-columns:minmax(0,1fr) minmax(320px,.92fr);gap:42px;align-items:center}.card{padding:32px}.quote{margin:0;font-size:clamp(1.9rem,3vw,2.7rem);line-height:1.16}.note{margin-top:20px;color:var(--muted);line-height:1.8}.aside{margin-top:22px;padding:18px 20px;border-left:2px solid var(--gold);background:rgba(202,155,84,.08);color:var(--muted);line-height:1.8}
+    .gallery{display:grid;grid-template-columns:1.2fr .9fr .9fr;gap:18px;margin-top:50px}.shot{position:relative;min-height:250px;overflow:hidden;border-radius:28px;border:1px solid var(--line);box-shadow:var(--shadow)}.shot.tall{grid-row:span 2;min-height:520px}.shot.wide{grid-column:span 2}.shot img{width:100%;height:100%;object-fit:cover;transition:transform .5s ease}.shot:hover img{transform:scale(1.04)}.shot:after{content:attr(data-caption);position:absolute;left:18px;right:18px;bottom:18px;padding:10px 14px;border-radius:999px;background:rgba(6,15,23,.62);backdrop-filter:blur(12px);font-size:.76rem;letter-spacing:.16em;text-transform:uppercase}
+    .photo{min-height:520px;overflow:hidden}.photo img{width:100%;height:100%;object-fit:cover}.features{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:16px;margin-top:38px}.feature{padding:22px;border-radius:24px;border:1px solid var(--line);background:rgba(255,255,255,.04)}.n{width:46px;height:46px;display:inline-flex;align-items:center;justify-content:center;margin-bottom:16px;border-radius:16px;background:rgba(202,155,84,.12);color:var(--gold);font-weight:700}.feature h3{margin:0 0 10px;font-family:"Playfair Display",serif;font-weight:500;font-size:1.3rem}.feature p{margin:0;color:var(--muted);line-height:1.75;font-size:.92rem}
+    .amenities{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;margin-top:32px}.amenity{position:relative;padding:18px 18px 18px 52px;border-radius:20px;border:1px solid var(--line);background:rgba(255,255,255,.04);color:var(--muted);line-height:1.65}.amenity:before{content:"";position:absolute;top:21px;left:20px;width:12px;height:12px;border-radius:50%;background:linear-gradient(135deg,#d6b06f,#c28437);box-shadow:0 0 0 6px rgba(202,155,84,.12)}
+    .host-card{display:grid;grid-template-columns:124px minmax(0,1fr);gap:22px;align-items:center;margin-top:28px;padding:22px;border:1px solid var(--line);border-radius:26px;background:rgba(255,255,255,.05)}.host-card img{width:124px;height:124px;border-radius:26px;object-fit:cover}.host-card h3{margin:0 0 8px;font-family:"Playfair Display",serif;font-weight:500;font-size:1.8rem}.host-card p{margin:0;color:var(--muted);line-height:1.8}
+    .reviews{padding:32px}.review-top{display:flex;justify-content:space-between;gap:18px;align-items:end;margin-bottom:24px}.score{font-family:"Playfair Display",serif;font-size:clamp(3rem,5vw,4.2rem);line-height:.9}.score span{display:block;margin-top:8px;font-family:"Manrope",sans-serif;font-size:.88rem;letter-spacing:.16em;text-transform:uppercase;color:var(--gold)}.badges{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:20px}.badge{padding:10px 14px;border-radius:999px;border:1px solid rgba(202,155,84,.22);background:rgba(202,155,84,.1);font-size:.76rem;letter-spacing:.14em;text-transform:uppercase}.review-list{display:grid;gap:14px}.review{padding:20px;border:1px solid var(--line);border-radius:22px;background:rgba(255,255,255,.04)}.review p{margin:0;color:var(--muted);line-height:1.8}.review strong{display:block;margin-top:12px;color:var(--gold);font-size:.76rem;letter-spacing:.18em;text-transform:uppercase}
+    .contact{padding-bottom:136px}.contact-form{padding:32px}.form{display:grid;gap:14px}.row{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}.field{display:grid;gap:8px}.field label{font-size:.72rem;letter-spacing:.18em;text-transform:uppercase;color:var(--gold)}.field input,.field textarea,.field select{width:100%;padding:15px 16px;border:1px solid var(--line);border-radius:18px;background:rgba(255,255,255,.04);color:var(--sand);font:inherit;outline:none}.field textarea{min-height:130px;resize:vertical}.field input:focus,.field textarea:focus,.field select:focus{border-color:rgba(202,155,84,.45);box-shadow:0 0 0 4px rgba(202,155,84,.12)}.fine{margin-top:16px;color:var(--muted);font-size:.88rem;line-height:1.8}
+    footer{padding:28px 0 40px;border-top:1px solid var(--line);color:var(--muted);font-size:.84rem}.foot{display:flex;justify-content:space-between;gap:20px;align-items:center}.reveal{opacity:0;transform:translateY(26px);transition:opacity .8s ease,transform .8s ease}.reveal.visible{opacity:1;transform:none}
+    @media (max-width:1080px){.hero-grid,.two{grid-template-columns:1fr}.gallery{grid-template-columns:1fr 1fr}.shot.tall,.shot.wide{grid-column:auto;grid-row:auto;min-height:300px}.features{grid-template-columns:repeat(2,minmax(0,1fr))}.amenities{grid-template-columns:repeat(2,minmax(0,1fr))}.photo{min-height:420px}}
+    @media (max-width:760px){nav{padding:16px 0}.nav-links{display:none}.hero{min-height:auto;padding-top:110px}.hero-title{font-size:clamp(3rem,13vw,4.7rem)}.stats,.row,.features,.amenities,.gallery,.strip-grid,.host-card,.foot{grid-template-columns:1fr}.tile{border-left:none;border-top:1px solid var(--line)}.tile:first-child{border-top:none}.host-card img{width:100%;height:260px}.foot{display:grid}.card,.reviews,.contact-form,.hero-card{padding:26px}}
+    @media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}.reveal{opacity:1;transform:none;transition:none}.shot img,.btn,.nav-cta{transition:none}}
+  </style>
+</head>
+<body>
+  <nav>
+    <div class="wrap nav">
+      <a class="brand" href="#top">Car<span>mine</span> 1</a>
+      <div class="nav-links">
+        <a href="#gallery">Gallery</a>
+        <a href="#stay">La casa</a>
+        <a href="#place">Il quartiere</a>
+        <a href="#host">Host</a>
+        <a href="#contatti">Contatti</a>
+      </div>
+      <a class="nav-cta" href="#contatti">Richiedi disponibilita</a>
+    </div>
+  </nav>
+
+  <header class="hero" id="top">
+    <div class="hero-bg"><img src="assets/carmine/house/1a4eee33-bf4b-409b-8701-d5f4d95fdea7.jpeg" alt="Interno luminoso di Carmine 1" loading="eager"></div>
+    <div class="wrap hero-grid">
+      <div class="hero-copy reveal">
+        <p class="eyebrow">Genova, quartiere del Carmine</p>
+        <h1 class="hero-title">Un rifugio intimo,<br><em>tra luce, pietra e piazza.</em></h1>
+        <p class="hero-sub">Carmine 1 e un monolocale ristrutturato con accesso indipendente, travi a vista e vista sulla piazza. Un punto di partenza raccolto e autentico per vivere Genova a piedi, tra carruggi, Porto Antico e scorci che restano addosso.</p>
+        <div class="actions">
+          <a class="btn btn-primary" href="#contatti">Richiedi informazioni</a>
+          <a class="btn btn-secondary" href="#gallery">Scopri la casa</a>
+        </div>
+      </div>
+      <aside class="panel hero-card reveal">
+        <div class="topline">
+          <div>
+            <div class="label">Boutique stay</div>
+            <strong style="display:block;margin-top:8px;font-size:1.45rem;font-family:'Playfair Display',serif;font-weight:500;">Salita di San Bartolomeo del Carmine, 1</strong>
+          </div>
+          <div class="rating"><strong>4.9/5</strong>50 recensioni Airbnb</div>
+        </div>
+        <div class="stats">
+          <div class="stat"><strong>2 ospiti</strong><span>Perfetto per un soggiorno a due nel centro storico.</span></div>
+          <div class="stat"><strong>1 bagno privato</strong><span>Bagno finestrato e comfort essenziale ma curato.</span></div>
+          <div class="stat"><strong>Self check-in</strong><span>Accesso facile, istruzioni chiare, ingresso indipendente.</span></div>
+          <div class="stat"><strong>Pet friendly</strong><span>La casa accoglie anche chi viaggia con il proprio animale.</span></div>
+        </div>
+      </aside>
+    </div>
+  </header>
+
+  <div class="strip">
+    <div class="wrap strip-grid">
+      <div class="tile"><div class="label">Stile</div><strong>Travi a vista e palette morbida</strong><span>Interni contemporanei con carattere ligure.</span></div>
+      <div class="tile"><div class="label">Posizione</div><strong>Tra Carmine, Darsena e carruggi</strong><span>Una base comoda per muoversi a piedi.</span></div>
+      <div class="tile"><div class="label">Comfort</div><strong>Wi-Fi, aria condizionata, cucina</strong><span>Tutto il necessario per city break e soggiorni smart.</span></div>
+      <div class="tile"><div class="label">Atmosfera</div><strong>Vista diretta sulla piazza</strong><span>Una Genova viva, sincera e piena di dettagli.</span></div>
+    </div>
+  </div>
+
+  <section>
+    <div class="wrap two">
+      <div class="reveal">
+        <p class="eyebrow">L'anima del soggiorno</p>
+        <h2 class="section-title">Una casa piccola,<br><em>ma piena di carattere.</em></h2>
+        <p class="copy">Dalle finestre si apre la vita del quartiere. Dentro, il ritmo rallenta: luce calda, legno, linee pulite, una cucina compatta ma completa, un letto comodo che si apre al mattino verso il cielo chiaro di Genova. E il tipo di spazio che non prova a stupire con eccessi, ma con equilibrio e autenticita.</p>
+        <ul class="chips">
+          <li>Accesso indipendente</li><li>Centro storico a piedi</li><li>Smart TV e streaming</li><li>Macchina del caffe</li><li>Lavasciuga</li><li>Animali ammessi</li>
+        </ul>
+      </div>
+      <div class="panel card reveal">
+        <p class="quote">"Il fascino non e solo dentro casa. E nel modo in cui <em>la piazza entra</em> nella tua esperienza."</p>
+        <p class="note">I dati Airbnb esportati descrivono una casa con ingresso indipendente, cucina attrezzata, bagno privato, TV, Wi-Fi, aria condizionata e una posizione strategica per scoprire Acquario, Darsena, Porto Antico, Palazzi dei Rolli e il cuore universitario di Genova.</p>
+        <div class="aside">Perfetta per chi vuole un soggiorno urbano e raccolto: due persone, pochi minuti dai principali punti di interesse e quella sensazione rara di abitare davvero il quartiere.</div>
+      </div>
+    </div>
+  </section>
+
+  <section id="gallery">
+    <div class="wrap">
+      <div class="reveal">
+        <p class="eyebrow">Gallery</p>
+        <h2 class="section-title">Interni luminosi, scorci sinceri,<br><em>Genova appena fuori dalla finestra.</em></h2>
+      </div>
+      <div class="gallery">
+        <figure class="shot tall reveal" data-caption="La stanza principale"><img src="assets/carmine/house/5ab1b873-432b-481a-9781-ae4e05cf63a0.jpeg" alt="Vista ampia del soggiorno di Carmine 1" loading="lazy"></figure>
+        <figure class="shot reveal" data-caption="Cucina attrezzata"><img src="assets/carmine/house/26d10ddd-a7be-433d-98d6-495320402025.jpeg" alt="Cucina moderna di Carmine 1" loading="lazy"></figure>
+        <figure class="shot reveal" data-caption="Letto e finestra"><img src="assets/carmine/house/1a4eee33-bf4b-409b-8701-d5f4d95fdea7.jpeg" alt="Letto aperto con finestra sulla piazza" loading="lazy"></figure>
+        <figure class="shot wide reveal" data-caption="La piazza sotto casa"><img src="assets/carmine/house/4eea40ca-b952-4045-9575-82dd69585ca3.jpeg" alt="Vista sulla piazza del Carmine" loading="lazy"></figure>
+      </div>
+    </div>
+  </section>
+
+  <section id="stay">
+    <div class="wrap two">
+      <div class="panel photo reveal"><img src="assets/carmine/house/329e9580-07ee-4512-a3cd-4bbdd8d8355c.jpeg" alt="Zona cucina e tavolo alto di Carmine 1" loading="lazy"></div>
+      <div class="reveal">
+        <p class="eyebrow">La casa</p>
+        <h2 class="section-title">Pensata per chi cerca <em>comodita vera</em>, non solo una base.</h2>
+        <p class="copy">Il soggiorno unisce zona relax, letto trasformabile, cucina lineare, tavolo alto, microonde, frigorifero, macchina del caffe, aria condizionata e tutto l'essenziale per fermarsi qualche notte o qualche giorno in piu. L'impostazione e semplice, elegante, luminosa.</p>
+        <p class="copy">Dai contenuti Airbnb emergono anche dettagli pratici che fanno la differenza: self check-in, smart lock, Wi-Fi, TV, asciugacapelli, ferro da stiro, biancheria, stoviglie, calici da vino e una cucina davvero pronta all'uso.</p>
+      </div>
+    </div>
+    <div class="wrap">
+      <div class="features">
+        <article class="feature reveal"><div class="n">01</div><h3>Accesso facile</h3><p>Le recensioni confermano check-in semplice, istruzioni chiare e ingresso immediato.</p></article>
+        <article class="feature reveal"><div class="n">02</div><h3>Spazio curato</h3><p>Foto fedeli, pulizia molto apprezzata e una palette calda che rende il soggiorno accogliente.</p></article>
+        <article class="feature reveal"><div class="n">03</div><h3>Quartiere vivo</h3><p>Il Carmine oggi e tra le zone piu interessanti del centro per atmosfera, locali e autenticita.</p></article>
+        <article class="feature reveal"><div class="n">04</div><h3>Genova a piedi</h3><p>Porto Antico, Acquario, Rolli, universita e carruggi sono tutti raggiungibili con facilita.</p></article>
+      </div>
+      <div class="amenities">
+        <div class="amenity reveal">Wi-Fi veloce e Smart TV per una pausa comoda dopo la citta.</div>
+        <div class="amenity reveal">Aria condizionata e riscaldamento per vivere bene ogni stagione.</div>
+        <div class="amenity reveal">Cucina attrezzata con piastra, frigo, freezer, microonde e stoviglie.</div>
+        <div class="amenity reveal">Macchina del caffe, calici, tavolo snack e piccola area dining.</div>
+        <div class="amenity reveal">Bagno privato, asciugamani, phon, prodotti base e biancheria.</div>
+        <div class="amenity reveal">Lavatrice-asciugatrice, ferro da stiro e dettagli pratici per stay piu lunghi.</div>
+      </div>
+    </div>
+  </section>
+
+  <section id="place">
+    <div class="wrap two">
+      <div class="reveal">
+        <p class="eyebrow">Il quartiere</p>
+        <h2 class="section-title">Carmine e la Genova piu bella:<br><em>quella che non forza nulla.</em></h2>
+        <p class="copy">La descrizione esportata da Airbnb parla chiaro: il Carmine e un quartiere sempre piu amato per locali, piazze vissute e atmosfera autentica. Da qui puoi attraversare il centro storico medievale, raggiungere il Porto Antico, l'Acquario, le Strade Nuove e i Palazzi dei Rolli UNESCO lasciandoti guidare piu dall'istinto che dalla mappa.</p>
+        <p class="copy">Nelle vicinanze trovi botteghe, focaccia, ristoranti tipici, universita, fermate utili per muoverti in citta e il piacere raro di avere una Genova vera, intensa e viva sotto casa.</p>
+        <ul class="chips">
+          <li>Acquario e Porto Antico</li><li>Darsena e Piazza Principe</li><li>Palazzi dei Rolli</li><li>Cattedrale di San Lorenzo</li><li>Botteghe e locali del Carmine</li><li>Cuore universitario</li>
+        </ul>
+      </div>
+      <div class="panel photo reveal"><img src="assets/carmine/house/e122916b-a28c-4858-8f5a-0fe6702f19f5.jpeg" alt="Scorcio del quartiere del Carmine a Genova" loading="lazy"></div>
+    </div>
+  </section>
+
+  <section id="host">
+    <div class="wrap two">
+      <div class="reveal">
+        <p class="eyebrow">Host e fiducia</p>
+        <h2 class="section-title">Ospitalita presente,<br><em>risposte veloci, esperienza solida.</em></h2>
+        <p class="copy">Dal profilo Airbnb emerge una host genovese, Elisabetta, con base a Genova e un'impostazione professionale. Le recensioni insistono sugli stessi punti: comunicazione puntuale, indicazioni chiare, casa fedele alle foto e posizione comoda da vivere a piedi.</p>
+        <div class="host-card">
+          <img src="assets/carmine/profile/original.jpg" alt="Ritratto di Elisabetta, host di Carmine 1" loading="lazy">
+          <div><h3>Elisabetta</h3><p>Host di Genova. Nel profilo Airbnb si presenta come innovation manager e porta nella casa uno stile di ospitalita ordinato, chiaro, contemporaneo. Il risultato e un soggiorno semplice da vivere e facile da organizzare.</p></div>
+        </div>
+      </div>
+      <div class="panel reviews reveal">
+        <div class="review-top">
+          <div><div class="label">Recensioni del listing</div><div class="score">4.9<span>media su 50 recensioni</span></div></div>
+          <div style="max-width:220px;color:var(--muted);font-size:.9rem;line-height:1.8">I tag ricorrenti parlano soprattutto di check-in semplice, casa pulita, host reattiva e zona perfetta da fare a piedi.</div>
+        </div>
+        <div class="badges"><div class="badge">Easy to get inside</div><div class="badge">Clear instructions</div><div class="badge">Walkable</div><div class="badge">Spotless</div><div class="badge">Matched description</div></div>
+        <div class="review-list">
+          <article class="review"><p>"Monolocale con posizione perfetta, pulito e accogliente. La comunicazione con gli host e veloce ed esaustiva. Tornero."</p><strong>Recensione in italiano</strong></article>
+          <article class="review"><p>"Appartement tres agreable ou tout est bien pense" e "Excellent sejour": due segnali semplici ma forti sulla qualita dell'esperienza.</p><strong>Recensioni in francese</strong></article>
+          <article class="review"><p>Molti ospiti sottolineano che tutto e raggiungibile a piedi, che le foto sono fedeli e che la comunicazione dell'host e rapida e utile.</p><strong>Sintesi dei feedback ricorrenti</strong></article>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="contact" id="contatti">
+    <div class="wrap two">
+      <div class="reveal">
+        <p class="eyebrow">Contatti</p>
+        <h2 class="section-title">Se questa casa ti assomiglia,<br><em>scrivi subito.</em></h2>
+        <p class="copy">Questo form prepara direttamente una richiesta email con le informazioni essenziali del soggiorno. Compila i campi, aggiungi il tuo messaggio e invia la richiesta con il tuo client di posta.</p>
+        <div class="aside">Ideale per richieste su disponibilita, periodo, numero di ospiti, soggiorni di lavoro, fughe di coppia o domande pratiche prima della prenotazione.</div>
+      </div>
+      <div class="panel contact-form reveal">
+        <form class="form" id="contact-form" data-mail="ZWxpc2FiZXR0YS5taWdvbmVAZ21haWwuY29t">
+          <div class="row">
+            <div class="field"><label for="name">Nome</label><input id="name" name="name" type="text" placeholder="Il tuo nome" required></div>
+            <div class="field"><label for="email">Email</label><input id="email" name="email" type="email" placeholder="tu@email.com" required></div>
+          </div>
+          <div class="row">
+            <div class="field"><label for="checkin">Check-in</label><input id="checkin" name="checkin" type="date"></div>
+            <div class="field"><label for="checkout">Check-out</label><input id="checkout" name="checkout" type="date"></div>
+          </div>
+          <div class="row">
+            <div class="field"><label for="guests">Ospiti</label><select id="guests" name="guests"><option value="">Seleziona</option><option>1 ospite</option><option>2 ospiti</option></select></div>
+            <div class="field"><label for="travel">Tipo di soggiorno</label><select id="travel" name="travel"><option value="">Seleziona</option><option>Weekend romantico</option><option>City break</option><option>Lavoro</option><option>Soggiorno piu lungo</option></select></div>
+          </div>
+          <div class="field"><label for="message">Messaggio</label><textarea id="message" name="message" placeholder="Racconta il periodo che ti interessa o chiedi quello che vuoi sapere." required></textarea></div>
+          <button class="btn btn-primary" type="submit">Invia richiesta</button>
+        </form>
+        <p class="fine">Nessun backend esterno: al click si apre la tua email con oggetto e testo gia compilati.</p>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <div class="wrap foot">
+      <div>Carmine 1 · Genova · Boutique stay nel cuore del centro storico</div>
+      <div>Pagina creata a partire da foto e dati del listing Airbnb esportato.</div>
+    </div>
+  </footer>
+
+  <script>
+    const reveals=document.querySelectorAll('.reveal');
+    const observer=new IntersectionObserver((entries)=>{entries.forEach((entry)=>{if(entry.isIntersecting){entry.target.classList.add('visible');observer.unobserve(entry.target);}})},{threshold:.12});
+    reveals.forEach((item)=>observer.observe(item));
+    const form=document.getElementById('contact-form');
+    form.addEventListener('submit',(event)=>{
+      event.preventDefault();
+      const data=new FormData(form);
+      const email=atob(form.dataset.mail);
+      const body=encodeURIComponent([
+        'Ciao Elisabetta,','','ti scrivo dal sito di Carmine 1.','',
+        `Nome: ${(data.get('name')||'').toString().trim()}`,
+        `Email: ${(data.get('email')||'').toString().trim()}`,
+        `Check-in: ${(data.get('checkin')||'').toString().trim()||'da definire'}`,
+        `Check-out: ${(data.get('checkout')||'').toString().trim()||'da definire'}`,
+        `Ospiti: ${(data.get('guests')||'').toString().trim()||'da definire'}`,
+        `Tipo di soggiorno: ${(data.get('travel')||'').toString().trim()||'da definire'}`,'',
+        'Messaggio:',(data.get('message')||'').toString().trim(),'','A presto'
+      ].join('\n'));
+      const subject=encodeURIComponent(`Richiesta soggiorno - Carmine 1 - ${(data.get('name')||'').toString().trim()}`);
+      window.location.href=`mailto:${email}?subject=${subject}&body=${body}`;
+    });
+  </script>
+</body>
+</html>
