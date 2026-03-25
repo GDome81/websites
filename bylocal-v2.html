@@ -57,7 +57,8 @@
   .btn-ghost:hover::after { transform: translateX(4px); }
 
   .visual-shell { position: relative; overflow: hidden; border: 1px solid var(--border); background: linear-gradient(180deg, rgba(201,168,76,0.06) 0%, rgba(201,168,76,0.02) 28%, rgba(255,255,255,0.01) 100%), var(--dark); }
-  .visual-shell::before { content: ''; position: absolute; inset: 0; background: radial-gradient(circle at top right, rgba(201,168,76,0.10), transparent 35%), linear-gradient(180deg, rgba(10,10,10,0) 55%, rgba(10,10,10,0.28) 100%); pointer-events: none; }
+  .visual-shell::before { content: ''; position: absolute; inset: 0; z-index: 1; background: radial-gradient(circle at top right, rgba(201,168,76,0.12), transparent 40%), linear-gradient(180deg, rgba(10,10,10,0.18) 0%, rgba(10,10,10,0.55) 100%); pointer-events: none; }
+  .visual-shell img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; display: block; filter: brightness(0.52) saturate(0.82); z-index: 0; }
   .visual-meta { position: absolute; top: 18px; left: 18px; z-index: 2; font-size: 0.64rem; letter-spacing: 0.18em; text-transform: uppercase; color: var(--gold); }
   .visual-note { position: absolute; left: 18px; right: 18px; bottom: 18px; z-index: 2; display: flex; justify-content: space-between; gap: 14px; font-size: 0.64rem; letter-spacing: 0.16em; text-transform: uppercase; color: rgba(245,240,232,0.72); }
   .visual-note span { flex: 1; }
@@ -239,41 +240,7 @@
     </div>
     <div class="visual-shell hero-visual">
       <div class="visual-meta">Casa + AI + Curatore</div>
-      <svg class="visual-svg" viewBox="0 0 520 620" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-        <defs>
-          <linearGradient id="heroGlow" x1="0%" y1="0%" x2="100%" y2="100%">
-            <stop offset="0%" stop-color="#2b2416"/>
-            <stop offset="100%" stop-color="#131313"/>
-          </linearGradient>
-        </defs>
-        <rect width="520" height="620" fill="url(#heroGlow)"/>
-        <circle cx="390" cy="96" r="74" fill="rgba(201,168,76,0.12)"/>
-        <circle cx="124" cy="454" r="112" fill="rgba(201,168,76,0.06)"/>
-        <rect x="56" y="78" width="196" height="404" rx="24" fill="#111111" stroke="rgba(201,168,76,0.28)" stroke-width="2"/>
-        <rect x="78" y="116" width="152" height="18" rx="9" fill="rgba(245,240,232,0.08)"/>
-        <rect x="78" y="162" width="152" height="92" rx="16" fill="#181818" stroke="rgba(201,168,76,0.18)"/>
-        <circle cx="112" cy="196" r="18" fill="rgba(201,168,76,0.82)"/>
-        <rect x="140" y="184" width="58" height="10" rx="5" fill="rgba(245,240,232,0.78)"/>
-        <rect x="140" y="204" width="74" height="8" rx="4" fill="rgba(245,240,232,0.3)"/>
-        <rect x="78" y="276" width="152" height="70" rx="16" fill="#161616" stroke="rgba(201,168,76,0.14)"/>
-        <path d="M104 317 L136 289 L168 311 L212 266" fill="none" stroke="rgba(201,168,76,0.85)" stroke-width="4" stroke-linecap="round"/>
-        <circle cx="212" cy="266" r="6" fill="#e8c96d"/>
-        <rect x="78" y="370" width="96" height="72" rx="14" fill="#1b1b1b"/>
-        <rect x="188" y="370" width="42" height="72" rx="14" fill="rgba(201,168,76,0.16)"/>
-        <path d="M312 184 L394 126 L470 184 L470 424 L312 424 Z" fill="#141414" stroke="rgba(201,168,76,0.24)" stroke-width="2"/>
-        <path d="M338 214 H444" stroke="rgba(245,240,232,0.2)" stroke-width="2"/>
-        <rect x="338" y="240" width="42" height="72" fill="rgba(201,168,76,0.18)"/>
-        <rect x="392" y="240" width="42" height="72" fill="rgba(245,240,232,0.06)"/>
-        <rect x="338" y="330" width="96" height="20" rx="10" fill="rgba(245,240,232,0.08)"/>
-        <path d="M314 476 C352 438 430 436 474 476" fill="none" stroke="rgba(201,168,76,0.45)" stroke-width="2"/>
-        <circle cx="392" cy="476" r="18" fill="#c9a84c"/>
-        <circle cx="392" cy="476" r="7" fill="#111111"/>
-        <path d="M286 524 L228 472" stroke="rgba(201,168,76,0.55)" stroke-width="2" stroke-dasharray="7 8"/>
-        <path d="M286 524 L392 494" stroke="rgba(201,168,76,0.55)" stroke-width="2" stroke-dasharray="7 8"/>
-        <circle cx="286" cy="524" r="26" fill="#0f0f0f" stroke="rgba(201,168,76,0.3)" stroke-width="2"/>
-        <path d="M272 524 C272 511 282 500 295 500 C307 500 318 511 318 524 C318 538 307 548 295 548 C282 548 272 538 272 524 Z" fill="none" stroke="rgba(245,240,232,0.72)" stroke-width="2"/>
-        <path d="M286 520 L294 528 L308 514" fill="none" stroke="#c9a84c" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
-      </svg>
+      <img src="https://images.unsplash.com/photo-1570077188670-e3a8d69ac5ff?w=640&q=80&fit=crop" alt="Villa italiana con vista sul mare, Positano" loading="lazy">
       <div class="visual-note"><span>portale casa</span><span>risposte verificate</span><span>scoperta locale</span></div>
     </div>
   </div>
@@ -308,21 +275,7 @@
     <div class="problema-right">
       <div class="visual-shell problema-visual reveal">
         <div class="visual-meta">Host + Ospite</div>
-        <svg class="visual-svg" viewBox="0 0 520 290" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-          <rect width="520" height="290" fill="#141414"/>
-          <rect x="28" y="38" width="182" height="214" rx="18" fill="#101010" stroke="rgba(201,168,76,0.2)"/>
-          <rect x="56" y="68" width="118" height="18" rx="9" fill="rgba(245,240,232,0.08)"/>
-          <rect x="56" y="108" width="126" height="42" rx="14" fill="rgba(201,168,76,0.16)"/>
-          <rect x="84" y="168" width="98" height="42" rx="14" fill="rgba(245,240,232,0.08)"/>
-          <circle cx="260" cy="144" r="42" fill="rgba(201,168,76,0.12)" stroke="rgba(201,168,76,0.28)" stroke-width="2"/>
-          <path d="M260 118 V145 L278 160" stroke="#c9a84c" stroke-width="4" stroke-linecap="round"/>
-          <rect x="310" y="38" width="182" height="214" rx="18" fill="#101010" stroke="rgba(201,168,76,0.2)"/>
-          <rect x="338" y="72" width="126" height="48" rx="14" fill="#181818"/>
-          <rect x="338" y="136" width="126" height="48" rx="14" fill="#181818"/>
-          <rect x="338" y="200" width="126" height="24" rx="12" fill="rgba(201,168,76,0.16)"/>
-          <circle cx="362" cy="96" r="11" fill="#c9a84c"/>
-          <circle cx="362" cy="160" r="11" fill="#c9a84c"/>
-        </svg>
+        <img src="https://images.unsplash.com/photo-1499750310107-5fef28a66643?w=640&q=80&fit=crop" alt="Ospite alle prese con troppe informazioni sul telefono" loading="lazy">
         <div class="visual-note"><span>messaggi ripetuti</span><span>tempo perso</span><span>scelta difficile</span></div>
       </div>
       <div class="problema-card reveal reveal-delay-1">
@@ -353,40 +306,12 @@
   <div class="soluzione-visuals">
     <div class="visual-shell soluzione-visual-main reveal">
       <div class="visual-meta">Il flusso del prodotto</div>
-      <svg class="visual-svg" viewBox="0 0 700 340" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-        <rect width="700" height="340" fill="#141414"/>
-        <path d="M106 186 H590" stroke="rgba(201,168,76,0.28)" stroke-width="3" stroke-dasharray="8 10"/>
-        <circle cx="140" cy="186" r="42" fill="#101010" stroke="rgba(201,168,76,0.3)" stroke-width="2"/>
-        <path d="M118 196 L118 166 L140 148 L162 166 L162 196" fill="none" stroke="#c9a84c" stroke-width="4" stroke-linejoin="round"/>
-        <circle cx="350" cy="186" r="50" fill="#101010" stroke="rgba(201,168,76,0.3)" stroke-width="2"/>
-        <rect x="316" y="154" width="68" height="44" rx="14" fill="rgba(201,168,76,0.16)"/>
-        <path d="M336 176 H364" stroke="#f5f0e8" stroke-width="4" stroke-linecap="round"/>
-        <path d="M350 162 V190" stroke="#f5f0e8" stroke-width="4" stroke-linecap="round"/>
-        <circle cx="560" cy="186" r="42" fill="#101010" stroke="rgba(201,168,76,0.3)" stroke-width="2"/>
-        <path d="M560 152 C542 152 528 166 528 184 C528 210 560 230 560 230 C560 230 592 210 592 184 C592 166 578 152 560 152 Z" fill="rgba(201,168,76,0.2)" stroke="#c9a84c" stroke-width="3"/>
-        <circle cx="560" cy="184" r="10" fill="#111111"/>
-        <rect x="92" y="62" width="96" height="18" rx="9" fill="rgba(245,240,232,0.08)"/>
-        <rect x="302" y="62" width="96" height="18" rx="9" fill="rgba(245,240,232,0.08)"/>
-        <rect x="512" y="62" width="96" height="18" rx="9" fill="rgba(245,240,232,0.08)"/>
-      </svg>
+      <img src="https://images.unsplash.com/photo-1516483638261-f4dbaf036963?w=800&q=80&fit=crop" alt="Cinque Terre, costa italiana, scoperta locale" loading="lazy">
       <div class="visual-note"><span>contenuti host</span><span>interfaccia guidata</span><span>raccomandazioni locali</span></div>
     </div>
     <div class="visual-shell soluzione-visual-side reveal reveal-delay-1">
       <div class="visual-meta">Output per l'ospite</div>
-      <svg class="visual-svg" viewBox="0 0 420 340" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-        <rect width="420" height="340" fill="#141414"/>
-        <rect x="46" y="48" width="328" height="74" rx="18" fill="#111111" stroke="rgba(201,168,76,0.2)"/>
-        <rect x="46" y="140" width="328" height="74" rx="18" fill="#111111" stroke="rgba(201,168,76,0.2)"/>
-        <rect x="46" y="232" width="328" height="62" rx="18" fill="#111111" stroke="rgba(201,168,76,0.2)"/>
-        <circle cx="88" cy="85" r="18" fill="#c9a84c"/>
-        <circle cx="88" cy="177" r="18" fill="#c9a84c"/>
-        <rect x="118" y="74" width="126" height="12" rx="6" fill="rgba(245,240,232,0.82)"/>
-        <rect x="118" y="95" width="168" height="9" rx="4.5" fill="rgba(245,240,232,0.2)"/>
-        <rect x="118" y="166" width="126" height="12" rx="6" fill="rgba(245,240,232,0.82)"/>
-        <rect x="118" y="187" width="150" height="9" rx="4.5" fill="rgba(245,240,232,0.2)"/>
-        <path d="M314 247 H350" stroke="#c9a84c" stroke-width="4" stroke-linecap="round"/>
-        <path d="M342 239 L350 247 L342 255" fill="none" stroke="#c9a84c" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
-      </svg>
+      <img src="https://images.unsplash.com/photo-1522202176988-66273c2fd55f?w=500&q=80&fit=crop" alt="Ospite che scopre esperienze locali tramite telefono" loading="lazy">
       <div class="visual-note"><span>domanda</span><span>risposta</span><span>azione</span></div>
     </div>
   </div>
@@ -475,21 +400,7 @@
       </div>
       <div class="visual-shell curatori-visual reveal reveal-delay-2">
         <div class="visual-meta">Rete di curatori</div>
-        <svg class="visual-svg" viewBox="0 0 520 320" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-          <rect width="520" height="320" fill="#141414"/>
-          <rect x="34" y="38" width="138" height="244" rx="22" fill="#111111" stroke="rgba(201,168,76,0.2)"/>
-          <rect x="190" y="38" width="138" height="244" rx="22" fill="#111111" stroke="rgba(201,168,76,0.2)"/>
-          <rect x="346" y="38" width="138" height="244" rx="22" fill="#111111" stroke="rgba(201,168,76,0.2)"/>
-          <circle cx="103" cy="112" r="34" fill="rgba(201,168,76,0.18)"/>
-          <path d="M80 148 C88 124 118 124 126 148" fill="none" stroke="#c9a84c" stroke-width="4" stroke-linecap="round"/>
-          <circle cx="103" cy="108" r="16" fill="none" stroke="#f5f0e8" stroke-width="3"/>
-          <path d="M228 188 L264 116 L300 188" fill="none" stroke="#c9a84c" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
-          <path d="M224 214 H304" stroke="rgba(245,240,232,0.22)" stroke-width="3"/>
-          <rect x="378" y="94" width="74" height="112" rx="18" fill="#171717" stroke="rgba(201,168,76,0.2)"/>
-          <rect x="392" y="112" width="46" height="10" rx="5" fill="rgba(245,240,232,0.8)"/>
-          <rect x="392" y="136" width="46" height="40" rx="12" fill="rgba(201,168,76,0.16)"/>
-          <path d="M103 236 C174 272 338 272 415 236" fill="none" stroke="rgba(201,168,76,0.32)" stroke-width="3" stroke-dasharray="7 8"/>
-        </svg>
+        <img src="https://images.unsplash.com/photo-1552832230-c0197dd311b5?w=640&q=80&fit=crop" alt="Roma, architettura italiana autentica, curatori locali" loading="lazy">
         <div class="visual-note"><span>curatore locale</span><span>capo curatore</span><span>host e ospite</span></div>
       </div>
     </div>
