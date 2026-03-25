@@ -1,0 +1,55 @@
+{
+  "slug": "carmine",
+  "siteTitle": "Carmine 1",
+  "location": {
+    "city": "Genova",
+    "address": "Salita di San Bartolomeo del Carmine, 1",
+    "area": "Quartiere del Carmine",
+    "country": "Italia"
+  },
+  "stay": {
+    "guests": 2,
+    "bedrooms": 1,
+    "bathrooms": 1,
+    "propertyType": "Apartment",
+    "roomType": "Entire home/apt",
+    "petFriendly": true,
+    "selfCheckIn": true
+  },
+  "host": {
+    "name": "Elisabetta",
+    "city": "Genoa, Liguria, Italy",
+    "role": "Innovation Manager"
+  },
+  "reviewSummary": {
+    "count": 50,
+    "averageRating": 4.9,
+    "highlights": [
+      "Check-in semplice e accesso immediato",
+      "Casa pulita e coerente con le foto",
+      "Posizione molto comoda da vivere a piedi",
+      "Comunicazione rapida e indicazioni chiare"
+    ]
+  },
+  "amenities": [
+    "Wi-Fi",
+    "Aria condizionata",
+    "Cucina attrezzata",
+    "Macchina del caffe",
+    "Smart TV",
+    "Lavatrice-asciugatrice",
+    "Asciugacapelli",
+    "Animali ammessi"
+  ],
+  "images": {
+    "hero": "assets/carmine/house/1a4eee33-bf4b-409b-8701-d5f4d95fdea7.jpeg",
+    "gallery": [
+      "assets/carmine/house/5ab1b873-432b-481a-9781-ae4e05cf63a0.jpeg",
+      "assets/carmine/house/26d10ddd-a7be-433d-98d6-495320402025.jpeg",
+      "assets/carmine/house/4eea40ca-b952-4045-9575-82dd69585ca3.jpeg",
+      "assets/carmine/house/329e9580-07ee-4512-a3cd-4bbdd8d8355c.jpeg",
+      "assets/carmine/house/e122916b-a28c-4858-8f5a-0fe6702f19f5.jpeg"
+    ],
+    "host": "assets/carmine/profile/original.jpg"
+  }
+}
