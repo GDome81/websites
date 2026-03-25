@@ -1,0 +1,503 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ByLocal — Il concierge digitale per case vacanza</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,700;0,900;1,400;1,700&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --black: #0a0a0a;
+    --off-black: #111111;
+    --dark: #161616;
+    --charcoal: #1e1e1e;
+    --gold: #c9a84c;
+    --gold-light: #e8c96d;
+    --cream: #f5f0e8;
+    --white: #fafaf8;
+    --muted: rgba(245,240,232,0.45);
+    --border: rgba(201,168,76,0.2);
+  }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body { background: var(--black); color: var(--cream); font-family: 'DM Sans', sans-serif; font-weight: 300; overflow-x: hidden; }
+  ::-webkit-scrollbar { width: 3px; }
+  ::-webkit-scrollbar-track { background: var(--black); }
+  ::-webkit-scrollbar-thumb { background: var(--gold); }
+
+  /* NAV */
+  nav { position: fixed; top: 0; left: 0; right: 0; z-index: 100; display: flex; align-items: center; justify-content: space-between; padding: 24px 60px; background: linear-gradient(to bottom, rgba(10,10,10,0.95) 0%, transparent 100%); backdrop-filter: blur(4px); }
+  .nav-logo { font-family: 'Playfair Display', serif; font-size: 1.5rem; font-weight: 700; letter-spacing: 0.08em; color: var(--cream); text-decoration: none; }
+  .nav-logo span { color: var(--gold); }
+  .nav-links { display: flex; gap: 40px; list-style: none; }
+  .nav-links a { color: var(--muted); text-decoration: none; font-size: 0.78rem; letter-spacing: 0.15em; text-transform: uppercase; transition: color 0.3s; }
+  .nav-links a:hover { color: var(--gold); }
+  .nav-cta { padding: 10px 28px; border: 1px solid var(--gold); color: var(--gold); text-decoration: none; font-size: 0.75rem; letter-spacing: 0.15em; text-transform: uppercase; transition: all 0.3s; }
+  .nav-cta:hover { background: var(--gold); color: var(--black); }
+
+  /* HERO */
+  .hero { min-height: 100vh; display: flex; flex-direction: column; justify-content: flex-end; padding: 0 60px 80px; position: relative; overflow: hidden; }
+  .hero-bg { position: absolute; inset: 0; background: radial-gradient(ellipse 80% 60% at 70% 50%, rgba(201,168,76,0.06) 0%, transparent 60%), radial-gradient(ellipse 40% 80% at 20% 80%, rgba(201,168,76,0.04) 0%, transparent 50%), var(--black); }
+  .hero-grid { position: absolute; inset: 0; pointer-events: none; background-image: linear-gradient(to right, rgba(201,168,76,0.04) 1px, transparent 1px), linear-gradient(to bottom, rgba(201,168,76,0.04) 1px, transparent 1px); background-size: 80px 80px; }
+  .hero-eyebrow { font-size: 0.72rem; letter-spacing: 0.3em; text-transform: uppercase; color: var(--gold); margin-bottom: 28px; position: relative; display: flex; align-items: center; gap: 16px; opacity: 0; animation: fadeUp 0.8s 0.3s forwards; }
+  .hero-eyebrow::before { content: ''; display: inline-block; width: 40px; height: 1px; background: var(--gold); }
+  .hero-title { font-family: 'Playfair Display', serif; font-size: clamp(3.5rem, 7vw, 7rem); font-weight: 400; line-height: 1.05; letter-spacing: -0.01em; max-width: 900px; opacity: 0; animation: fadeUp 0.9s 0.5s forwards; }
+  .hero-title em { font-style: italic; color: var(--gold); }
+  .hero-sub { margin-top: 32px; font-family: 'Cormorant Garamond', serif; font-size: 1.3rem; font-weight: 300; font-style: italic; color: var(--muted); max-width: 600px; line-height: 1.7; opacity: 0; animation: fadeUp 0.9s 0.7s forwards; }
+  .hero-actions { margin-top: 52px; display: flex; gap: 24px; align-items: center; opacity: 0; animation: fadeUp 0.9s 0.9s forwards; }
+  .btn-primary { display: inline-block; padding: 16px 40px; background: var(--gold); color: var(--black); text-decoration: none; font-size: 0.78rem; font-weight: 500; letter-spacing: 0.15em; text-transform: uppercase; transition: all 0.3s; }
+  .btn-primary:hover { background: var(--gold-light); transform: translateY(-2px); }
+  .btn-ghost { display: inline-flex; align-items: center; gap: 10px; color: var(--muted); text-decoration: none; font-size: 0.78rem; letter-spacing: 0.1em; transition: color 0.3s; }
+  .btn-ghost:hover { color: var(--cream); }
+  .btn-ghost::after { content: '→'; transition: transform 0.3s; }
+  .btn-ghost:hover::after { transform: translateX(4px); }
+
+  /* TICKER */
+  .ticker { overflow: hidden; border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); padding: 14px 0; background: var(--off-black); }
+  .ticker-track { display: flex; animation: ticker 30s linear infinite; white-space: nowrap; }
+  .ticker-item { display: flex; align-items: center; gap: 20px; font-size: 0.72rem; letter-spacing: 0.2em; text-transform: uppercase; color: var(--muted); padding: 0 40px; }
+  .ticker-dot { width: 4px; height: 4px; background: var(--gold); border-radius: 50%; flex-shrink: 0; }
+  @keyframes ticker { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+
+  /* SHARED */
+  .section-label { font-size: 0.7rem; letter-spacing: 0.3em; text-transform: uppercase; color: var(--gold); display: flex; align-items: center; gap: 12px; margin-bottom: 20px; }
+  .section-label::before { content: ''; width: 28px; height: 1px; background: var(--gold); }
+  .section-title { font-family: 'Playfair Display', serif; font-size: clamp(2.2rem, 4vw, 3.8rem); font-weight: 400; line-height: 1.15; letter-spacing: -0.01em; }
+  .section-title em { font-style: italic; color: var(--gold); }
+
+  /* PROBLEMA */
+  .problema { padding: 120px 60px; background: var(--off-black); }
+  .problema-inner { display: grid; grid-template-columns: 1fr 1fr; gap: 100px; max-width: 1200px; margin: 0 auto; align-items: start; }
+  .problema-body { margin-top: 32px; font-family: 'Cormorant Garamond', serif; font-size: 1.25rem; font-style: italic; color: var(--muted); line-height: 1.8; }
+  .problema-right { display: grid; grid-template-rows: 1fr 1fr; gap: 24px; margin-top: 60px; }
+  .problema-card { padding: 36px; border: 1px solid var(--border); background: var(--dark); position: relative; overflow: hidden; transition: border-color 0.3s; }
+  .problema-card:hover { border-color: var(--gold); }
+  .problema-card::before { content: ''; position: absolute; top: 0; left: 0; width: 3px; height: 0; background: var(--gold); transition: height 0.4s; }
+  .problema-card:hover::before { height: 100%; }
+  .problema-card-tag { font-size: 0.68rem; letter-spacing: 0.2em; text-transform: uppercase; color: var(--gold); margin-bottom: 14px; }
+  .problema-card h3 { font-family: 'Playfair Display', serif; font-size: 1.3rem; font-weight: 400; margin-bottom: 12px; }
+  .problema-card p { font-size: 0.88rem; color: var(--muted); line-height: 1.7; }
+
+  /* SOLUZIONE */
+  .soluzione { padding: 140px 60px; background: var(--black); }
+  .soluzione-header { max-width: 1200px; margin: 0 auto 80px; display: grid; grid-template-columns: 1fr 1fr; gap: 80px; align-items: end; }
+  .soluzione-desc { font-size: 0.95rem; color: var(--muted); line-height: 1.9; margin-top: 32px; }
+  .soluzione-quote { font-family: 'Cormorant Garamond', serif; font-size: 2rem; font-style: italic; font-weight: 300; line-height: 1.4; color: var(--cream); border-left: 2px solid var(--gold); padding-left: 32px; }
+  .soluzione-quote span { color: var(--gold); }
+  .layers { max-width: 1200px; margin: 0 auto; display: grid; grid-template-columns: repeat(3, 1fr); gap: 2px; background: var(--border); }
+  .layer { background: var(--dark); padding: 52px 40px; position: relative; overflow: hidden; transition: background 0.4s; }
+  .layer:hover { background: var(--charcoal); }
+  .layer-num { font-family: 'Playfair Display', serif; font-size: 5rem; font-weight: 900; color: rgba(201,168,76,0.08); position: absolute; top: 20px; right: 20px; line-height: 1; transition: color 0.4s; }
+  .layer:hover .layer-num { color: rgba(201,168,76,0.15); }
+  .layer-icon { width: 44px; height: 44px; border: 1px solid var(--border); display: flex; align-items: center; justify-content: center; font-size: 1.2rem; margin-bottom: 28px; transition: border-color 0.3s; }
+  .layer:hover .layer-icon { border-color: var(--gold); }
+  .layer h3 { font-family: 'Playfair Display', serif; font-size: 1.5rem; font-weight: 400; margin-bottom: 8px; }
+  .layer-sub { font-size: 0.72rem; letter-spacing: 0.2em; text-transform: uppercase; color: var(--gold); margin-bottom: 20px; }
+  .layer p { font-size: 0.88rem; color: var(--muted); line-height: 1.8; }
+  .layer ul { list-style: none; margin-top: 16px; }
+  .layer ul li { font-size: 0.85rem; color: var(--muted); padding: 7px 0; border-bottom: 1px solid rgba(201,168,76,0.08); display: flex; align-items: center; gap: 10px; }
+  .layer ul li::before { content: '—'; color: var(--gold); font-size: 0.7rem; }
+
+  /* MOMENTO */
+  .momento { padding: 160px 60px; background: var(--off-black); text-align: center; position: relative; overflow: hidden; }
+  .momento-bg { position: absolute; inset: 0; background: radial-gradient(ellipse 60% 60% at 50% 50%, rgba(201,168,76,0.05) 0%, transparent 70%); }
+  .momento-time { position: absolute; font-family: 'Playfair Display', serif; font-size: clamp(5rem, 15vw, 14rem); font-weight: 900; color: rgba(201,168,76,0.06); top: 50%; left: 50%; transform: translate(-50%, -50%); white-space: nowrap; pointer-events: none; }
+  .momento-inner { position: relative; max-width: 700px; margin: 0 auto; }
+  .momento-title { font-family: 'Playfair Display', serif; font-size: clamp(2.5rem, 4vw, 4rem); font-weight: 400; line-height: 1.2; margin-bottom: 32px; }
+  .momento-title em { font-style: italic; color: var(--gold); }
+  .momento-desc { font-family: 'Cormorant Garamond', serif; font-size: 1.4rem; font-style: italic; color: var(--muted); line-height: 1.7; margin-bottom: 52px; }
+  .momento-steps { display: flex; justify-content: center; margin-top: 60px; }
+  .momento-step { flex: 1; padding: 32px 24px; border-right: 1px solid var(--border); max-width: 180px; }
+  .momento-step:last-child { border-right: none; }
+  .momento-step-n { font-family: 'Playfair Display', serif; font-size: 2.5rem; color: var(--gold); opacity: 0.4; line-height: 1; margin-bottom: 12px; }
+  .momento-step p { font-size: 0.82rem; color: var(--muted); line-height: 1.6; }
+
+  /* CURATORI */
+  .curatori { padding: 140px 60px; background: var(--black); }
+  .curatori-inner { max-width: 1200px; margin: 0 auto; display: grid; grid-template-columns: 1fr 1.4fr; gap: 100px; align-items: start; }
+  .curatori-text { font-size: 0.92rem; color: var(--muted); line-height: 1.9; margin-bottom: 20px; margin-top: 24px; }
+  .curatori-callout { margin-top: 40px; padding: 28px 32px; border: 1px solid var(--border); border-left: 3px solid var(--gold); background: rgba(201,168,76,0.04); }
+  .curatori-callout p { font-family: 'Cormorant Garamond', serif; font-size: 1.2rem; font-style: italic; line-height: 1.6; color: var(--cream); }
+  .curatori-right { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  .ruolo-card { padding: 32px 28px; background: var(--dark); border: 1px solid var(--border); transition: border-color 0.3s, transform 0.3s; }
+  .ruolo-card:hover { border-color: var(--gold); transform: translateY(-4px); }
+  .ruolo-card-icon { font-size: 1.6rem; margin-bottom: 16px; }
+  .ruolo-card h4 { font-family: 'Playfair Display', serif; font-size: 1rem; font-weight: 500; margin-bottom: 8px; letter-spacing: 0.03em; }
+  .ruolo-card p { font-size: 0.82rem; color: var(--muted); line-height: 1.7; }
+
+  /* VISIONE */
+  .visione { padding: 160px 60px; background: var(--off-black); position: relative; overflow: hidden; }
+  .visione-bg-text { position: absolute; font-family: 'Playfair Display', serif; font-size: clamp(8rem, 18vw, 18rem); font-weight: 900; color: rgba(201,168,76,0.03); top: 50%; left: 50%; transform: translate(-50%, -50%); white-space: nowrap; pointer-events: none; letter-spacing: -0.02em; }
+  .visione-inner { max-width: 1200px; margin: 0 auto; position: relative; }
+  .visione-header { text-align: center; margin-bottom: 100px; }
+  .visione-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 2px; background: var(--border); margin-bottom: 100px; }
+  .visione-card { background: var(--dark); padding: 60px 40px; text-align: center; transition: background 0.3s; }
+  .visione-card:hover { background: var(--charcoal); }
+  .visione-card-n { font-family: 'Playfair Display', serif; font-size: 3.5rem; font-weight: 700; color: var(--gold); line-height: 1; margin-bottom: 20px; }
+  .visione-card h3 { font-family: 'Playfair Display', serif; font-size: 1.3rem; font-weight: 400; margin-bottom: 12px; }
+  .visione-card p { font-size: 0.85rem; color: var(--muted); line-height: 1.7; }
+  .visione-finale { text-align: center; max-width: 800px; margin: 0 auto; }
+  .visione-finale-quote { font-family: 'Playfair Display', serif; font-size: clamp(1.6rem, 3vw, 2.8rem); font-style: italic; font-weight: 400; line-height: 1.3; color: var(--cream); margin-bottom: 40px; }
+  .visione-finale-quote em { color: var(--gold); }
+
+  /* CONTATTI */
+  .contatti { padding: 140px 60px; background: var(--black); }
+  .contatti-inner { max-width: 1200px; margin: 0 auto; display: grid; grid-template-columns: 1fr 1fr; gap: 100px; align-items: start; }
+  .contatti-form { display: flex; flex-direction: column; gap: 16px; margin-top: 40px; }
+  .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  .form-group { display: flex; flex-direction: column; gap: 8px; }
+  .form-group label { font-size: 0.68rem; letter-spacing: 0.2em; text-transform: uppercase; color: var(--gold); }
+  .form-group input, .form-group select, .form-group textarea { background: var(--dark); border: 1px solid var(--border); color: var(--cream); padding: 14px 18px; font-family: 'DM Sans', sans-serif; font-size: 0.9rem; font-weight: 300; outline: none; transition: border-color 0.3s; width: 100%; }
+  .form-group input:focus, .form-group select:focus, .form-group textarea:focus { border-color: var(--gold); }
+  .form-group select { appearance: none; cursor: pointer; }
+  .form-group select option { background: var(--dark); }
+  .form-group textarea { resize: vertical; min-height: 120px; }
+  .form-submit { margin-top: 8px; padding: 16px 40px; background: var(--gold); color: var(--black); border: none; font-family: 'DM Sans', sans-serif; font-size: 0.78rem; font-weight: 500; letter-spacing: 0.15em; text-transform: uppercase; cursor: pointer; transition: all 0.3s; align-self: flex-start; }
+  .form-submit:hover { background: var(--gold-light); transform: translateY(-2px); }
+  .contatti-body { font-family: 'Cormorant Garamond', serif; font-size: 1.25rem; font-style: italic; color: var(--muted); line-height: 1.8; margin-bottom: 48px; margin-top: 24px; }
+  .info-items { display: flex; flex-direction: column; gap: 20px; }
+  .info-item { display: flex; align-items: flex-start; gap: 20px; padding: 20px 0; border-bottom: 1px solid var(--border); }
+  .info-item-icon { width: 36px; height: 36px; border: 1px solid var(--border); display: flex; align-items: center; justify-content: center; font-size: 0.9rem; flex-shrink: 0; }
+  .info-item-label { font-size: 0.68rem; letter-spacing: 0.2em; text-transform: uppercase; color: var(--gold); margin-bottom: 4px; }
+  .info-item-value { font-size: 0.9rem; color: var(--cream); }
+  .info-item-value a { color: var(--cream); text-decoration: none; transition: color 0.3s; }
+  .info-item-value a:hover { color: var(--gold); }
+
+  /* FOOTER */
+  footer { padding: 32px 60px; background: var(--off-black); border-top: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
+  .footer-logo { font-family: 'Playfair Display', serif; font-size: 1.1rem; font-weight: 700; letter-spacing: 0.08em; }
+  .footer-logo span { color: var(--gold); }
+  .footer-copy { font-size: 0.75rem; color: var(--muted); letter-spacing: 0.1em; }
+
+  /* ANIMATIONS */
+  @keyframes fadeUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
+  .reveal { opacity: 0; transform: translateY(40px); transition: opacity 0.8s ease, transform 0.8s ease; }
+  .reveal.visible { opacity: 1; transform: translateY(0); }
+  .reveal-delay-1 { transition-delay: 0.1s; }
+  .reveal-delay-2 { transition-delay: 0.2s; }
+  .reveal-delay-3 { transition-delay: 0.3s; }
+
+  /* RESPONSIVE */
+  @media (max-width: 900px) {
+    nav { padding: 20px 24px; }
+    .nav-links { display: none; }
+    .hero, .problema, .soluzione, .momento, .curatori, .visione, .contatti { padding-left: 24px; padding-right: 24px; }
+    .hero { padding-bottom: 60px; }
+    .problema-inner, .soluzione-header, .curatori-inner, .contatti-inner { grid-template-columns: 1fr; gap: 48px; }
+    .layers, .visione-grid { grid-template-columns: 1fr; }
+    .curatori-right { grid-template-columns: 1fr; }
+    .form-row { grid-template-columns: 1fr; }
+    footer { flex-direction: column; gap: 16px; text-align: center; }
+    .momento-steps { flex-wrap: wrap; }
+    .momento-step { border-right: none; border-bottom: 1px solid var(--border); }
+  }
+</style>
+</head>
+<body>
+
+<nav>
+  <a href="#" class="nav-logo">By<span>Local</span></a>
+  <ul class="nav-links">
+    <li><a href="#soluzione">Prodotto</a></li>
+    <li><a href="#curatori">Curatori</a></li>
+    <li><a href="#visione">Visione</a></li>
+    <li><a href="#contatti">Contatti</a></li>
+  </ul>
+  <a href="#contatti" class="nav-cta">Inizia ora →</a>
+</nav>
+
+<section class="hero">
+  <div class="hero-bg"></div>
+  <div class="hero-grid"></div>
+  <div class="hero-eyebrow">Il concierge digitale per case vacanza</div>
+  <h1 class="hero-title">La guida locale<br><em>già dentro casa tua.</em></h1>
+  <p class="hero-sub">Non un chatbot. Un sistema che unisce AI e curatori locali per trasformare ogni soggiorno in un'esperienza guidata, autentica e memorabile.</p>
+  <div class="hero-actions">
+    <a href="#contatti" class="btn-primary">Scopri ByLocal</a>
+    <a href="#soluzione" class="btn-ghost">Come funziona</a>
+  </div>
+</section>
+
+<div class="ticker">
+  <div class="ticker-track">
+    <div class="ticker-item"><span class="ticker-dot"></span>AI + Curazione locale</div>
+    <div class="ticker-item"><span class="ticker-dot"></span>Contenuti verificati</div>
+    <div class="ticker-item"><span class="ticker-dot"></span>Zero allucinazioni</div>
+    <div class="ticker-item"><span class="ticker-dot"></span>Decidi in 30 secondi</div>
+    <div class="ticker-item"><span class="ticker-dot"></span>Per host e ospiti</div>
+    <div class="ticker-item"><span class="ticker-dot"></span>Esperienze autentiche</div>
+    <div class="ticker-item"><span class="ticker-dot"></span>Rete di curatori</div>
+    <div class="ticker-item"><span class="ticker-dot"></span>AI + Curazione locale</div>
+    <div class="ticker-item"><span class="ticker-dot"></span>Contenuti verificati</div>
+    <div class="ticker-item"><span class="ticker-dot"></span>Zero allucinazioni</div>
+    <div class="ticker-item"><span class="ticker-dot"></span>Decidi in 30 secondi</div>
+    <div class="ticker-item"><span class="ticker-dot"></span>Per host e ospiti</div>
+    <div class="ticker-item"><span class="ticker-dot"></span>Esperienze autentiche</div>
+    <div class="ticker-item"><span class="ticker-dot"></span>Rete di curatori</div>
+  </div>
+</div>
+
+<section class="problema" id="problema">
+  <div class="problema-inner">
+    <div class="reveal">
+      <div class="section-label">Il problema</div>
+      <h2 class="section-title">Due frustrazioni.<br><em>Un'unica soluzione.</em></h2>
+      <p class="problema-body">L'host risponde sempre alle stesse domande. L'ospite si perde tra mille fonti. Il momento più importante del soggiorno — quando si deve decidere cosa fare — viene sprecato in una ricerca senza fine.</p>
+    </div>
+    <div class="problema-right">
+      <div class="problema-card reveal reveal-delay-1">
+        <div class="problema-card-tag">Lato Host</div>
+        <h3>Richieste infinite, tempo zero</h3>
+        <p>WiFi, check-in, regole, istruzioni. Le stesse domande ogni giorno, sparse tra PDF, messaggi e WhatsApp. Un loop che consuma tempo e attenzione.</p>
+      </div>
+      <div class="problema-card reveal reveal-delay-2">
+        <div class="problema-card-tag">Lato Ospite</div>
+        <h3>Troppe fonti, poca fiducia</h3>
+        <p>Google, TripAdvisor, Instagram. Cento opzioni, nessuna certezza. Il turista vuole decidere velocemente, ma finisce per perdersi prima ancora di iniziare.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="soluzione" id="soluzione">
+  <div class="soluzione-header">
+    <div class="reveal">
+      <div class="section-label">La soluzione</div>
+      <h2 class="section-title">Non un chatbot.<br><em>Un concierge.</em></h2>
+      <p class="soluzione-desc">ByLocal porta dentro ogni casa vacanza il meglio che una città ha da offrire — selezionato da persone che quella città la conoscono davvero, reso accessibile dall'intelligenza artificiale.</p>
+    </div>
+    <blockquote class="soluzione-quote reveal reveal-delay-2">
+      "Portiamo la risposta <span>dentro la casa</span>, nel momento esatto in cui l'ospite ne ha bisogno."
+    </blockquote>
+  </div>
+  <div class="layers">
+    <div class="layer reveal">
+      <div class="layer-num">1</div>
+      <div class="layer-icon">🏠</div>
+      <div class="layer-sub">Layer Casa</div>
+      <h3>Il portale</h3>
+      <p>Ogni casa vacanza diventa un ecosistema informativo completo. L'host carica tutto una volta sola.</p>
+      <ul>
+        <li>Istruzioni e regole della casa</li>
+        <li>WiFi, check-in e check-out</li>
+        <li>Documenti, link e contatti</li>
+        <li>Accesso ospite via link dedicato</li>
+      </ul>
+    </div>
+    <div class="layer reveal reveal-delay-1">
+      <div class="layer-num">2</div>
+      <div class="layer-icon">🤖</div>
+      <div class="layer-sub">Layer AI</div>
+      <h3>L'interfaccia</h3>
+      <p>Il chatbot risponde solo su contenuti verificati. Zero invenzioni. Zero fuori tema. Solo informazioni reali.</p>
+      <ul>
+        <li>Risposte istantanee 24/7</li>
+        <li>Solo contenuti verificati</li>
+        <li>Fallback intelligente all'host</li>
+        <li>Supporto multilingua</li>
+      </ul>
+    </div>
+    <div class="layer reveal reveal-delay-2">
+      <div class="layer-num">3</div>
+      <div class="layer-icon">🗺️</div>
+      <div class="layer-sub">Layer Editoriale</div>
+      <h3>I curatori</h3>
+      <p>Persone che conoscono il territorio selezionano e filtrano. L'AI distribuisce. Gli umani decidono cosa vale.</p>
+      <ul>
+        <li>Ristoranti e bar selezionati</li>
+        <li>Esperienze autentiche</li>
+        <li>Percorsi e itinerari curati</li>
+        <li>Integrazione contenuti social</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<section class="momento" id="momento">
+  <div class="momento-bg"></div>
+  <div class="momento-time">19:30</div>
+  <div class="momento-inner">
+    <div class="reveal">
+      <div class="section-label" style="justify-content:center;">Il momento che conta</div>
+      <h2 class="momento-title">Sono qui.<br><em>Cosa faccio adesso?</em></h2>
+      <p class="momento-desc">Ogni ospite, ogni sera, si trova davanti alla stessa domanda. In quel momento non vuole cercare — vuole decidere. Velocemente. Fidarsi.</p>
+    </div>
+    <div class="momento-steps reveal">
+      <div class="momento-step">
+        <div class="momento-step-n">01</div>
+        <p>Apre il portale della casa</p>
+      </div>
+      <div class="momento-step">
+        <div class="momento-step-n">02</div>
+        <p>Trova 2–3 suggerimenti selezionati</p>
+      </div>
+      <div class="momento-step">
+        <div class="momento-step-n">03</div>
+        <p>Decide in meno di un minuto</p>
+      </div>
+      <div class="momento-step">
+        <div class="momento-step-n">04</div>
+        <p>Vive un'esperienza autentica</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="curatori" id="curatori">
+  <div class="curatori-inner">
+    <div class="curatori-left reveal">
+      <div class="section-label">Il cuore del sistema</div>
+      <h2 class="section-title">Le persone<br><em>fanno la differenza.</em></h2>
+      <p class="curatori-text">L'AI può rispondere a tutto. Ma non sa cosa conta davvero. Ecco perché ByLocal si basa su curatori locali — persone radicate nel territorio, con una voce riconoscibile e una selezione autentica.</p>
+      <p class="curatori-text">Ogni città ha il suo curatore. Ogni curatore porta identità, fiducia e qualità. La piattaforma distribuisce il tutto dentro ogni casa.</p>
+      <div class="curatori-callout">
+        <p>"Non distribuiamo informazioni. Distribuiamo la persona giusta, nel posto giusto, al momento giusto."</p>
+      </div>
+    </div>
+    <div class="curatori-right">
+      <div class="ruolo-card reveal reveal-delay-1">
+        <div class="ruolo-card-icon">🎙️</div>
+        <h4>Curatore Locale</h4>
+        <p>Seleziona luoghi, esperienze e contenuti. Garantisce autenticità. È la voce della città.</p>
+      </div>
+      <div class="ruolo-card reveal reveal-delay-2">
+        <div class="ruolo-card-icon">🎯</div>
+        <h4>Capo Curatore</h4>
+        <p>Definisce gli standard editoriali. Approva i curatori. Garantisce coerenza tra città.</p>
+      </div>
+      <div class="ruolo-card reveal reveal-delay-1">
+        <div class="ruolo-card-icon">🏠</div>
+        <h4>Host</h4>
+        <p>Carica le informazioni della casa. Gestisce il portale. Riduce drasticamente le richieste operative.</p>
+      </div>
+      <div class="ruolo-card reveal reveal-delay-2">
+        <div class="ruolo-card-icon">✈️</div>
+        <h4>Ospite</h4>
+        <p>Accede al portale. Trova risposte immediate. Scopre la città attraverso occhi di chi la vive.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="visione" id="visione">
+  <div class="visione-bg-text">BYLOCAL</div>
+  <div class="visione-inner">
+    <div class="visione-header reveal">
+      <div class="section-label" style="justify-content:center;">La visione</div>
+      <h2 class="section-title">Da una città.<br><em>A una rete.</em></h2>
+    </div>
+    <div class="visione-grid">
+      <div class="visione-card reveal">
+        <div class="visione-card-n">1</div>
+        <h3>Una città</h3>
+        <p>Un curatore. Una voce. Un'identità locale forte che guida ogni turista in ogni casa.</p>
+      </div>
+      <div class="visione-card reveal reveal-delay-1">
+        <div class="visione-card-n">∞</div>
+        <h3>Una rete</h3>
+        <p>Più città, più curatori, un unico sistema. Ogni nodo amplifica il precedente.</p>
+      </div>
+      <div class="visione-card reveal reveal-delay-2">
+        <div class="visione-card-n">→</div>
+        <h3>Un futuro</h3>
+        <p>Esperienze prenotabili, integrazione social, personalizzazione avanzata. Il soggiorno ridisegnato.</p>
+      </div>
+    </div>
+    <div class="visione-finale reveal">
+      <p class="visione-finale-quote">"Siamo partiti da un chatbot. Stiamo costruendo <em>la guida locale più intelligente</em>, distribuita dentro ogni soggiorno d'Italia."</p>
+      <a href="#contatti" class="btn-primary">Entra nel progetto →</a>
+    </div>
+  </div>
+</section>
+
+<section class="contatti" id="contatti">
+  <div class="contatti-inner">
+    <div class="reveal">
+      <div class="section-label">Parliamoci</div>
+      <h2 class="section-title">Sei un host,<br><em>un curatore,</em><br>un partner?</h2>
+      <p class="contatti-body">ByLocal è in fase di lancio. Stiamo costruendo la rete di case e curatori che darà vita al progetto. Scrivi se vuoi far parte del primo capitolo.</p>
+      <div class="info-items">
+        <div class="info-item">
+          <div class="info-item-icon">📧</div>
+          <div>
+            <div class="info-item-label">Email</div>
+            <div class="info-item-value"><a href="mailto:info@bylocal.it">info@bylocal.it</a></div>
+          </div>
+        </div>
+        <div class="info-item">
+          <div class="info-item-icon">📸</div>
+          <div>
+            <div class="info-item-label">Instagram</div>
+            <div class="info-item-value"><a href="#">@bylocal.it</a></div>
+          </div>
+        </div>
+        <div class="info-item">
+          <div class="info-item-icon">📍</div>
+          <div>
+            <div class="info-item-label">Nato a</div>
+            <div class="info-item-value">Genova, Italia</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="reveal reveal-delay-2">
+      <form class="contatti-form" onsubmit="return false;">
+        <div class="form-row">
+          <div class="form-group">
+            <label>Nome *</label>
+            <input type="text" placeholder="Il tuo nome">
+          </div>
+          <div class="form-group">
+            <label>Email *</label>
+            <input type="email" placeholder="tu@email.com">
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Sei un</label>
+          <select>
+            <option value="">Seleziona il tuo ruolo</option>
+            <option>Host / Property Manager</option>
+            <option>Curatore / Influencer locale</option>
+            <option>Investitore / Partner</option>
+            <option>Turista curioso</option>
+            <option>Altro</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Città di interesse</label>
+          <input type="text" placeholder="Es. Genova, Milano, Firenze...">
+        </div>
+        <div class="form-group">
+          <label>Messaggio *</label>
+          <textarea placeholder="Raccontaci come vorresti collaborare con ByLocal..."></textarea>
+        </div>
+        <button type="submit" class="form-submit">Invia messaggio →</button>
+      </form>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="footer-logo">By<span>Local</span></div>
+  <div class="footer-copy">© 2026 ByLocal · Il concierge digitale per case vacanza · Genova, Italia</div>
+</footer>
+
+<script>
+  const reveals = document.querySelectorAll('.reveal');
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
+  }, { threshold: 0.1 });
+  reveals.forEach(r => observer.observe(r));
+
+  const sections = document.querySelectorAll('section[id]');
+  const navLinks = document.querySelectorAll('.nav-links a');
+  window.addEventListener('scroll', () => {
+    let current = '';
+    sections.forEach(s => { if (window.scrollY >= s.offsetTop - 200) current = s.id; });
+    navLinks.forEach(a => { a.style.color = a.getAttribute('href') === '#' + current ? 'var(--gold)' : ''; });
+  });
+</script>
+</body>
+</html>
