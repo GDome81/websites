@@ -1,0 +1,4514 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Fit Island v2</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700;9..144,800&family=Geist+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --sea-deep: #1e4d5c;
+    --sea-mid: #2d7a8f;
+    --sea-light: #5fb3c4;
+    --sea-pale: #b8dde5;
+    --sand: #f4e4c1;
+    --sand-warm: #e8c896;
+    --sand-deep: #c89968;
+    --terracotta: #c8643c;
+    --terracotta-deep: #9e4828;
+    --terracotta-dark: #5d3825;
+    --olive: #7d9a6e;
+    --olive-deep: #5d8866;
+    --cream: #fff5e1;
+    --ink: #3d2810;
+    --ink-soft: #5d4828;
+    --muted: #8a7560;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+  html, body { width: 100%; height: 100%; overflow: hidden; }
+  body {
+    font-family: 'Fraunces', Georgia, serif;
+    color: var(--ink);
+    background: linear-gradient(180deg, var(--sea-deep) 0%, var(--sea-mid) 40%, var(--sea-light) 100%);
+    display: flex; flex-direction: column;
+    user-select: none; -webkit-user-select: none;
+  }
+
+  /* === TOP BAR === */
+  .top-bar {
+    background: rgba(255,245,225,0.95);
+    backdrop-filter: blur(10px);
+    border-bottom: 2px solid var(--terracotta);
+    padding: 8px 12px;
+    display: flex; align-items: center; gap: 8px;
+    flex-shrink: 0;
+    z-index: 10;
+  }
+  .top-pill {
+    display: flex; align-items: center; gap: 4px;
+    padding: 4px 10px;
+    background: var(--cream);
+    border: 1.5px solid var(--terracotta);
+    border-radius: 999px;
+    font-family: 'Geist Mono', monospace;
+    font-size: 13px; font-weight: 600;
+    color: var(--terracotta-deep);
+  }
+  .top-pill.level { background: var(--terracotta); color: white; border-color: var(--terracotta-deep); }
+  .top-pill.mood { font-size: 16px; padding: 2px 8px; }
+  .xp-bar {
+    flex: 1; height: 8px;
+    background: rgba(157,72,40,0.15);
+    border-radius: 999px;
+    overflow: hidden;
+    border: 1px solid var(--terracotta);
+  }
+  .xp-bar-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--terracotta) 0%, #ff7a1e 100%);
+    transition: width 0.4s ease;
+  }
+  .rate-text {
+    font-family: 'Geist Mono', monospace;
+    font-size: 11px;
+    color: var(--olive-deep);
+    font-weight: 600;
+  }
+
+  /* === ISLAND CONTAINER === */
+  .island-container {
+    flex: 1;
+    position: relative;
+    overflow: hidden;
+    background: linear-gradient(180deg, var(--sea-mid) 0%, var(--sea-light) 70%, var(--sea-pale) 100%);
+  }
+  .island-svg {
+    width: 100%;
+    height: 100%;
+    display: block;
+  }
+
+  /* === BOTTOM NAV === */
+  .bottom-nav {
+    background: rgba(255,245,225,0.95);
+    backdrop-filter: blur(10px);
+    border-top: 2px solid var(--terracotta);
+    padding: 6px 4px;
+    display: flex;
+    flex-shrink: 0;
+    z-index: 10;
+  }
+  .nav-btn {
+    flex: 1;
+    background: none;
+    border: none;
+    padding: 6px 4px;
+    display: flex; flex-direction: column; align-items: center;
+    gap: 2px;
+    cursor: pointer;
+    color: var(--ink);
+    font-family: inherit;
+    border-radius: 8px;
+    transition: background 0.15s;
+  }
+  .nav-btn:active { background: rgba(200,100,60,0.15); }
+  .nav-icon { font-size: 22px; }
+  .nav-label {
+    font-size: 11px; font-weight: 600;
+    font-family: 'Geist Mono', monospace;
+  }
+
+  /* === MODAL OVERLAY === */
+  .modal-overlay {
+    display: none;
+    position: fixed; inset: 0;
+    background: rgba(30,40,50,0.55);
+    z-index: 100;
+    align-items: flex-end;
+    justify-content: center;
+  }
+  .modal {
+    background: var(--cream);
+    border-radius: 20px 20px 0 0;
+    width: 100%;
+    max-width: 500px;
+    max-height: 88vh;
+    display: flex; flex-direction: column;
+    box-shadow: 0 -8px 30px rgba(0,0,0,0.3);
+    animation: slideUp 0.25s ease;
+  }
+  @keyframes slideUp {
+    from { transform: translateY(100%); }
+    to { transform: translateY(0); }
+  }
+  .modal-head {
+    padding: 16px 18px 12px;
+    display: flex; align-items: center; justify-content: space-between;
+    border-bottom: 1.5px solid rgba(157,72,40,0.2);
+  }
+  .modal-head h2 {
+    font-family: 'Fraunces', serif;
+    font-weight: 700;
+    font-size: 22px;
+    color: var(--terracotta-deep);
+  }
+  .close-btn {
+    width: 32px; height: 32px;
+    background: var(--terracotta);
+    border: none;
+    border-radius: 50%;
+    color: white;
+    font-size: 22px;
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    line-height: 1;
+    font-family: inherit;
+  }
+  .modal-content {
+    padding: 16px 18px 24px;
+    overflow-y: auto;
+    flex: 1;
+    -webkit-overflow-scrolling: touch;
+  }
+  .modal-content .muted { color: var(--muted); font-size: 13px; margin-bottom: 12px; }
+  .modal-content .small { font-size: 12px; }
+  .modal-content .center { text-align: center; }
+  .section-title {
+    font-family: 'Fraunces', serif;
+    font-size: 16px;
+    color: var(--terracotta-deep);
+    margin: 18px 0 10px;
+    font-weight: 700;
+  }
+
+  /* === BUTTONS === */
+  .primary-btn, .secondary-btn, .ghost-btn, .menu-btn {
+    width: 100%;
+    padding: 12px 16px;
+    border-radius: 10px;
+    font-family: inherit;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    margin-bottom: 8px;
+    border: none;
+    transition: transform 0.1s, opacity 0.15s;
+  }
+  .primary-btn {
+    background: var(--terracotta);
+    color: white;
+  }
+  .primary-btn:active:not(.disabled) { transform: scale(0.97); }
+  .primary-btn.disabled { opacity: 0.45; cursor: not-allowed; }
+  .primary-btn.small {
+    width: auto;
+    padding: 8px 14px;
+    font-size: 13px;
+    margin-bottom: 0;
+  }
+  .secondary-btn {
+    background: var(--sand-warm);
+    color: var(--ink);
+    border: 1.5px solid var(--terracotta);
+  }
+  .secondary-btn.small { width: auto; padding: 8px 14px; font-size: 13px; margin-bottom: 0; }
+  .ghost-btn {
+    background: transparent;
+    color: var(--muted);
+    border: 1.5px dashed rgba(157,72,40,0.4);
+  }
+  .menu-btn {
+    background: var(--cream);
+    color: var(--ink);
+    text-align: left;
+    border: 1.5px solid rgba(157,72,40,0.25);
+    font-size: 16px;
+  }
+  .menu-btn:active { background: var(--sand); }
+
+  /* === WORKOUT CARDS === */
+  .workout-card {
+    width: 100%;
+    display: flex; align-items: center; gap: 12px;
+    padding: 12px;
+    background: var(--cream);
+    border: 1.5px solid rgba(157,72,40,0.25);
+    border-radius: 12px;
+    margin-bottom: 8px;
+    cursor: pointer;
+    font-family: inherit;
+    text-align: left;
+  }
+  .workout-card:active { background: var(--sand); transform: scale(0.99); }
+  .w-icon {
+    width: 44px; height: 44px;
+    background: var(--sand-warm);
+    border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 24px;
+    flex-shrink: 0;
+  }
+  .w-info { flex: 1; }
+  .w-name { font-size: 15px; font-weight: 700; color: var(--ink); margin-bottom: 3px; }
+  .w-meta { font-family: 'Geist Mono', monospace; font-size: 12px; color: var(--ink-soft); }
+
+  /* === BUILD CARDS === */
+  .build-card {
+    width: 100%;
+    display: flex; align-items: center; gap: 12px;
+    padding: 12px;
+    background: var(--cream);
+    border: 1.5px solid rgba(157,72,40,0.25);
+    border-radius: 12px;
+    margin-bottom: 8px;
+    cursor: pointer;
+    font-family: inherit;
+    text-align: left;
+  }
+  .build-card:active:not(.disabled) { background: var(--sand); transform: scale(0.99); }
+  .build-card.disabled { opacity: 0.5; cursor: not-allowed; }
+  .b-svg {
+    width: 56px; height: 56px;
+    background: var(--sand);
+    border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+  .b-info { flex: 1; min-width: 0; }
+  .b-name { font-size: 15px; font-weight: 700; color: var(--ink); margin-bottom: 2px; }
+  .b-desc { font-size: 12px; color: var(--muted); margin-bottom: 6px; }
+  .b-stats {
+    display: flex; gap: 10px; flex-wrap: wrap;
+    font-family: 'Geist Mono', monospace;
+    font-size: 11px; font-weight: 600;
+    color: var(--terracotta-deep);
+  }
+  .badge-interior {
+    display: inline-block;
+    background: var(--sea-light);
+    color: white;
+    padding: 1px 6px;
+    border-radius: 999px;
+    font-size: 9px;
+    font-family: 'Geist Mono', monospace;
+    font-weight: 700;
+    text-transform: uppercase;
+    vertical-align: middle;
+  }
+
+  /* === BUILDING DETAIL === */
+  .bd-icon {
+    display: flex; justify-content: center;
+    padding: 16px;
+    background: var(--sand);
+    border-radius: 12px;
+    margin-bottom: 12px;
+  }
+  .bd-meta {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px 16px;
+    margin-bottom: 14px;
+    font-size: 14px;
+  }
+  .bd-meta b { color: var(--terracotta-deep); }
+  .bd-stats-box {
+    display: flex; flex-wrap: wrap; gap: 8px;
+    padding: 10px;
+    background: var(--sand);
+    border-radius: 10px;
+    margin-bottom: 12px;
+    font-family: 'Geist Mono', monospace;
+    font-size: 12px;
+    color: var(--ink-soft);
+  }
+  .bd-stats-box span {
+    background: white;
+    padding: 4px 8px;
+    border-radius: 6px;
+  }
+
+  /* === INTERIOR === */
+  .interior-modal { padding-bottom: 24px; }
+  .interior-view {
+    margin-bottom: 12px;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: inset 0 0 20px rgba(0,0,0,0.1);
+  }
+  .interior-info {
+    display: flex; gap: 16px;
+    font-family: 'Geist Mono', monospace;
+    font-size: 13px;
+    color: var(--ink-soft);
+    padding: 8px 12px;
+    background: var(--sand);
+    border-radius: 8px;
+    margin-bottom: 12px;
+    justify-content: center;
+  }
+  .upgrade-card {
+    display: flex; align-items: center; gap: 10px;
+    padding: 10px 12px;
+    background: var(--cream);
+    border: 1.5px solid rgba(157,72,40,0.2);
+    border-radius: 10px;
+    margin-bottom: 8px;
+  }
+  .upgrade-card.applied {
+    background: rgba(123,180,196,0.15);
+    border-color: var(--sea-mid);
+  }
+  .up-info { flex: 1; }
+  .up-name { font-weight: 700; font-size: 14px; margin-bottom: 2px; }
+  .up-desc { font-size: 12px; color: var(--muted); }
+  .up-applied {
+    font-family: 'Geist Mono', monospace;
+    font-size: 12px;
+    color: var(--sea-mid);
+    font-weight: 700;
+  }
+
+  /* === DECORAZIONI === */
+  .decor-card {
+    display: flex; align-items: center; gap: 10px;
+    padding: 10px;
+    background: var(--cream);
+    border: 1.5px solid rgba(157,72,40,0.2);
+    border-radius: 10px;
+    margin-bottom: 8px;
+  }
+  .d-svg {
+    width: 56px; height: 56px;
+    background: var(--sand);
+    border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+  .d-info { flex: 1; min-width: 0; }
+  .d-name { font-weight: 700; font-size: 14px; }
+  .d-desc { font-size: 12px; color: var(--muted); }
+  .d-owned { font-family: 'Geist Mono', monospace; font-size: 11px; color: var(--olive-deep); }
+  .d-actions { display: flex; flex-direction: column; gap: 4px; }
+
+  /* === QUEST / ACH === */
+  .quest-card, .ach-card {
+    display: flex; align-items: center; gap: 10px;
+    padding: 12px;
+    background: var(--cream);
+    border: 1.5px solid rgba(157,72,40,0.2);
+    border-radius: 10px;
+    margin-bottom: 8px;
+  }
+  .quest-card.ready, .ach-card.ready {
+    border-color: var(--olive-deep);
+    background: rgba(125,154,110,0.12);
+  }
+  .quest-card.claimed, .ach-card.claimed {
+    opacity: 0.55;
+  }
+  .ach-card.locked { opacity: 0.6; }
+  .q-info, .a-info { flex: 1; }
+  .q-name, .a-name { font-weight: 700; font-size: 14px; }
+  .q-desc, .a-desc { font-size: 12px; color: var(--muted); margin-top: 2px; }
+  .a-reward { font-family: 'Geist Mono', monospace; font-size: 11px; color: var(--terracotta-deep); margin-top: 4px; font-weight: 600; }
+  .q-progress { display: flex; align-items: center; gap: 8px; margin-top: 6px; font-family: 'Geist Mono', monospace; font-size: 11px; }
+  .q-bar { flex: 1; height: 6px; background: rgba(0,0,0,0.1); border-radius: 999px; overflow: hidden; }
+  .q-bar-fill { height: 100%; background: var(--olive-deep); transition: width 0.3s; }
+  .claimed-tag {
+    font-family: 'Geist Mono', monospace;
+    font-size: 11px;
+    color: var(--olive-deep);
+    font-weight: 700;
+  }
+
+  /* === POPULATION === */
+  .pop-overview {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 16px;
+    background: var(--sand);
+    border-radius: 12px;
+    margin-bottom: 12px;
+  }
+  .pop-big {
+    font-family: 'Fraunces', serif;
+    font-size: 36px;
+    font-weight: 700;
+    color: var(--terracotta-deep);
+  }
+  .pop-big .muted { font-size: 20px; }
+  .pop-trend {
+    font-family: 'Geist Mono', monospace;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--terracotta-deep);
+    text-align: right;
+  }
+  .stat-row { margin-bottom: 14px; }
+  .stat-head {
+    display: flex; justify-content: space-between;
+    font-size: 14px; font-weight: 700;
+    margin-bottom: 4px;
+  }
+  .stat-val { font-family: 'Geist Mono', monospace; font-size: 12px; color: var(--ink-soft); }
+  .stat-bar {
+    height: 10px;
+    background: rgba(0,0,0,0.08);
+    border-radius: 999px;
+    overflow: hidden;
+  }
+  .stat-fill { height: 100%; transition: width 0.5s ease; }
+  .stat-hint { font-size: 11px; color: var(--muted); margin-top: 3px; font-style: italic; }
+  .archetype-list {
+    background: var(--sand);
+    border-radius: 10px;
+    padding: 10px;
+  }
+  .arch-row {
+    display: flex; align-items: center; gap: 10px;
+    padding: 4px 0;
+    font-size: 13px;
+  }
+  .arch-color { width: 14px; height: 14px; border-radius: 4px; }
+  .arch-name { flex: 1; }
+  .arch-count {
+    font-family: 'Geist Mono', monospace;
+    font-weight: 600;
+    color: var(--terracotta-deep);
+  }
+
+  /* === SATELLITE === */
+  .sat-card {
+    display: flex; align-items: center; gap: 10px;
+    padding: 12px;
+    background: var(--cream);
+    border: 1.5px solid rgba(157,72,40,0.2);
+    border-radius: 10px;
+    margin-bottom: 8px;
+  }
+  .sat-card.unlocked { background: rgba(125,154,110,0.1); border-color: var(--olive-deep); }
+  .sat-info { flex: 1; }
+  .sat-name { font-weight: 700; font-size: 15px; }
+  .sat-desc { font-size: 12px; color: var(--muted); margin: 2px 0; }
+  .sat-req { font-family: 'Geist Mono', monospace; font-size: 11px; color: var(--terracotta-deep); font-weight: 600; }
+  .sat-preview {
+    display: flex; justify-content: center;
+    padding: 16px;
+    background: var(--sea-pale);
+    border-radius: 12px;
+    margin-bottom: 12px;
+  }
+  .sat-detail { margin-bottom: 12px; font-size: 14px; line-height: 1.7; }
+  .sat-detail .ok { color: var(--olive-deep); font-weight: 600; }
+  .sat-detail .no { color: var(--terracotta-deep); font-weight: 600; }
+
+  /* === STATS === */
+  .stat-line {
+    display: flex; justify-content: space-between;
+    padding: 8px 0;
+    border-bottom: 1px solid rgba(157,72,40,0.1);
+    font-size: 14px;
+  }
+  .stat-line b { color: var(--terracotta-deep); }
+  .hist-row {
+    display: flex; justify-content: space-between;
+    padding: 6px 0;
+    font-size: 13px;
+  }
+
+  /* === INTRO === */
+  .intro p { margin-bottom: 12px; line-height: 1.5; }
+
+  /* === TOAST === */
+  .toast-container {
+    position: fixed;
+    top: 70px; left: 50%;
+    transform: translateX(-50%);
+    z-index: 200;
+    display: flex; flex-direction: column;
+    gap: 6px;
+    pointer-events: none;
+  }
+  .toast {
+    padding: 10px 18px;
+    background: var(--ink);
+    color: var(--cream);
+    border-radius: 999px;
+    font-family: 'Geist Mono', monospace;
+    font-size: 13px;
+    font-weight: 600;
+    opacity: 0;
+    transform: translateY(-12px);
+    transition: opacity 0.3s, transform 0.3s;
+    white-space: nowrap;
+    box-shadow: 0 4px 14px rgba(0,0,0,0.3);
+  }
+  .toast.show { opacity: 1; transform: translateY(0); }
+  .toast-good { background: var(--olive-deep); }
+  .toast-warn { background: var(--terracotta); }
+  .toast-levelup { background: linear-gradient(90deg, var(--terracotta), #ff7a1e); font-size: 14px; }
+  .toast-achievement { background: linear-gradient(90deg, #d9a86a, #ff7a1e); }
+
+  /* === PLACEMENT BAR === */
+  .placement-bar {
+    display: none;
+    position: fixed;
+    top: 56px; left: 0; right: 0;
+    background: var(--ink);
+    color: var(--cream);
+    padding: 10px 14px;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    z-index: 50;
+    font-family: 'Geist Mono', monospace;
+    font-size: 13px;
+    font-weight: 600;
+  }
+  .placement-bar button {
+    background: var(--terracotta);
+    color: white;
+    border: none;
+    padding: 6px 14px;
+    border-radius: 6px;
+    font-family: inherit;
+    font-weight: 700;
+    cursor: pointer;
+  }
+
+  /* === INFO BANNERS (tutorial / hint) === */
+  .info-banner {
+    display: none;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 14px;
+    margin: 0 auto;
+    max-width: 600px;
+    border-bottom: 2px solid;
+    font-family: 'Geist Mono', monospace;
+    font-size: 12px;
+    line-height: 1.4;
+  }
+  .tutorial-banner {
+    background: linear-gradient(90deg, #fff5e1, #f4e4c1);
+    border-color: var(--terracotta);
+    color: var(--terracotta-deep);
+  }
+  .hint-banner {
+    background: linear-gradient(90deg, #ffe9c9, #fdd9a3);
+    border-color: var(--terracotta);
+    color: var(--ink);
+  }
+  .banner-icon { font-size: 18px; flex-shrink: 0; }
+  .banner-text { flex: 1; }
+  .banner-close {
+    width: 26px; height: 26px;
+    border-radius: 50%;
+    border: none;
+    background: rgba(0,0,0,0.1);
+    color: var(--ink);
+    cursor: pointer;
+    font-size: 16px;
+    line-height: 1;
+    flex-shrink: 0;
+    font-family: inherit;
+  }
+
+  /* === WORKOUT DETAIL: SLIDERS & SEGMENTED CONTROL === */
+  .param-row {
+    margin-bottom: 16px;
+    padding: 12px;
+    background: var(--sand);
+    border-radius: 10px;
+  }
+  .param-label {
+    display: block;
+    font-size: 13px;
+    color: var(--ink);
+    margin-bottom: 8px;
+    font-weight: 600;
+  }
+  .param-label b { color: var(--terracotta-deep); font-family: 'Geist Mono', monospace; }
+  .slider {
+    width: 100%;
+    height: 32px;
+    -webkit-appearance: none;
+    appearance: none;
+    background: transparent;
+    cursor: pointer;
+  }
+  .slider::-webkit-slider-runnable-track {
+    height: 8px;
+    background: rgba(157,72,40,0.2);
+    border-radius: 999px;
+  }
+  .slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 22px; height: 22px;
+    background: var(--terracotta);
+    border-radius: 50%;
+    border: 2px solid var(--cream);
+    margin-top: -7px;
+    cursor: pointer;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+  }
+  .slider::-moz-range-track {
+    height: 8px;
+    background: rgba(157,72,40,0.2);
+    border-radius: 999px;
+  }
+  .slider::-moz-range-thumb {
+    width: 22px; height: 22px;
+    background: var(--terracotta);
+    border-radius: 50%;
+    border: 2px solid var(--cream);
+    cursor: pointer;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+  }
+
+  .seg-control {
+    display: flex;
+    gap: 0;
+    border-radius: 8px;
+    overflow: hidden;
+    border: 1.5px solid var(--terracotta);
+  }
+  .seg-control .seg {
+    flex: 1;
+    padding: 10px 8px;
+    background: var(--cream);
+    border: none;
+    cursor: pointer;
+    font-family: inherit;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--ink);
+    transition: background 0.15s;
+  }
+  .seg-control .seg + .seg { border-left: 1px solid rgba(157,72,40,0.25); }
+  .seg-control .seg.active {
+    background: var(--terracotta);
+    color: white;
+  }
+
+  /* === REWARD PREVIEW === */
+  .reward-preview {
+    margin: 16px 0;
+    padding: 14px;
+    background: linear-gradient(180deg, var(--cream), var(--sand));
+    border-radius: 10px;
+    border: 1.5px solid var(--terracotta);
+  }
+  .reward-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 4px 0;
+    font-size: 14px;
+  }
+  .reward-row b {
+    font-family: 'Geist Mono', monospace;
+    color: var(--terracotta-deep);
+    font-size: 15px;
+  }
+  .reward-row.small { font-size: 11px; }
+
+  /* === BUILD EXTRAS === */
+  .badge-owned {
+    display: inline-block;
+    background: var(--olive-deep);
+    color: white;
+    padding: 1px 6px;
+    border-radius: 999px;
+    font-size: 9px;
+    font-family: 'Geist Mono', monospace;
+    font-weight: 700;
+    vertical-align: middle;
+  }
+  .warn-banner {
+    padding: 10px 12px;
+    background: rgba(200,100,60,0.15);
+    border: 1.5px solid var(--terracotta);
+    border-radius: 8px;
+    color: var(--terracotta-deep);
+    font-size: 12px;
+    margin-bottom: 12px;
+    font-weight: 600;
+  }
+
+  /* === CONSTRUCTION DETAIL === */
+  .construction-progress {
+    margin-bottom: 16px;
+    padding: 16px;
+    background: var(--sand);
+    border-radius: 10px;
+  }
+  .cp-bar {
+    height: 14px;
+    background: rgba(0,0,0,0.1);
+    border-radius: 999px;
+    overflow: hidden;
+    margin-bottom: 10px;
+  }
+  .cp-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--terracotta), #ff7a1e);
+    transition: width 0.5s;
+  }
+  .cp-time {
+    font-family: 'Geist Mono', monospace;
+    font-size: 14px;
+    color: var(--ink);
+    font-weight: 600;
+    text-align: center;
+  }
+
+  /* === UNLOCK SLOT === */
+  .unlock-cost-box {
+    padding: 20px;
+    background: var(--sand);
+    border-radius: 12px;
+    text-align: center;
+    margin-bottom: 12px;
+  }
+  .big-cost {
+    font-family: 'Fraunces', serif;
+    font-size: 36px;
+    font-weight: 700;
+    color: var(--terracotta-deep);
+  }
+
+  /* === GEM SHOP === */
+  .gem-pack {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px;
+    background: var(--cream);
+    border: 1.5px solid rgba(157,72,40,0.2);
+    border-radius: 10px;
+    margin-bottom: 8px;
+  }
+  .gp-name { font-weight: 700; font-size: 15px; }
+  .gp-detail { font-family: 'Geist Mono', monospace; font-size: 13px; color: var(--ink-soft); margin-top: 2px; }
+  .diamond-use {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px;
+    background: var(--sand);
+    border-radius: 8px;
+    margin-bottom: 8px;
+  }
+  .du-icon { font-size: 22px; width: 32px; text-align: center; }
+  .du-text { flex: 1; font-size: 13px; line-height: 1.4; }
+
+  /* === DECORATE === */
+  .decor-cap-info {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 12px;
+    background: var(--sand);
+    border-radius: 8px;
+    margin-bottom: 12px;
+    font-family: 'Geist Mono', monospace;
+    font-size: 13px;
+  }
+  .decor-cap-info b { color: var(--terracotta-deep); }
+  .d-svg-big {
+    display: flex;
+    justify-content: center;
+    padding: 18px;
+    background: var(--sand);
+    border-radius: 12px;
+    margin-bottom: 12px;
+  }
+
+  /* === SVG INTERACTIVE === */
+  /* NB: NON applicare mai 'transform' via CSS a elementi SVG che hanno gia un attributo
+     transform di posizionamento — sovrascriverebbe la posizione e l'elemento "salta". */
+  .slot-empty, .building-placed, .sat-hitbox, .decor-marker {
+    cursor: pointer;
+    transition: opacity 0.2s, filter 0.15s;
+  }
+  /* Hover solo su desktop (mouse), NON su touch */
+  @media (hover: hover) and (pointer: fine) {
+    .slot-empty:hover { opacity: 0.7; }
+    .building-placed:hover { filter: brightness(1.1); }
+    .decor-marker:hover { opacity: 0.85; }
+  }
+  /* Feedback al tap senza alterare la position transform: usiamo opacity */
+  .slot-empty:active, .building-placed:active, .decor-marker:active { opacity: 0.5; }
+
+  /* === ZOOM CONTROLS === */
+  .zoom-controls {
+    position: absolute;
+    right: 12px;
+    bottom: 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    z-index: 20;
+  }
+  .zoom-btn {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: rgba(255,245,225,0.95);
+    border: 2px solid var(--terracotta);
+    color: var(--terracotta-deep);
+    font-size: 20px;
+    font-weight: 700;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 1;
+    font-family: inherit;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+    transition: transform 0.1s;
+  }
+  .zoom-btn:active { transform: scale(0.9); }
+  .zoom-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+  .island-svg {
+    touch-action: none; /* gestiamo noi pinch/pan */
+    cursor: grab;
+  }
+  .island-svg.dragging { cursor: grabbing; }
+
+  /* === Responsive === */
+  /* Mobile portrait (default): tutto stretto, modali bottom sheet */
+
+  /* Tablet portrait e small desktop */
+  @media (min-width: 600px) {
+    body {
+      background: linear-gradient(135deg, var(--sea-deep) 0%, var(--sea-mid) 50%, var(--sea-light) 100%);
+    }
+    .top-bar, .bottom-nav { max-width: none; width: 100%; }
+    .island-container { max-width: none; width: 100%; }
+
+    /* Modali centrati invece che bottom-sheet */
+    .modal-overlay {
+      align-items: center;
+      padding: 24px;
+    }
+    .modal {
+      border-radius: 20px;
+      max-width: 540px;
+      max-height: 85vh;
+      animation: fadeScale 0.2s ease;
+    }
+    @keyframes fadeScale {
+      from { opacity: 0; transform: scale(0.95); }
+      to   { opacity: 1; transform: scale(1); }
+    }
+    /* Top bar / bottom nav meno densi */
+    .top-bar { padding: 10px 24px; }
+    .bottom-nav { padding: 8px 12px; }
+    .nav-icon { font-size: 26px; }
+    .nav-label { font-size: 12px; }
+    /* Toast piu in alto */
+    .toast-container { top: 80px; }
+    /* Zoom controls piu grossi */
+    .zoom-btn { width: 48px; height: 48px; font-size: 22px; }
+  }
+
+  /* Desktop landscape: layout con sidebar info */
+  @media (min-width: 1024px) {
+    .top-bar { padding: 14px 32px; }
+    .top-pill {
+      padding: 6px 14px;
+      font-size: 14px;
+    }
+    .xp-bar { max-width: 320px; }
+    .bottom-nav { padding: 10px 16px; max-width: 760px; margin: 0 auto; }
+    .nav-btn { padding: 8px; }
+    .nav-icon { font-size: 28px; }
+    .modal { max-width: 600px; }
+    /* Banner piu ariosi */
+    .info-banner { padding: 12px 24px; font-size: 13px; }
+    /* Container isola con max-width per non spalmare troppo, ma flex per centrare */
+    .island-container {
+      max-width: none;
+    }
+    /* Toast piu grandi */
+    .toast { padding: 12px 22px; font-size: 14px; }
+  }
+
+  /* Mobile landscape: piu compatto in altezza */
+  @media (max-height: 480px) and (orientation: landscape) {
+    .top-bar { padding: 4px 12px; }
+    .top-pill { padding: 2px 8px; font-size: 11px; }
+    .bottom-nav { padding: 2px 4px; }
+    .nav-icon { font-size: 18px; }
+    .nav-label { font-size: 9px; }
+    .info-banner { padding: 4px 10px; font-size: 11px; }
+    .banner-icon { font-size: 14px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- TOP BAR -->
+<div class="top-bar">
+  <div class="top-pill level"><span id="levelText">Lv1</span></div>
+  <div class="xp-bar"><div class="xp-bar-fill" id="xpBarFill" style="width:0%"></div></div>
+  <div class="top-pill"><span>💰</span><span id="coinsText">0</span></div>
+  <div class="top-pill"><span>💎</span><span id="gemsText">0</span></div>
+</div>
+<div style="display:flex;align-items:center;gap:8px;padding:4px 12px;background:rgba(255,245,225,0.85);border-bottom:1px solid rgba(157,72,40,0.2);font-family:'Geist Mono',monospace;font-size:11px;color:var(--ink-soft);max-width:600px;margin:0 auto;width:100%">
+  <span id="popText">👥 0</span>
+  <span id="moodText" style="font-size:14px">😊</span>
+  <span id="streakText"></span>
+  <span style="flex:1"></span>
+  <span id="rateText">+0/s</span>
+</div>
+
+<!-- PLACEMENT BAR (decor placement) -->
+<div class="placement-bar" id="placementBar">
+  <span id="placementText">Tocca uno slot per piazzare</span>
+  <button id="cancelPlacementBtn">Annulla</button>
+</div>
+
+<!-- TUTORIAL BANNER -->
+<div class="info-banner tutorial-banner" id="tutorialBanner">
+  <span class="banner-icon">💡</span>
+  <span class="banner-text" id="tutorialText"></span>
+  <button id="tutorialCloseBtn" class="banner-close">×</button>
+</div>
+
+<!-- HINT BANNER -->
+<div class="info-banner hint-banner" id="hintBanner">
+  <span class="banner-icon">⚠️</span>
+  <span class="banner-text" id="hintText"></span>
+  <button id="hintCloseBtn" class="banner-close">×</button>
+</div>
+
+<!-- ISLAND CONTAINER -->
+<div class="island-container">
+  <svg class="island-svg" id="islandSvg" viewBox="-280 -220 1480 920" preserveAspectRatio="xMidYMid meet">
+    <!-- DEFS -->
+    <defs>
+      <radialGradient id="islandGrad" cx="50%" cy="40%">
+        <stop offset="0%" stop-color="#9bb88a"/>
+        <stop offset="65%" stop-color="#7d9a6e"/>
+        <stop offset="100%" stop-color="#5d8866"/>
+      </radialGradient>
+      <radialGradient id="sandGrad" cx="50%" cy="50%">
+        <stop offset="0%" stop-color="#f4e4c1"/>
+        <stop offset="100%" stop-color="#d4a878"/>
+      </radialGradient>
+      <linearGradient id="seaWave" x1="0%" y1="0%" x2="0%" y2="100%">
+        <stop offset="0%" stop-color="#5fb3c4"/>
+        <stop offset="100%" stop-color="#7ac9d9"/>
+      </linearGradient>
+    </defs>
+
+    <!-- WAVES BACKGROUND -->
+    <g id="wavesLayer" opacity="0.4">
+      <path d="M-280,200 Q-100,180 100,200 T500,200 T900,200 T1200,200" stroke="#fff" stroke-width="2" fill="none" opacity="0.4"/>
+      <path d="M-280,360 Q-100,340 100,360 T500,360 T900,360 T1200,360" stroke="#fff" stroke-width="2" fill="none" opacity="0.3"/>
+      <path d="M-280,500 Q-100,480 100,500 T500,500 T900,500 T1200,500" stroke="#fff" stroke-width="2" fill="none" opacity="0.3"/>
+      <path d="M-280,640 Q-100,620 100,640 T500,640 T900,640 T1200,640" stroke="#fff" stroke-width="2" fill="none" opacity="0.4"/>
+    </g>
+
+    <!-- SATELLITE ISLANDS (rendered first, behind) -->
+    <g id="satelliteLayer"></g>
+
+    <!-- BRIDGES -->
+    <g id="bridgeLayer"></g>
+
+    <!-- MAIN ISLAND -->
+    <g id="mainIslandLayer">
+      <!-- Spiaggia sabbia esterna -->
+      <ellipse cx="450" cy="400" rx="430" ry="330" fill="url(#sandGrad)" opacity="0.9"/>
+      <!-- Erba/Vegetazione -->
+      <ellipse cx="450" cy="380" rx="380" ry="280" fill="url(#islandGrad)"/>
+      <!-- Sentieri stilizzati -->
+      <path d="M150,440 Q300,410 450,420 T740,440" stroke="#c8a878" stroke-width="6" fill="none" opacity="0.4"/>
+      <path d="M450,200 Q450,300 450,420" stroke="#c8a878" stroke-width="4" fill="none" opacity="0.35"/>
+      <!-- Cespugli ambientali -->
+      <circle cx="220" cy="320" r="14" fill="#5d8866" opacity="0.6"/>
+      <circle cx="680" cy="340" r="12" fill="#5d8866" opacity="0.6"/>
+      <circle cx="540" cy="280" r="10" fill="#7d9a6e" opacity="0.6"/>
+      <circle cx="320" cy="280" r="11" fill="#7d9a6e" opacity="0.6"/>
+      <circle cx="640" cy="460" r="13" fill="#5d8866" opacity="0.6"/>
+      <circle cx="160" cy="500" r="12" fill="#5d8866" opacity="0.6"/>
+    </g>
+
+    <!-- DECORAZIONI -->
+    <g id="decorLayer"></g>
+
+    <!-- SLOT VUOTI -->
+    <g id="slotLayer"></g>
+
+    <!-- EDIFICI -->
+    <g id="buildingLayer"></g>
+
+    <!-- NPC -->
+    <g id="npcLayer"></g>
+
+    <!-- BARCA -->
+    <g id="boatLayer"></g>
+
+    <!-- PLACEMENT MARKERS (decor placement) -->
+    <g id="placementLayer"></g>
+  </svg>
+  <!-- ZOOM CONTROLS -->
+  <div class="zoom-controls">
+    <button class="zoom-btn" id="zoomInBtn" title="Zoom +">+</button>
+    <button class="zoom-btn" id="zoomOutBtn" title="Zoom −">−</button>
+    <button class="zoom-btn" id="zoomResetBtn" title="Reset" style="font-size:16px">⌖</button>
+  </div>
+</div>
+
+<!-- BOTTOM NAV -->
+<div class="bottom-nav">
+  <button class="nav-btn" id="navWorkout">
+    <span class="nav-icon">💪</span>
+    <span class="nav-label">Workout</span>
+  </button>
+  <button class="nav-btn" id="navQuests">
+    <span class="nav-icon">📋</span>
+    <span class="nav-label">Quest</span>
+  </button>
+  <button class="nav-btn" id="navAch">
+    <span class="nav-icon">🏆</span>
+    <span class="nav-label">Obiettivi</span>
+  </button>
+  <button class="nav-btn" id="navMore">
+    <span class="nav-icon">⋯</span>
+    <span class="nav-label">Altro</span>
+  </button>
+</div>
+
+<!-- MODAL OVERLAY -->
+<div class="modal-overlay" id="modalOverlay">
+  <div class="modal">
+    <div id="modalBody"></div>
+  </div>
+</div>
+
+<!-- TOAST CONTAINER -->
+<div class="toast-container" id="toastContainer"></div>
+
+<!-- SCRIPTS PLACEHOLDER -->
+<script id="dataScript">
+// ============================================================
+// FIT ISLAND v2 — DATA
+// ============================================================
+
+const SAVE_KEY = 'fit_island_save_v2';
+const VERSION = '2.0.0';
+
+// --- Zone ---
+const ZONES = {
+  beach:    { id:'beach',    name:'Beach Run',     color:'#e8c896', icon:'🏖️', desc:'Cardio • costa', statBoost:'vitalita' },
+  iron:     { id:'iron',     name:'Iron Cove',     color:'#a8826a', icon:'💪', desc:'Forza',          statBoost:'forza' },
+  zen:      { id:'zen',      name:'Zen Garden',    color:'#9bb88a', icon:'🍃', desc:'Mobilità',       statBoost:'armonia' },
+  plaza:    { id:'plaza',    name:'Vitality Plaza',color:'#d9a86a', icon:'🍊', desc:'Hub sociale',    statBoost:'comunita' },
+  spa:      { id:'spa',      name:'Sunset Spa',    color:'#d4a8b8', icon:'♨️', desc:'Recupero',       statBoost:'armonia' },
+  summit:   { id:'summit',   name:'Summit Trail',  color:'#b8a89c', icon:'⛰️', desc:'Achievement',    statBoost:'forza' },
+};
+
+// --- Slot fissi sull'isola principale ---
+// Coordinate in viewBox 1000x700
+// premium: slot bonus a sblocco coins/gem. unlockCost = coins; unlockGems = gems (alternativo)
+const SLOTS_MAIN = [
+  // Beach Run (costa sud)
+  { id:'b1', zone:'beach',  x:200, y:540 },
+  { id:'b2', zone:'beach',  x:340, y:580 },
+  { id:'b3', zone:'beach',  x:500, y:600 },
+  { id:'b4', zone:'beach',  x:660, y:580 },
+  // Iron Cove (est)
+  { id:'i1', zone:'iron',   x:760, y:430 },
+  { id:'i2', zone:'iron',   x:800, y:340 },
+  // Zen Garden (ovest)
+  { id:'z1', zone:'zen',    x:200, y:380 },
+  { id:'z2', zone:'zen',    x:160, y:280 },
+  // Vitality Plaza (centro)
+  { id:'p1', zone:'plaza',  x:460, y:380 },
+  { id:'p2', zone:'plaza',  x:560, y:410 },
+  { id:'p3', zone:'plaza',  x:380, y:440 },
+  // Sunset Spa (ovest-sud)
+  { id:'s1', zone:'spa',    x:280, y:480 },
+  { id:'s2', zone:'spa',    x:140, y:440 },
+  // Summit Trail (nord)
+  { id:'m1', zone:'summit', x:480, y:200 },
+  { id:'m2', zone:'summit', x:600, y:240 },
+  { id:'m3', zone:'summit', x:380, y:240 },
+  // SLOT PREMIUM (sbloccabili con coins)
+  { id:'prem_b5', zone:'beach',  x:60,  y:580, premium:true, unlockCost:2500 },
+  { id:'prem_p4', zone:'plaza',  x:440, y:480, premium:true, unlockCost:5000 },
+  { id:'prem_i3', zone:'iron',   x:740, y:520, premium:true, unlockCost:8000 },
+  // SLOT PREMIUM (sbloccabili con gemme - vista panoramica)
+  { id:'gem_m4',  zone:'summit', x:540, y:160, premium:true, unlockGems:8 },
+  { id:'gem_s3',  zone:'spa',    x:240, y:560, premium:true, unlockGems:12 },
+  { id:'gem_z3',  zone:'zen',    x:120, y:200, premium:true, unlockGems:18 },
+];
+
+// --- Edifici ---
+// stats: bonus per stat dell'isola (vitalita/armonia/forza/comunita)
+// capacity: quante persone "ospita" (contribuisce a popolazione max)
+// attracts: tipi di NPC attratti
+const BUILDINGS = {
+  // === BEACH RUN ===
+  jog_path:    { id:'jog_path',    name:'Pista Jogging',   zone:'beach', cost:50,    rate:1,    capacity:3, stats:{vitalita:4},                icon:'path',     desc:'Una pista lungo la costa.', attracts:['jogger'] },
+  beach_lounger:{id:'beach_lounger',name:'Lounger Spiaggia',zone:'beach', cost:120,   rate:2,    capacity:2, stats:{armonia:3,vitalita:1},      icon:'lounger',  desc:'Relax in riva al mare.', attracts:['nuotatore'] },
+  surf_shack:  { id:'surf_shack',  name:'Surf Shack',      zone:'beach', cost:280,   rate:5,    capacity:5, stats:{vitalita:6,comunita:2},     icon:'shack',    desc:'Tavole, onde, energia.', attracts:['nuotatore','jogger'], hasInterior:true },
+  pier:        { id:'pier',        name:'Molo',            zone:'beach', cost:650,   rate:10,   capacity:4, stats:{comunita:5,vitalita:2},     icon:'pier',     desc:'Le barche attraccano qui. Più migranti.', attracts:['nuotatore'] },
+  lighthouse:  { id:'lighthouse',  name:'Faro',            zone:'beach', cost:1800,  rate:24,   capacity:2, stats:{vitalita:5,armonia:3,comunita:3,forza:3}, icon:'lighthouse', desc:'Punto panoramico. Vista sull\'isola.', attracts:['escursionista'], hasInterior:true },
+
+  // === IRON COVE ===
+  outdoor_gym: { id:'outdoor_gym', name:'Palestra Aperta', zone:'iron',  cost:80,    rate:1.5,  capacity:4, stats:{forza:5},                   icon:'gym',      desc:'Attrezzi sotto il sole.', attracts:['atleta'], hasInterior:true },
+  parallel_bars:{id:'parallel_bars',name:'Parallele',      zone:'iron',  cost:200,   rate:3,    capacity:3, stats:{forza:4,vitalita:1},        icon:'bars',     desc:'Calistenia pura.', attracts:['atleta'] },
+  climb_wall:  { id:'climb_wall',  name:'Parete Climb',    zone:'iron',  cost:550,   rate:8,    capacity:4, stats:{forza:6,vitalita:3},        icon:'climb',    desc:'Sfida verticale.', attracts:['atleta','escursionista'] },
+  forge:       { id:'forge',       name:'Forgia',          zone:'iron',  cost:1400,  rate:18,   capacity:3, stats:{forza:8,comunita:2},        icon:'forge',    desc:'Pesi liberi, ghisa nera.', attracts:['atleta'] },
+  dojo:        { id:'dojo',        name:'Dojo',            zone:'iron',  cost:3200,  rate:38,   capacity:6, stats:{forza:7,armonia:4,comunita:3}, icon:'dojo', desc:'Arti marziali e disciplina.', attracts:['atleta','yogi'] },
+
+  // === ZEN GARDEN ===
+  zen_pad:     { id:'zen_pad',     name:'Tappeto Zen',     zone:'zen',   cost:60,    rate:1.2,  capacity:2, stats:{armonia:4},                 icon:'zen',      desc:'Meditazione semplice.', attracts:['yogi'] },
+  pavilion:    { id:'pavilion',    name:'Padiglione Yoga', zone:'zen',   cost:180,   rate:3,    capacity:4, stats:{armonia:5,vitalita:1},      icon:'pavilion', desc:'Asana sotto il legno.', attracts:['yogi'] },
+  koi_pond:    { id:'koi_pond',    name:'Stagno Koi',      zone:'zen',   cost:450,   rate:6,    capacity:2, stats:{armonia:7,comunita:1},      icon:'pond',     desc:'Pesci dorati e silenzio.', attracts:['yogi'] },
+  bamboo_grove:{id:'bamboo_grove', name:'Bambù',           zone:'zen',   cost:1100,  rate:14,   capacity:3, stats:{armonia:8,vitalita:2},      icon:'bamboo',   desc:'Foresta sussurrante.', attracts:['yogi','escursionista'] },
+  tea_house:   { id:'tea_house',   name:'Casa del Tè',     zone:'zen',   cost:2600,  rate:30,   capacity:5, stats:{armonia:7,comunita:4},      icon:'tea',      desc:'Cerimonia e calma.', attracts:['yogi'] },
+
+  // === VITALITY PLAZA ===
+  juice_bar:   { id:'juice_bar',   name:'Juice Bar',       zone:'plaza', cost:90,    rate:1.8,  capacity:5, stats:{comunita:4,vitalita:2},     icon:'bar',      desc:'Centrifughe e sorrisi.', attracts:['jogger','nuotatore','yogi'], hasInterior:true },
+  healthy_cafe:{id:'healthy_cafe', name:'Café Healthy',    zone:'plaza', cost:230,   rate:4,    capacity:6, stats:{comunita:6,armonia:2},      icon:'cafe',     desc:'Brunch e cappuccini d\'avena.', attracts:['yogi','jogger'] },
+  market:      { id:'market',      name:'Mercato Bio',     zone:'plaza', cost:600,   rate:9,    capacity:5, stats:{comunita:7,vitalita:2},     icon:'market',   desc:'Frutta, verdura, vita.', attracts:['yogi','nuotatore','atleta','jogger','escursionista'] },
+  amphitheater:{id:'amphitheater', name:'Anfiteatro',      zone:'plaza', cost:1500,  rate:20,   capacity:10,stats:{comunita:10,vitalita:3},    icon:'amphi',    desc:'Eventi e raduni.', attracts:['yogi','nuotatore','atleta','jogger','escursionista'] },
+
+  // === SUNSET SPA ===
+  spa_pools:   { id:'spa_pools',   name:'Vasche Termali',  zone:'spa',   cost:110,   rate:2,    capacity:4, stats:{armonia:5,vitalita:1},      icon:'pools',    desc:'Acque calde e vapore.', attracts:['nuotatore','yogi'], hasInterior:true },
+  sauna:       { id:'sauna',       name:'Sauna',           zone:'spa',   cost:300,   rate:5,    capacity:3, stats:{armonia:6,vitalita:2},      icon:'sauna',    desc:'Sudore e detox.', attracts:['atleta','nuotatore'] },
+  massage_hut: { id:'massage_hut', name:'Capanna Massaggi',zone:'spa',   cost:750,   rate:10,   capacity:3, stats:{armonia:8,vitalita:1},      icon:'massage',  desc:'Mani esperte.', attracts:['atleta','yogi'] },
+  hammam:      { id:'hammam',      name:'Hammam',          zone:'spa',   cost:1900,  rate:25,   capacity:5, stats:{armonia:9,comunita:3},      icon:'hammam',   desc:'Tradizione orientale.', attracts:['yogi','nuotatore'] },
+
+  // === SUMMIT TRAIL ===
+  trail_marker:{id:'trail_marker', name:'Segnavia',        zone:'summit',cost:100,   rate:1.5,  capacity:1, stats:{forza:3,vitalita:2},        icon:'trail',    desc:'Indica la via.', attracts:['escursionista'] },
+  trail_post:  { id:'trail_post',  name:'Avamposto',       zone:'summit',cost:250,   rate:4,    capacity:3, stats:{forza:4,vitalita:3,armonia:1}, icon:'outpost', desc:'Sosta dei viandanti.', attracts:['escursionista'] },
+  summit:      { id:'summit',      name:'Vetta',           zone:'summit',cost:800,   rate:12,   capacity:2, stats:{forza:8,vitalita:4,armonia:3}, icon:'summit', desc:'Il punto più alto.', attracts:['escursionista','atleta'] },
+  observatory: { id:'observatory', name:'Osservatorio',    zone:'summit',cost:2400,  rate:32,   capacity:4, stats:{forza:5,armonia:6,comunita:4}, icon:'observ',desc:'Stelle e silenzio.', attracts:['escursionista','yogi'] },
+};
+
+// --- Interni dettagliati per alcuni edifici ---
+const INTERIORS = {
+  juice_bar: {
+    bgColor:'#fdf4e3', floorColor:'#e8d5a8',
+    elements:[
+      {type:'counter',  x:50,  y:280, w:600, h:50},
+      {type:'shelf',    x:80,  y:80,  w:540, h:30},
+      {type:'bottles',  x:100, y:120, count:8},
+      {type:'sign',     x:550, y:60,  text:'JUICE BAR' },
+      {type:'stool',    x:130, y:380},
+      {type:'stool',    x:230, y:380},
+      {type:'stool',    x:330, y:380},
+      {type:'stool',    x:430, y:380},
+      {type:'stool',    x:530, y:380},
+    ],
+    npcSpots:[{x:130,y:360},{x:230,y:360},{x:330,y:360},{x:430,y:360},{x:530,y:360}],
+    upgrades:[
+      {id:'mango_special', name:'Specialità Mango', cost:300, desc:'+10% rate, +2 Comunità', mod:{rateBoost:0.10, statBoost:{comunita:2}}},
+      {id:'detox_menu',    name:'Menu Detox',       cost:800, desc:'+15% rate, +3 Armonia',  mod:{rateBoost:0.15, statBoost:{armonia:3}}},
+      {id:'protein_bowls', name:'Protein Bowls',    cost:1500,desc:'+20% rate, +3 Forza',    mod:{rateBoost:0.20, statBoost:{forza:3}}},
+    ]
+  },
+  outdoor_gym: {
+    bgColor:'#e8dccb', floorColor:'#c4a987',
+    elements:[
+      {type:'sign',  x:280, y:50,  text:'IRON COVE'},
+      {type:'rack',  x:80,  y:200, w:120},
+      {type:'rack',  x:300, y:200, w:120},
+      {type:'rack',  x:520, y:200, w:120},
+      {type:'bench', x:120, y:380, w:140},
+      {type:'bench', x:360, y:380, w:140},
+      {type:'painting', x:560, y:380, w:80, h:80, color:'#c8643c'},
+    ],
+    npcSpots:[{x:140,y:360},{x:380,y:360},{x:200,y:280},{x:420,y:280},{x:560,y:280}],
+    upgrades:[
+      {id:'kettlebells',  name:'Kettlebell Set',    cost:400, desc:'+12% rate, +3 Forza',     mod:{rateBoost:0.12, statBoost:{forza:3}}},
+      {id:'pullup_bars',  name:'Sbarre Pullup',     cost:1000,desc:'+18% rate, +3 Vitalità',  mod:{rateBoost:0.18, statBoost:{vitalita:3}}},
+      {id:'bench_press',  name:'Panca Piana',       cost:2200,desc:'+25% rate, +5 Forza',     mod:{rateBoost:0.25, statBoost:{forza:5}}},
+    ]
+  },
+  spa_pools: {
+    bgColor:'#dde9ed', floorColor:'#a8c4cf',
+    elements:[
+      {type:'sign',   x:280, y:50, text:'SUNSET SPA'},
+      {type:'pool',   x:100, y:200, w:200, h:140, color:'#7ab5c4'},
+      {type:'pool',   x:400, y:200, w:200, h:140, color:'#6ba8b8'},
+      {type:'towel',  x:60,  y:380},
+      {type:'towel',  x:340, y:380},
+      {type:'candle', x:50,  y:120},
+      {type:'candle', x:640, y:120},
+    ],
+    npcSpots:[{x:180,y:260},{x:480,y:260},{x:130,y:280},{x:540,y:280}],
+    upgrades:[
+      {id:'aromatic',     name:'Aromi Naturali',    cost:350, desc:'+10% rate, +4 Armonia',   mod:{rateBoost:0.10, statBoost:{armonia:4}}},
+      {id:'thermal_jets', name:'Getti Termali',     cost:900, desc:'+18% rate, +3 Vitalità',  mod:{rateBoost:0.18, statBoost:{vitalita:3}}},
+      {id:'mud_therapy',  name:'Fanghi Curativi',   cost:2000,desc:'+22% rate, +5 Armonia',   mod:{rateBoost:0.22, statBoost:{armonia:5}}},
+    ]
+  },
+  surf_shack: {
+    bgColor:'#fff0d4', floorColor:'#d4b888',
+    elements:[
+      {type:'sign',  x:280, y:50, text:'SURF SHACK'},
+      {type:'board', x:80,  y:130, color:'#c8643c'},
+      {type:'board', x:160, y:130, color:'#7ab5c4'},
+      {type:'board', x:240, y:130, color:'#d9a86a'},
+      {type:'board', x:320, y:130, color:'#9e4828'},
+      {type:'counter', x:50, y:300, w:600, h:40},
+      {type:'painting', x:520, y:130, w:120, h:80, color:'#5fb3c4'},
+    ],
+    npcSpots:[{x:140,y:380},{x:280,y:380},{x:420,y:380},{x:560,y:380}],
+    upgrades:[
+      {id:'big_boards',   name:'Tavole Longboard',  cost:300, desc:'+10% rate, +3 Vitalità',  mod:{rateBoost:0.10, statBoost:{vitalita:3}}},
+      {id:'lessons',      name:'Lezioni Principianti',cost:700,desc:'+15% rate, +4 Comunità', mod:{rateBoost:0.15, statBoost:{comunita:4}}},
+      {id:'sunset_tours', name:'Tour al Tramonto',  cost:1600,desc:'+20% rate, +3 Armonia',   mod:{rateBoost:0.20, statBoost:{armonia:3}}},
+    ]
+  },
+  lighthouse: {
+    bgColor:'#f0e4d0', floorColor:'#b89878',
+    isPanorama: true, // segnale per render speciale (vista panoramica)
+    elements:[],
+    npcSpots:[],
+    upgrades:[
+      {id:'better_lamp',  name:'Lampada Potenziata',cost:1500,desc:'+15% rate globale',       mod:{globalRateBoost:0.05}},
+      {id:'telescope',    name:'Telescopio',        cost:3000,desc:'+10% Comunità, +5 Armonia',mod:{statBoost:{comunita:10,armonia:5}}},
+      {id:'fog_horn',     name:'Sirena da Nebbia',  cost:5000,desc:'+1 barca/ora',            mod:{boatFreq:0.3}},
+    ]
+  },
+};
+
+// --- Decorazioni ---
+const DECORATIONS = {
+  palm:        { id:'palm',        name:'Palma',           cost:30,  happiness:1,  icon:'palm' },
+  rock:        { id:'rock',        name:'Roccia',          cost:25,  happiness:1,  icon:'rock' },
+  flower_bed:  { id:'flower_bed',  name:'Aiuola',          cost:50,  happiness:2,  icon:'flowers' },
+  fountain:    { id:'fountain',    name:'Fontana',         cost:200, happiness:5,  icon:'fountain' },
+  statue:      { id:'statue',      name:'Statua',          cost:400, happiness:8,  icon:'statue' },
+  lantern:     { id:'lantern',     name:'Lanterna',        cost:80,  happiness:2,  icon:'lantern' },
+  bench_deco:  { id:'bench_deco',  name:'Panchina',        cost:120, happiness:3,  icon:'bench_deco' },
+  topiary:     { id:'topiary',     name:'Topiaria',        cost:250, happiness:5,  icon:'topiary' },
+  totem:       { id:'totem',       name:'Totem',           cost:350, happiness:6,  icon:'totem' },
+  pergola:     { id:'pergola',     name:'Pergolato',       cost:500, happiness:8,  icon:'pergola' },
+  flagpole:    { id:'flagpole',    name:'Pennone',         cost:180, happiness:4,  icon:'flagpole' },
+};
+
+// Decorazioni: piazzamento LIBERO sull'isola (non piu slot fissi).
+// Limiti: max DECOR_CAP_BASE decorazioni totali, espandibile con gemme.
+const DECOR_CAP_BASE = 30;
+const DECOR_CAP_EXPANDED = 50;
+const DECOR_CAP_UPGRADE_GEM_COST = 25;
+
+// Aree dove NON si possono piazzare decorazioni (acqua attorno all'isola, etc.).
+// Per semplicita verifichiamo a runtime con un test "isola principale o satellite sbloccata".
+
+// === TIMER DI COSTRUZIONE ===
+// build time = round(15 + sqrt(cost) * 3) secondi (cap min 10s, max 1h)
+function buildTimeSeconds(cost) {
+  const t = Math.round(15 + Math.sqrt(cost) * 3);
+  return Math.max(10, Math.min(3600, t));
+}
+// upgrade time = buildTime base * livello target
+function upgradeTimeSeconds(baseCost, targetLevel) {
+  return Math.max(10, Math.min(7200, buildTimeSeconds(baseCost) * targetLevel));
+}
+// interior upgrade time = half del building
+function interiorUpgradeTimeSeconds(stationCost) {
+  return Math.max(8, Math.round(buildTimeSeconds(stationCost) * 0.5));
+}
+// Skip cost in gemme: 1 gem ogni 5 minuti residui (min 1)
+function skipCostGems(secondsLeft) {
+  return Math.max(1, Math.ceil(secondsLeft / 300));
+}
+const MAX_CONCURRENT_BUILDS = 3;
+
+// === NEGOZIO DIAMANTI -> COINS ===
+const GEM_SHOP = [
+  { id:'pack_s', gems:10,  coins:1000,  label:'Pacchetto Piccolo' },
+  { id:'pack_m', gems:50,  coins:6000,  label:'Pacchetto Medio'   },
+  { id:'pack_l', gems:100, coins:15000, label:'Pacchetto Grande'  },
+];
+
+// === INTERNI A LIVELLI ===
+// Ogni edificio con interno ha 3 STAZIONI con livelli 1-5.
+// Cap stazione = livello dell'edificio esterno.
+// Costo stazione livello N = baseCost * 1.7^(N-1)
+// Bonus per livello: i campi rateBoost/statBoost di mod si moltiplicano per livello stazione
+const INTERIOR_STATIONS = {
+  juice_bar: [
+    { id:'counter', name:'Bancone',     baseCost:200, mod:{rateBoost:0.05, statBoost:{comunita:1}}, desc:'Aumenta produzione e comunita' },
+    { id:'fridge',  name:'Frigorifero', baseCost:300, mod:{rateBoost:0.06, statBoost:{armonia:1}},  desc:'Detox e succhi freschi' },
+    { id:'menu',    name:'Specialita',  baseCost:450, mod:{rateBoost:0.08, statBoost:{forza:1}},    desc:'Protein bowls e smoothie' },
+  ],
+  outdoor_gym: [
+    { id:'rack',    name:'Rastrelliera', baseCost:250, mod:{rateBoost:0.06, statBoost:{forza:2}},   desc:'Manubri e kettlebell' },
+    { id:'pullup',  name:'Sbarre Pullup',baseCost:400, mod:{rateBoost:0.07, statBoost:{forza:1, vitalita:1}}, desc:'Calistenia avanzata' },
+    { id:'bench',   name:'Panca',        baseCost:600, mod:{rateBoost:0.10, statBoost:{forza:2}},   desc:'Panca piana professionale' },
+  ],
+  spa_pools: [
+    { id:'aroma',   name:'Aromi',        baseCost:220, mod:{rateBoost:0.05, statBoost:{armonia:2}}, desc:'Essenze naturali' },
+    { id:'jets',    name:'Getti Termali',baseCost:380, mod:{rateBoost:0.07, statBoost:{vitalita:1, armonia:1}}, desc:'Acqua dinamica' },
+    { id:'mud',     name:'Fanghi',       baseCost:550, mod:{rateBoost:0.09, statBoost:{armonia:3}}, desc:'Trattamenti curativi' },
+  ],
+  surf_shack: [
+    { id:'boards',  name:'Tavole',       baseCost:200, mod:{rateBoost:0.06, statBoost:{vitalita:2}},desc:'Longboard e shortboard' },
+    { id:'lessons', name:'Lezioni',      baseCost:350, mod:{rateBoost:0.07, statBoost:{comunita:2}},desc:'Corsi principianti' },
+    { id:'tours',   name:'Tour Tramonto',baseCost:500, mod:{rateBoost:0.09, statBoost:{armonia:1, vitalita:1}}, desc:'Esperienze guidate' },
+  ],
+  lighthouse: [
+    { id:'lamp',    name:'Lampada',      baseCost:600, mod:{globalRateBoost:0.02},                  desc:'Boost globale produzione' },
+    { id:'scope',   name:'Telescopio',   baseCost:900, mod:{statBoost:{comunita:3, armonia:1}},    desc:'Attrae visitatori' },
+    { id:'horn',    name:'Sirena',       baseCost:1400, mod:{boatFreqBoost:0.15},                   desc:'Piu barche, piu abitanti' },
+  ],
+};
+
+// Helper costo stazione a livello target
+function interiorStationCost(baseCost, targetLevel) {
+  return Math.floor(baseCost * Math.pow(1.7, targetLevel-1));
+}
+
+// === TUTORIAL ===
+// Sequenza di step. Ognuno ha un trigger (cosa l'utente deve fare) e un messaggio.
+const TUTORIAL_STEPS = [
+  { id:'intro_done', text:null }, // marker che intro 3-schermate e finita
+  { id:'first_build', text:'Tap su uno slot con il puntino tratteggiato per costruire il tuo primo edificio. Prova con un slot sulla spiaggia (in basso).' },
+  { id:'first_workout', text:'Bravo! Ora tocca il pulsante "Workout" in basso e completa il tuo primo allenamento. I workout sono l\'unico modo per guadagnare diamanti.' },
+  { id:'collect_idle', text:'I tuoi edifici producono coins anche quando non giochi. Lasciali lavorare e torna piu tardi.' },
+  { id:'upgrade_one', text:'Tocca un edificio gia costruito per potenziarlo. Edifici di livello piu alto producono di piu e hanno piu capacita.' },
+  { id:'check_pop', text:'Apri il menu "Altro > Popolazione" per vedere le statistiche della tua isola. Tienile alte per attirare nuovi abitanti!' },
+  { id:'done', text:null },
+];
+
+// === HINTS CONTESTUALI ===
+// Si attivano quando una stat scende sotto soglia e suggeriscono un'azione.
+const HINTS = [
+  { id:'low_vitalita', threshold:{stat:'vitalita', below:40}, text:'⚡ Vitalita bassa! Fai un workout cardio (corsa, HIIT) o costruisci una Pista Jogging.' },
+  { id:'low_armonia',  threshold:{stat:'armonia',  below:40}, text:'🧘 Armonia bassa! Fai yoga o costruisci uno Zen Garden / Spa.' },
+  { id:'low_forza',    threshold:{stat:'forza',    below:40}, text:'💪 Forza Collettiva bassa! Fai un workout di forza o costruisci una Palestra Aperta.' },
+  { id:'low_comunita', threshold:{stat:'comunita', below:40}, text:'🤝 Comunita bassa! Costruisci un Juice Bar, Cafe o Mercato in Vitality Plaza.' },
+  { id:'no_workout_today', threshold:{noWorkoutHours:18}, text:'🏃 Non ti alleni da un po\'. La Vitalita decade! Fai anche solo una camminata corta.' },
+  { id:'overcrowded', threshold:{popOverCap:0.9}, text:'🏘️ Sovraffollamento! La popolazione e vicina al massimo. Costruisci piu edifici per aumentare la capacita.' },
+];
+
+// --- Isole satellite ---
+// Si aggiungono al viewBox espandendolo
+const SATELLITE_ISLANDS = {
+  sun_isle: {
+    id:'sun_isle', name:'Isola del Sole', costCoins:25000, costGems:0, unlockLevel:12,
+    shape:'sun', // SVG shape preset
+    centerX:1180, centerY:520, // posizione nel viewBox espanso
+    slots:[
+      {id:'su1',zone:'beach', x:1080, y:500},
+      {id:'su2',zone:'beach', x:1200, y:540},
+      {id:'su3',zone:'plaza', x:1140, y:460},
+      {id:'su4',zone:'spa',   x:1260, y:480},
+      {id:'su5',zone:'plaza', x:1200, y:580},
+      {id:'su6',zone:'beach', x:1100, y:600},
+    ],
+    decorSlots:[
+      {id:'sd1',x:1140,y:520}, {id:'sd2',x:1220,y:540}, {id:'sd3',x:1180,y:580},
+    ],
+    bridgeFrom: {x:880, y:550}, bridgeTo:{x:1080, y:520},
+  },
+  forest_isle: {
+    id:'forest_isle', name:'Isola della Foresta', costCoins:80000, costGems:0, unlockLevel:20,
+    shape:'forest',
+    centerX:-180, centerY:280,
+    slots:[
+      {id:'fo1',zone:'zen',    x:-260, y:240},
+      {id:'fo2',zone:'zen',    x:-120, y:300},
+      {id:'fo3',zone:'iron',   x:-200, y:340},
+      {id:'fo4',zone:'iron',   x:-80,  y:220},
+      {id:'fo5',zone:'summit', x:-260, y:160},
+      {id:'fo6',zone:'zen',    x:-150, y:380},
+    ],
+    decorSlots:[
+      {id:'fd1',x:-200,y:280}, {id:'fd2',x:-140,y:240}, {id:'fd3',x:-220,y:380},
+    ],
+    bridgeFrom: {x:80, y:340}, bridgeTo:{x:-80, y:300},
+  },
+  peak_isle: {
+    id:'peak_isle', name:'Isola dei Picchi', costCoins:0, costGems:50, unlockLevel:28,
+    shape:'peak',
+    centerX:580, centerY:-160,
+    slots:[
+      {id:'pe1',zone:'summit', x:500, y:-180},
+      {id:'pe2',zone:'summit', x:620, y:-200},
+      {id:'pe3',zone:'summit', x:560, y:-100},
+      {id:'pe4',zone:'iron',   x:680, y:-140},
+      {id:'pe5',zone:'zen',    x:460, y:-100},
+    ],
+    decorSlots:[
+      {id:'pd1',x:560,y:-160}, {id:'pd2',x:640,y:-180},
+    ],
+    bridgeFrom: {x:540, y:120}, bridgeTo:{x:560, y:-60},
+  },
+};
+
+// --- Tipi NPC ---
+// Ogni NPC ha un "ruolo" che ne determina edifici preferiti e colore
+const NPC_TYPES = {
+  jogger:       { color:'#c8643c', icon:'🏃', name:'Jogger' },
+  atleta:       { color:'#9e4828', icon:'💪', name:'Atleta' },
+  yogi:         { color:'#9bb88a', icon:'🧘', name:'Yogi' },
+  nuotatore:    { color:'#5fb3c4', icon:'🏊', name:'Nuotatore' },
+  escursionista:{ color:'#7d6850', icon:'🥾', name:'Escursionista' },
+};
+const NPC_TYPE_LIST = Object.keys(NPC_TYPES);
+
+// --- Workout TYPES (v1 style, parametrizzabili) ---
+// Ogni tipo ha durataBase (minuti) e coinsBase (a durata e intensita base).
+// L'utente sceglie durata effettiva, intensita (low/medium/high) e formScore (50-100).
+// Reward:
+//   coins = coinsBase * (durata/durataBase) * intensityMult * (formScore/100) * streakMult
+//   gems  = floor((durata/10) * intensityGemMult * (formScore/100))  [solo dal workout!]
+//   xp    = xpBase * (durata/durataBase) * intensityMult
+const WORKOUT_TYPES = [
+  { id:'walk',     name:'Camminata',    durataBase:20, coinsBase:40,  xpBase:6,  energyBase:5,  statType:'vitalita', icon:'🚶', desc:'Bassa intensita, sostenibile' },
+  { id:'run',      name:'Corsa',        durataBase:25, coinsBase:75,  xpBase:12, energyBase:12, statType:'vitalita', icon:'🏃', desc:'Cardio classico' },
+  { id:'strength', name:'Forza',        durataBase:30, coinsBase:100, xpBase:15, energyBase:10, statType:'forza',    icon:'🏋️', desc:'Pesi o corpo libero' },
+  { id:'yoga',     name:'Yoga',         durataBase:40, coinsBase:110, xpBase:18, energyBase:14, statType:'armonia',  icon:'🧘', desc:'Flessibilita e respiro' },
+  { id:'hiit',     name:'HIIT',         durataBase:20, coinsBase:95,  xpBase:14, energyBase:8,  statType:'vitalita', icon:'⚡', desc:'Intervalli ad alta intensita' },
+  { id:'swim',     name:'Nuoto',        durataBase:30, coinsBase:120, xpBase:20, energyBase:16, statType:'vitalita', icon:'🏊', desc:'Total body' },
+  { id:'hike',     name:'Escursione',   durataBase:60, coinsBase:170, xpBase:30, energyBase:18, statType:'forza',    icon:'🥾', desc:'Lunga durata, terreno vario' },
+];
+
+const INTENSITY_LEVELS = {
+  low:    { id:'low',    name:'Bassa',  coinsMult:0.75, gemMult:0.5, xpMult:0.7,  comunitaBoost:0.2 },
+  medium: { id:'medium', name:'Media',  coinsMult:1.0,  gemMult:1.0, xpMult:1.0,  comunitaBoost:0.3 },
+  high:   { id:'high',   name:'Alta',   coinsMult:1.4,  gemMult:1.8, xpMult:1.35, comunitaBoost:0.5 },
+};
+
+// --- Achievement (rimossi i diamanti — solo coins) ---
+const ACHIEVEMENTS = [
+  { id:'first_build',  name:'Primo Edificio',     desc:'Costruisci il tuo primo edificio',     reward:80,   condition:s=>Object.keys(s.placed).length>=1 },
+  { id:'five_builds',  name:'In Espansione',      desc:'Costruisci 5 edifici',                 reward:300,  condition:s=>Object.keys(s.placed).length>=5 },
+  { id:'ten_builds',   name:'Architetto',         desc:'Costruisci 10 edifici',                reward:750,  condition:s=>Object.keys(s.placed).length>=10 },
+  { id:'first_workout',name:'Prima Sudata',       desc:'Completa il primo workout',            reward:150,  condition:s=>s.totalWorkouts>=1 },
+  { id:'ten_workouts', name:'Costanza',           desc:'Completa 10 workout',                  reward:500,  condition:s=>s.totalWorkouts>=10 },
+  { id:'streak_3',     name:'Streak x3',          desc:'3 giorni di allenamento di fila',      reward:250,  condition:s=>s.streak>=3 },
+  { id:'streak_7',     name:'Settimana di Fuoco', desc:'7 giorni di streak',                   reward:800,  condition:s=>s.streak>=7 },
+  { id:'all_zones',    name:'Tutta l\'Isola',     desc:'Un edificio per ogni zona',            reward:600,  condition:s=>{const zs=new Set();Object.values(s.placed).forEach(b=>zs.add(BUILDINGS[b.id].zone));return zs.size>=6;} },
+  { id:'lighthouse',   name:'Luce sul Mare',      desc:'Costruisci il Faro',                   reward:800,  condition:s=>Object.values(s.placed).some(b=>b.id==='lighthouse') },
+  { id:'level_10',     name:'Livello 10',         desc:'Raggiungi livello 10',                 reward:900,  condition:s=>s.level>=10 },
+  { id:'level_25',     name:'Livello 25',         desc:'Raggiungi livello 25',                 reward:3000, condition:s=>s.level>=25 },
+  { id:'rich',         name:'Ricco',              desc:'Possiedi 10.000 coins',                reward:500,  condition:s=>s.coins>=10000 },
+  { id:'pop_25',       name:'Comunita Nascente',  desc:'25 abitanti sull\'isola',              reward:500,  condition:s=>s.population>=25 },
+  { id:'pop_100',      name:'Citta Sull\'Acqua',  desc:'100 abitanti sull\'isola',             reward:2500, condition:s=>s.population>=100 },
+  { id:'all_high',     name:'Isola Perfetta',     desc:'Tutte le stat sopra 70',               reward:3500, condition:s=>s.stats.vitalita>=70&&s.stats.armonia>=70&&s.stats.forza>=70&&s.stats.comunita>=70 },
+  { id:'satellite_1',  name:'Primo Espatrio',     desc:'Sblocca la prima isola satellite',     reward:1500, condition:s=>s.unlockedSatellites.length>=1 },
+  { id:'satellite_all',name:'Arcipelago',         desc:'Sblocca tutte le isole satellite',     reward:7000, condition:s=>s.unlockedSatellites.length>=3 },
+  { id:'first_interior',name:'Imprenditore',     desc:'Compra il primo upgrade di un edificio',reward:400,  condition:s=>Object.values(s.placed).some(b=>b.interiorUpgrades&&Object.keys(b.interiorUpgrades).length>0) },
+  { id:'all_interiors',name:'Padrone di Casa',    desc:'Visita gli interni di tutti gli edifici speciali', reward:1200, condition:s=>s.visitedInteriors.length>=5 },
+];
+
+// --- Quest giornaliere (pool) ---
+const DAILY_QUEST_POOL = [
+  { id:'walk_today',   name:'Cammina oggi',          desc:'Completa 1 camminata',        target:1, type:'workout_count', reward:100 },
+  { id:'two_workouts', name:'Doppio Sforzo',         desc:'Completa 2 workout oggi',     target:2, type:'workout_count', reward:200 },
+  { id:'build_one',    name:'Costruisci Qualcosa',   desc:'Costruisci 1 edificio',       target:1, type:'build_count',   reward:150 },
+  { id:'upgrade_one',  name:'Potenzia',              desc:'Potenzia 1 edificio',         target:1, type:'upgrade_count', reward:120 },
+  { id:'spend_500',    name:'Reinvestire',           desc:'Spendi 500 coins',            target:500, type:'spend',       reward:120 },
+  { id:'collect_300',  name:'Raccolta',              desc:'Guadagna 300 coins idle',     target:300, type:'idle_collect',reward:100 },
+  { id:'place_decor',  name:'Estetica',              desc:'Piazza 1 decorazione',        target:1, type:'decor_count',   reward:80 },
+];
+
+// --- Eventi ---
+const EVENTS = [
+  {
+    id:'solstice', name:'Solstizio d\'Estate',
+    desc:'Doppio rate di produzione + decorazioni a metà prezzo per 7 giorni!',
+    icon:'☀️', durationDays:7,
+    bonuses:{rateMultiplier:2.0, decorDiscount:0.5}
+  },
+];
+
+
+</script>
+<script id="coreScript">
+// ============================================================
+// FIT ISLAND v2 — CORE STATE & SYSTEMS
+// ============================================================
+
+var state = null;
+
+function defaultState() {
+  return {
+    version: VERSION,
+    islandName: null,
+    coins: 100,
+    gems: 0,    // diamanti SOLO dal workout
+    level: 1,
+    xp: 0,
+    streak: 0,
+    lastWorkoutDate: null,
+    lastWorkoutAt: 0,    // timestamp ms ultimo workout (per penalty inattivita)
+    lastDailyReset: null,
+    totalWorkouts: 0,
+    totalCoinsEarned: 0,
+    totalCoinsSpent: 0,
+    totalGemsEarned: 0,
+    totalGemsSpent: 0,
+    totalIdleCollected: 0,
+    workoutHistory: [],
+
+    placed: {},          // { slotId: { id, level, slotId, interiorStations:{stationId:level}, builtAt } }
+    construction: {},    // { slotId: { type:'build'|'upgrade'|'interior', bId, stationId?, targetLevel, startAt, endAt } }
+    decorPlaced: [],     // [{ id, decorId, x, y, placedAt }]
+    decorInventory: {},  // { decorId: count }
+    decorCapBonus: 0,    // +20 se sbloccato (porta a 50)
+    unlockedSlots: [],   // ['prem_b5','gem_m4',...] slot premium sbloccati
+
+    // Popolazione / stat
+    population: 0,
+    populationFloat: 0,
+    stats: {
+      vitalita: 30,
+      armonia: 30,
+      forza: 30,
+      comunita: 30,
+    },
+    npcRoster: [],
+
+    // Achievement / quest
+    achievementsClaimed: [],
+    dailyQuests: [],
+    dailyQuestsProgress: {},
+
+    visitedInteriors: [],
+    unlockedSatellites: [],
+
+    // Eventi
+    activeEvent: null,
+    eventEndsAt: 0,
+
+    lastTick: Date.now(),
+    onboardingDone: false,
+    introStep: 0,        // 0,1,2 schermate intro narrativa
+    tutorialIdx: 1,      // step tutorial corrente (1 = first_build, vedi TUTORIAL_STEPS)
+    dismissedHints: [],  // hints che l'utente ha gia chiuso oggi
+    lastHintAt: 0,
+    boatCount: 0,        // contatore barche spawnate (per "prime 3 garantite")
+
+    // Barche
+    boat: null,
+    nextBoatAt: 0,
+    boatArrivingNotified: false,
+  };
+}
+
+// ===== SAVE / LOAD =====
+function loadGame() {
+  try {
+    const raw = localStorage.getItem(SAVE_KEY);
+    if (!raw) { state = defaultState(); return false; }
+    const parsed = JSON.parse(raw);
+    state = Object.assign(defaultState(), parsed);
+    // Backfill campi nuovi
+    state.stats = Object.assign({vitalita:30,armonia:30,forza:30,comunita:30}, state.stats||{});
+    state.npcRoster = state.npcRoster || [];
+    state.unlockedSatellites = state.unlockedSatellites || [];
+    state.visitedInteriors = state.visitedInteriors || [];
+    state.decorInventory = state.decorInventory || {};
+    // Migra decorPlaced da vecchio formato {slotId:decorId} a array
+    if (state.decorPlaced && !Array.isArray(state.decorPlaced)) {
+      state.decorPlaced = [];
+    }
+    state.decorPlaced = state.decorPlaced || [];
+    state.construction = state.construction || {};
+    state.unlockedSlots = state.unlockedSlots || [];
+    state.dismissedHints = state.dismissedHints || [];
+    // Migra placed[].interiorUpgrades (vecchio) a interiorStations
+    for (const slotId in state.placed) {
+      const b = state.placed[slotId];
+      if (!b.interiorStations) b.interiorStations = {};
+      delete b.interiorUpgrades;
+    }
+    return true;
+  } catch(e) {
+    console.error('Load error:', e);
+    state = defaultState();
+    return false;
+  }
+}
+
+function saveGame() {
+  try {
+    localStorage.setItem(SAVE_KEY, JSON.stringify(state));
+  } catch(e) { console.error('Save error:', e); }
+}
+
+function resetGame() {
+  localStorage.removeItem(SAVE_KEY);
+  state = defaultState();
+  saveGame();
+  location.reload();
+}
+
+// ===== XP / LEVEL =====
+function xpForLevel(lvl) { return Math.floor(50 * Math.pow(lvl, 1.5)); }
+
+function addXp(amount) {
+  state.xp += amount;
+  while (state.xp >= xpForLevel(state.level)) {
+    state.xp -= xpForLevel(state.level);
+    state.level++;
+    showToast(`Livello ${state.level}!`, 'levelup');
+  }
+}
+
+function formatNumber(n) {
+  if (n >= 1e6) return (n/1e6).toFixed(1)+'M';
+  if (n >= 1e3) return (n/1e3).toFixed(1)+'K';
+  return Math.floor(n).toString();
+}
+
+// ===== TEMPO / GIORNI =====
+function getToday() {
+  const d = new Date();
+  return `${d.getFullYear()}-${d.getMonth()+1}-${d.getDate()}`;
+}
+
+function checkDailyReset() {
+  const today = getToday();
+  if (state.lastDailyReset !== today) {
+    state.lastDailyReset = today;
+    // Genera 3 quest random
+    const pool = [...DAILY_QUEST_POOL];
+    state.dailyQuests = [];
+    for (let i=0;i<3 && pool.length>0;i++) {
+      const idx = Math.floor(Math.random()*pool.length);
+      const q = pool.splice(idx,1)[0];
+      state.dailyQuests.push({...q, progress:0, claimed:false});
+    }
+    state.dailyQuestsProgress = {};
+  }
+}
+
+function checkStreak() {
+  if (!state.lastWorkoutDate) return;
+  const last = new Date(state.lastWorkoutDate);
+  const today = new Date();
+  const diffDays = Math.floor((today - last) / (1000*60*60*24));
+  if (diffDays > 1) {
+    state.streak = 0;
+  }
+}
+
+function streakMultiplier() {
+  const s = state.streak;
+  if (s >= 30) return 2.0;
+  if (s >= 14) return 1.7;
+  if (s >= 7)  return 1.5;
+  if (s >= 3)  return 1.25;
+  return 1.0;
+}
+
+// ===== POPOLAZIONE / STAT =====
+function computeBuildingStats() {
+  // Aggrega stats da tutti gli edifici placed + upgrade interni applicati
+  const totals = {vitalita:0, armonia:0, forza:0, comunita:0};
+  let capacity = 0;
+  let baseRateMultiplier = 0;
+  let globalRateBoost = 0;
+  let boatFreqBoost = 0;
+
+  for (const slotId in state.placed) {
+    const b = state.placed[slotId];
+    const def = BUILDINGS[b.id];
+    if (!def) continue;
+    const lvl = b.level || 1;
+    for (const k in def.stats) {
+      totals[k] += def.stats[k] * lvl;
+    }
+    capacity += (def.capacity || 0) * lvl;
+    // Stazioni interne (nuovo sistema a livelli)
+    const stations = b.interiorStations || {};
+    const defs = INTERIOR_STATIONS[b.id];
+    if (defs) {
+      for (const st of defs) {
+        const stLvl = stations[st.id] || 0;
+        if (stLvl <= 0) continue;
+        const mod = st.mod;
+        if (mod.statBoost) {
+          for (const k in mod.statBoost) {
+            totals[k] += (mod.statBoost[k] || 0) * stLvl;
+          }
+        }
+        if (mod.rateBoost) {
+          baseRateMultiplier += (def.rate * lvl) * mod.rateBoost * stLvl;
+        }
+        if (mod.globalRateBoost) {
+          globalRateBoost += mod.globalRateBoost * stLvl;
+        }
+        if (mod.boatFreqBoost) {
+          boatFreqBoost += mod.boatFreqBoost * stLvl;
+        }
+      }
+    }
+  }
+  return { totals, capacity, baseRateMultiplier, globalRateBoost, boatFreqBoost };
+}
+
+function computeDecorHappiness() {
+  let h = 0;
+  if (!Array.isArray(state.decorPlaced)) return 0;
+  for (const d of state.decorPlaced) {
+    const def = DECORATIONS[d.decorId];
+    if (def) h += def.happiness;
+  }
+  return h;
+}
+
+function updateStats(dt) {
+  // dt in secondi
+  const { totals, capacity, globalRateBoost } = computeBuildingStats();
+  const decorH = computeDecorHappiness();
+
+  // Stat target = somma edifici (cappata) + bonus decor distribuito su armonia/comunità
+  const cap = 100;
+  const targetStats = {
+    vitalita: Math.min(cap, totals.vitalita + decorH * 0.5),
+    armonia:  Math.min(cap, totals.armonia + decorH * 1.5),
+    forza:    Math.min(cap, totals.forza),
+    comunita: Math.min(cap, totals.comunita + decorH * 1.0),
+  };
+
+  // Vitalita riceve boost diretto dai workout. Decadimento naturale verso target.
+  let decayPerSec = 0.05;
+
+  // === MALUS REALI ===
+  // 1) Inattivita: se nessun workout > 18h, vitalita decade piu forte
+  const hoursSinceWorkout = state.lastWorkoutAt ? (Date.now() - state.lastWorkoutAt) / 3600000 : 999;
+  const inactivityMalus = hoursSinceWorkout > 18 ? 0.20 : 0; // extra decay solo su vitalita
+
+  // 2) Sovraffollamento: pop > 90% capacity -> malus armonia
+  const overcrowdMalus = (capacity > 0 && state.populationFloat > capacity * 0.9) ? 0.15 : 0;
+
+  // 3) Squilibrio: se max-min stat > 50 -> malus 0.10 sulla stat piu alta (raddrizza)
+  const statValues = Object.values(state.stats);
+  const maxStat = Math.max(...statValues);
+  const minStat = Math.min(...statValues);
+  const imbalanceMalus = (maxStat - minStat > 50) ? 0.10 : 0;
+  const highestStatKey = Object.keys(state.stats).find(k => state.stats[k] === maxStat);
+
+  for (const k in state.stats) {
+    const current = state.stats[k];
+    const target = targetStats[k];
+
+    let myDecay = decayPerSec;
+    if (k === 'vitalita') myDecay += inactivityMalus;
+    if (k === 'armonia')  myDecay += overcrowdMalus;
+    if (k === highestStatKey) myDecay += imbalanceMalus;
+
+    if (target > current) {
+      state.stats[k] = Math.min(target, current + 0.3 * dt);
+    } else {
+      // Decay verso target, MA i malus possono spingere sotto target
+      const floor = imbalanceMalus > 0 && k === highestStatKey ? 0 : target;
+      state.stats[k] = Math.max(floor, current - myDecay * dt);
+    }
+    // Hard floor 0
+    if (state.stats[k] < 0) state.stats[k] = 0;
+  }
+
+  // Popolazione
+  const avgStat = (state.stats.vitalita + state.stats.armonia + state.stats.forza + state.stats.comunita) / 4;
+  let qualityFactor;
+  if (avgStat >= 70) qualityFactor = 1.0;
+  else if (avgStat >= 50) qualityFactor = 0.7;
+  else if (avgStat >= 40) qualityFactor = 0.4;
+  else if (avgStat >= 25) qualityFactor = 0.15;
+  else qualityFactor = 0;
+
+  const targetPop = Math.floor(capacity * qualityFactor);
+
+  if (state.populationFloat < targetPop) {
+    state.populationFloat = Math.min(targetPop, state.populationFloat + 0.05 * dt);
+  } else if (state.populationFloat > targetPop) {
+    state.populationFloat = Math.max(targetPop, state.populationFloat - 0.08 * dt);
+  }
+  state.population = Math.floor(state.populationFloat);
+
+  return { capacity, targetPop, avgStat };
+}
+
+function applyWorkoutBoost(workoutType, intensity, formScore, durationMin) {
+  // Boost vitalita/armonia/forza in base al tipo + scaled by intensity+form+duration
+  const statType = workoutType.statType;
+  const intensityDef = INTENSITY_LEVELS[intensity];
+  // energyBase scalato per durata/durataBase, intensita, form
+  const boost = workoutType.energyBase
+    * (durationMin / workoutType.durataBase)
+    * intensityDef.coinsMult
+    * (formScore / 100);
+  if (state.stats[statType] != null) {
+    state.stats[statType] = Math.min(100, state.stats[statType] + boost);
+  }
+  // Comunita: tutti contenti quando ti alleni
+  state.stats.comunita = Math.min(100, state.stats.comunita + boost * intensityDef.comunitaBoost);
+}
+
+// ===== IDLE RATE =====
+function computeIdleRate() {
+  let rate = 0;
+  for (const slotId in state.placed) {
+    const b = state.placed[slotId];
+    const def = BUILDINGS[b.id];
+    if (!def) continue;
+    rate += def.rate * (b.level || 1);
+  }
+  const { baseRateMultiplier, globalRateBoost } = computeBuildingStats();
+  rate += baseRateMultiplier;
+
+  // Comunità influenza rate: 100 comunità = +30% rate
+  const commBoost = 1 + (state.stats.comunita / 100) * 0.3;
+  rate *= commBoost;
+
+  // Global boost da upgrade
+  rate *= (1 + globalRateBoost);
+
+  // Evento attivo
+  if (state.activeEvent && state.activeEvent.bonuses && state.activeEvent.bonuses.rateMultiplier) {
+    rate *= state.activeEvent.bonuses.rateMultiplier;
+  }
+
+  return rate;
+}
+
+// ===== NPC ROSTER =====
+const MAX_VISIBLE_NPCS = 12;
+
+function targetVisibleNpcs() {
+  // numero di NPC visibili = funzione della popolazione (max 12)
+  if (state.population <= 0) return 0;
+  if (state.population < 5) return Math.max(1, state.population);
+  return Math.min(MAX_VISIBLE_NPCS, 2 + Math.floor(state.population / 10));
+}
+
+function spawnNpc() {
+  const type = NPC_TYPE_LIST[Math.floor(Math.random()*NPC_TYPE_LIST.length)];
+  // Spawn vicino a un molo o sulla spiaggia
+  const startX = 350 + Math.random()*300;
+  const startY = 600;
+  const npc = {
+    id: 'npc_'+Date.now()+'_'+Math.floor(Math.random()*9999),
+    type,
+    x: startX, y: startY,
+    targetX: startX, targetY: startY,
+    state: 'wander',
+    timer: 1 + Math.random()*3,
+    targetSlot: null,
+    speed: 25 + Math.random()*15, // px/s
+  };
+  pickNewTargetForNpc(npc);
+  state.npcRoster.push(npc);
+}
+
+function removeNpcVisually() {
+  if (state.npcRoster.length === 0) return;
+  // Rimuovi quello più vicino al "molo" simbolicamente
+  const idx = Math.floor(Math.random()*state.npcRoster.length);
+  state.npcRoster.splice(idx, 1);
+}
+
+function syncNpcRoster() {
+  const target = targetVisibleNpcs();
+  while (state.npcRoster.length < target) spawnNpc();
+  while (state.npcRoster.length > target) removeNpcVisually();
+}
+
+function pickNewTargetForNpc(npc) {
+  // 65% va verso un edificio attratto, 35% wander
+  const attracted = [];
+  for (const slotId in state.placed) {
+    const b = state.placed[slotId];
+    const def = BUILDINGS[b.id];
+    if (!def) continue;
+    if (def.attracts && def.attracts.includes(npc.type)) {
+      const slot = findSlotById(slotId);
+      if (slot) attracted.push({slot, slotId});
+    }
+  }
+  if (attracted.length > 0 && Math.random() < 0.65) {
+    const pick = attracted[Math.floor(Math.random()*attracted.length)];
+    npc.targetX = pick.slot.x + (Math.random()*40-20);
+    npc.targetY = pick.slot.y + (Math.random()*30-15) + 30; // sotto l'edificio
+    npc.targetSlot = pick.slotId;
+    npc.state = 'going';
+  } else {
+    // Wander random sull'isola principale (e satelliti sbloccati)
+    const inMain = Math.random() < 0.85 || state.unlockedSatellites.length === 0;
+    if (inMain) {
+      npc.targetX = 100 + Math.random()*700;
+      npc.targetY = 250 + Math.random()*350;
+    } else {
+      const sId = state.unlockedSatellites[Math.floor(Math.random()*state.unlockedSatellites.length)];
+      const sat = SATELLITE_ISLANDS[sId];
+      npc.targetX = sat.centerX + (Math.random()*120 - 60);
+      npc.targetY = sat.centerY + (Math.random()*80 - 40);
+    }
+    npc.targetSlot = null;
+    npc.state = 'wander';
+  }
+}
+
+function findSlotById(id) {
+  for (const s of SLOTS_MAIN) if (s.id === id) return s;
+  for (const sId of state.unlockedSatellites) {
+    const sat = SATELLITE_ISLANDS[sId];
+    for (const s of sat.slots) if (s.id === id) return s;
+  }
+  return null;
+}
+
+function updateNpcs(dt) {
+  for (const npc of state.npcRoster) {
+    if (npc.state === 'visiting') {
+      npc.timer -= dt;
+      if (npc.timer <= 0) {
+        pickNewTargetForNpc(npc);
+      }
+      continue;
+    }
+    // Movimento verso target
+    const dx = npc.targetX - npc.x;
+    const dy = npc.targetY - npc.y;
+    const dist = Math.sqrt(dx*dx + dy*dy);
+    if (dist < 4) {
+      // Arrivato
+      if (npc.targetSlot) {
+        npc.state = 'visiting';
+        npc.timer = 4 + Math.random()*6;
+      } else {
+        npc.timer -= dt;
+        if (npc.timer <= 0) pickNewTargetForNpc(npc);
+      }
+    } else {
+      const step = npc.speed * dt;
+      const r = Math.min(step, dist) / dist;
+      npc.x += dx * r;
+      npc.y += dy * r;
+    }
+  }
+}
+
+// ===== BARCHE =====
+function scheduleBoat() {
+  // PRIME 3 BARCHE GARANTITE ENTRO 90s
+  if (state.boatCount < 3) {
+    state.nextBoatAt = Date.now() + 60000 + Math.random()*30000; // 60-90s
+    return;
+  }
+  const avgStat = (state.stats.vitalita + state.stats.armonia + state.stats.forza + state.stats.comunita) / 4;
+  let minSec;
+  if (avgStat >= 70) minSec = 90;
+  else if (avgStat >= 50) minSec = 180;
+  else if (avgStat >= 40) minSec = 300;
+  else if (avgStat >= 25) minSec = 480;
+  else minSec = 360;
+  // Bonus dal Faro / Sirena
+  const { boatFreqBoost } = computeBuildingStats();
+  minSec = Math.max(60, minSec * (1 - Math.min(0.5, boatFreqBoost)));
+  state.nextBoatAt = Date.now() + minSec * 1000 + Math.random()*30000;
+}
+
+function forceBoatArrival() {
+  state.nextBoatAt = Date.now();
+  state.boatArrivingNotified = false;
+}
+
+function spawnBoat() {
+  const avgStat = (state.stats.vitalita + state.stats.armonia + state.stats.forza + state.stats.comunita) / 4;
+  // Prima barca sempre arrival
+  const isArrival = state.boatCount < 3 ? true : avgStat >= 40;
+  // Cerca un Molo costruito (slot piers); altrimenti spiaggia generica
+  let dockX = 500;
+  for (const slotId in state.placed) {
+    if (state.placed[slotId].id === 'pier') {
+      const slot = findSlotById(slotId);
+      if (slot) { dockX = slot.x; break; }
+    }
+  }
+  state.boat = {
+    phase:'approaching',
+    x: -120, y: 660,
+    targetX: dockX, targetY: 660,
+    type: isArrival ? 'arrival' : 'emigration',
+    passengers: isArrival ? (Math.random() < 0.5 ? 2 : 3) : (1 + Math.floor(Math.random()*2)),
+    timer: 0,
+    delivered: false,
+  };
+  state.boatCount = (state.boatCount || 0) + 1;
+}
+
+function updateBoat(dt) {
+  if (!state.boat) {
+    if (Date.now() >= state.nextBoatAt && state.placed && Object.keys(state.placed).length > 0) {
+      // Notifica 5s prima
+      if (!state.boatArrivingNotified) {
+        state.boatArrivingNotified = true;
+        showToast('⛵ Barca in arrivo!', 'info');
+      }
+      spawnBoat();
+      state.boatArrivingNotified = false;
+    }
+    return;
+  }
+  const b = state.boat;
+  if (b.phase === 'approaching') {
+    const dx = b.targetX - b.x;
+    if (dx <= 4) {
+      b.phase = 'docked';
+      b.timer = 4;
+    } else {
+      b.x += 60 * dt; // piu veloce
+    }
+  } else if (b.phase === 'docked') {
+    b.timer -= dt;
+    if (!b.delivered) {
+      if (b.type === 'arrival') {
+        state.populationFloat = Math.min(state.populationFloat + b.passengers, 9999);
+        state.population = Math.floor(state.populationFloat);
+        showToast(`+${b.passengers} nuovi abitanti! ⛵`, 'good');
+      } else {
+        const lost = Math.min(b.passengers, state.population);
+        state.populationFloat = Math.max(0, state.populationFloat - lost);
+        state.population = Math.floor(state.populationFloat);
+        if (lost > 0) showToast(`-${lost} abitanti emigrati 😢`, 'warn');
+      }
+      b.delivered = true;
+    }
+    if (b.timer <= 0) {
+      b.phase = 'leaving';
+    }
+  } else if (b.phase === 'leaving') {
+    b.x += 60 * dt;
+    if (b.x > 1300) {
+      state.boat = null;
+      scheduleBoat();
+    }
+  }
+}
+
+// ===== TIMER DI COSTRUZIONE =====
+function activeConstructions() {
+  let n = 0;
+  for (const _ in state.construction) n++;
+  return n;
+}
+
+function startConstruction(slotId, type, payload) {
+  // type: 'build' | 'upgrade' | 'interior'
+  // payload: { bId?, targetLevel, stationId?, cost, durationSec }
+  state.construction[slotId + (payload.stationId ? '@'+payload.stationId : '')] = {
+    type,
+    bId: payload.bId,
+    stationId: payload.stationId,
+    targetLevel: payload.targetLevel,
+    startAt: Date.now(),
+    endAt: Date.now() + payload.durationSec * 1000,
+    slotId,
+  };
+}
+
+function processCompletedConstructions() {
+  const now = Date.now();
+  const finished = [];
+  for (const key in state.construction) {
+    const c = state.construction[key];
+    if (now >= c.endAt) finished.push(key);
+  }
+  for (const key of finished) {
+    const c = state.construction[key];
+    completeConstruction(c);
+    delete state.construction[key];
+  }
+  return finished.length > 0;
+}
+
+function completeConstruction(c) {
+  if (c.type === 'build') {
+    state.placed[c.slotId] = {
+      id: c.bId, level: 1, slotId: c.slotId,
+      interiorStations: {}, builtAt: Date.now()
+    };
+    showToast(`${BUILDINGS[c.bId].name} pronto!`, 'good');
+    addXp(10);
+    progressQuest('build_count', 1);
+  } else if (c.type === 'upgrade') {
+    const b = state.placed[c.slotId];
+    if (b) {
+      b.level = c.targetLevel;
+      showToast(`${BUILDINGS[b.id].name} -> Lv${b.level}`, 'good');
+      addXp(15);
+      progressQuest('upgrade_count', 1);
+    }
+  } else if (c.type === 'interior') {
+    const b = state.placed[c.slotId];
+    if (b) {
+      if (!b.interiorStations) b.interiorStations = {};
+      b.interiorStations[c.stationId] = c.targetLevel;
+      const defs = INTERIOR_STATIONS[b.id];
+      const stDef = defs ? defs.find(s=>s.id===c.stationId) : null;
+      showToast(`${stDef ? stDef.name : 'Stazione'} Lv${c.targetLevel}!`, 'good');
+      addXp(8);
+    }
+  }
+}
+
+function skipConstruction(key) {
+  const c = state.construction[key];
+  if (!c) return false;
+  const left = Math.max(0, c.endAt - Date.now()) / 1000;
+  const cost = skipCostGems(left);
+  if (state.gems < cost) { showToast(`Servono ${cost} 💎`, 'warn'); return false; }
+  state.gems -= cost;
+  state.totalGemsSpent += cost;
+  c.endAt = Date.now();
+  showToast(`Skip per ${cost} 💎`, 'info');
+  return true;
+}
+
+// ===== HINTS =====
+function maybeShowHint() {
+  // Ogni 30s al massimo
+  if (Date.now() - state.lastHintAt < 30000) return null;
+  for (const h of HINTS) {
+    if (state.dismissedHints.includes(h.id)) continue;
+    const t = h.threshold;
+    let trigger = false;
+    if (t.stat && t.below !== undefined) {
+      trigger = state.stats[t.stat] < t.below;
+    } else if (t.noWorkoutHours !== undefined) {
+      const hrs = state.lastWorkoutAt ? (Date.now() - state.lastWorkoutAt)/3600000 : 999;
+      trigger = hrs > t.noWorkoutHours;
+    } else if (t.popOverCap !== undefined) {
+      const { capacity } = computeBuildingStats();
+      trigger = capacity > 0 && state.populationFloat > capacity * t.popOverCap;
+    }
+    if (trigger) {
+      state.lastHintAt = Date.now();
+      return h;
+    }
+  }
+  return null;
+}
+
+function dismissHint(id) {
+  if (!state.dismissedHints.includes(id)) state.dismissedHints.push(id);
+}
+
+// ===== EVENTI =====
+function initEvent() {
+  if (!state.activeEvent || Date.now() > state.eventEndsAt) {
+    state.activeEvent = EVENTS[0];
+    state.eventEndsAt = Date.now() + EVENTS[0].durationDays * 24 * 60 * 60 * 1000;
+  }
+}
+
+// ===== ACHIEVEMENT =====
+function checkAchievements() {
+  let anyClaimed = false;
+  for (const a of ACHIEVEMENTS) {
+    if (!state.achievementsClaimed.includes(a.id) && a.condition(state)) {
+      // L'achievement diventa claimable: notifica
+      if (!state._achievementsReady) state._achievementsReady = {};
+      if (!state._achievementsReady[a.id]) {
+        state._achievementsReady[a.id] = true;
+        showToast(`🏆 ${a.name} disponibile!`, 'achievement');
+      }
+    }
+  }
+  if (anyClaimed) saveGame();
+  // Re-render se il modal achievement è aperto
+  if (currentModal === 'achievements') renderModal();
+}
+
+function claimAchievement(id) {
+  if (state.achievementsClaimed.includes(id)) return;
+  const a = ACHIEVEMENTS.find(x=>x.id===id);
+  if (!a || !a.condition(state)) return;
+  state.achievementsClaimed.push(id);
+  state.coins += a.reward;
+  state.totalCoinsEarned += a.reward;
+  showToast(`+${a.reward} 💰`, 'good');
+  saveGame();
+  updateUI();
+  if (currentModal === 'achievements') renderModal();
+}
+
+function claimDailyQuest(id) {
+  const q = state.dailyQuests.find(x=>x.id===id);
+  if (!q || q.claimed || q.progress < q.target) return;
+  q.claimed = true;
+  state.coins += q.reward;
+  state.totalCoinsEarned += q.reward;
+  showToast(`+${q.reward} 💰`, 'good');
+  saveGame();
+  updateUI();
+  // RI-RENDERIZZA il modal
+  if (currentModal === 'quests') renderModal();
+}
+
+function progressQuest(type, amount) {
+  for (const q of state.dailyQuests) {
+    if (q.type === type && !q.claimed) {
+      q.progress = Math.min(q.target, q.progress + amount);
+    }
+  }
+}
+
+// ===== OFFLINE PROGRESS =====
+function applyOfflineProgress() {
+  const now = Date.now();
+  const elapsed = (now - state.lastTick) / 1000;
+  state.lastTick = now;
+  if (elapsed > 3) {
+    // Aggiorna idle
+    const rate = computeIdleRate();
+    const earned = rate * elapsed;
+    if (earned > 0) {
+      state.coins += earned;
+      state.totalCoinsEarned += earned;
+      state.totalIdleCollected += earned;
+    }
+    // Aggiorna stat & pop in modo proporzionale (cap a 1h per non far fluttuare troppo)
+    const capped = Math.min(elapsed, 3600);
+    updateStats(capped);
+    return Math.floor(earned);
+  }
+  return 0;
+}
+
+// ===== GAME LOOP =====
+var lastFrameTime = 0;
+var lastSaveTime = 0;
+var lastPopUpdate = 0;
+
+function gameLoop(now) {
+  if (typeof now !== 'number') now = performance.now();
+  if (!lastFrameTime) lastFrameTime = now;
+  const dt = Math.max(0, Math.min(0.1, (now - lastFrameTime) / 1000));
+  lastFrameTime = now;
+
+  // Idle coins
+  const rate = computeIdleRate();
+  const earned = rate * dt;
+  state.coins += earned;
+  state.totalCoinsEarned += earned;
+  state.totalIdleCollected += earned;
+  if (rate > 0) progressQuest('idle_collect', earned);
+
+  // NPC
+  updateNpcs(dt);
+
+  // Boat
+  updateBoat(dt);
+
+  // Costruzioni completate -> aggiorna isola
+  if (processCompletedConstructions()) {
+    if (typeof renderStatic === 'function') renderStatic();
+  }
+
+  // Stat & pop ogni ~1s
+  if (now - lastPopUpdate > 1000) {
+    const ddt = (now - lastPopUpdate) / 1000;
+    lastPopUpdate = now;
+    updateStats(ddt);
+    syncNpcRoster();
+    // Hint check
+    if (typeof handleHintCheck === 'function') handleHintCheck();
+  }
+
+  // Render entità mobili
+  renderEntities();
+
+  // UI tick
+  updateUI();
+
+  // Auto-save ogni 10s
+  if (now - lastSaveTime > 10000) {
+    lastSaveTime = now;
+    state.lastTick = Date.now();
+    saveGame();
+  }
+
+  // Check achievement disponibili (leggero)
+  if (Math.random() < 0.05) checkAchievements();
+
+  requestAnimationFrame(gameLoop);
+}
+
+</script>
+<script id="renderScript">
+// ============================================================
+// FIT ISLAND v2 — RENDER
+// ============================================================
+
+// === SVG BUILDING SHAPES ===
+function svgBuilding(b, isPlaced) {
+  const def = BUILDINGS[b.id];
+  if (!def) return '';
+  const lvl = b.level || 1;
+  const shape = svgBuildingShape(def.icon, def.zone);
+  return `
+    <g class="building-svg" data-slot="${b.slotId}">
+      ${shape}
+      ${lvl>1?`<text x="0" y="-30" text-anchor="middle" font-size="11" fill="#9e4828" font-weight="700" font-family="Geist Mono">Lv${lvl}</text>`:''}
+      ${def.hasInterior ? '<circle cx="22" cy="-22" r="6" fill="#5fb3c4" stroke="#fff" stroke-width="2"/><text x="22" y="-19" text-anchor="middle" font-size="9" fill="#fff" font-weight="800" font-family="Geist Mono">↵</text>' : ''}
+    </g>
+  `;
+}
+
+function svgBuildingShape(icon, zone) {
+  // Colori per zona
+  const zCol = ZONES[zone] ? ZONES[zone].color : '#888';
+  switch(icon) {
+    case 'path':
+      return `<ellipse cx="0" cy="6" rx="28" ry="6" fill="#c8a06a" opacity="0.7"/>
+              <path d="M-25,2 Q-12,-2 0,4 T25,2" stroke="#9e6e3c" stroke-width="2" fill="none"/>`;
+    case 'lounger':
+      return `<rect x="-22" y="0" width="44" height="6" rx="3" fill="#c8643c"/>
+              <rect x="-22" y="-2" width="44" height="3" fill="#e8895c"/>
+              <line x1="-18" y1="6" x2="-18" y2="14" stroke="#7d4828" stroke-width="2"/>
+              <line x1="18" y1="6" x2="18" y2="14" stroke="#7d4828" stroke-width="2"/>
+              <rect x="6" y="-12" width="14" height="14" fill="#d9a86a" opacity="0.8"/>`;
+    case 'shack':
+      return `<polygon points="-24,-6 0,-26 24,-6" fill="#c8643c"/>
+              <rect x="-22" y="-6" width="44" height="20" fill="#e8c896"/>
+              <rect x="-6" y="0" width="12" height="14" fill="#5d3825"/>
+              <rect x="10" y="-2" width="8" height="6" fill="#7ab5c4"/>`;
+    case 'pier':
+      return `<rect x="-28" y="-2" width="56" height="6" fill="#a8826a"/>
+              <rect x="-25" y="4" width="3" height="14" fill="#7d6850"/>
+              <rect x="-10" y="4" width="3" height="14" fill="#7d6850"/>
+              <rect x="5" y="4" width="3" height="14" fill="#7d6850"/>
+              <rect x="22" y="4" width="3" height="14" fill="#7d6850"/>
+              <circle cx="28" cy="-2" r="3" fill="#c8643c"/>`;
+    case 'lighthouse':
+      return `<rect x="-9" y="-30" width="18" height="40" fill="#fff" stroke="#c8643c" stroke-width="2"/>
+              <rect x="-9" y="-22" width="18" height="6" fill="#c8643c"/>
+              <rect x="-9" y="-8" width="18" height="6" fill="#c8643c"/>
+              <polygon points="-10,-30 0,-40 10,-30" fill="#9e4828"/>
+              <circle cx="0" cy="-34" r="3" fill="#ffe066"/>
+              <rect x="-14" y="10" width="28" height="6" fill="#a8826a"/>`;
+    case 'gym':
+      return `<rect x="-22" y="-4" width="44" height="18" fill="#a8826a"/>
+              <rect x="-22" y="-12" width="44" height="8" fill="#7d6850"/>
+              <line x1="-14" y1="-2" x2="-14" y2="10" stroke="#3d2810" stroke-width="3"/>
+              <line x1="-2" y1="-2" x2="-2" y2="10" stroke="#3d2810" stroke-width="3"/>
+              <line x1="14" y1="-2" x2="14" y2="10" stroke="#3d2810" stroke-width="3"/>
+              <circle cx="14" cy="0" r="3" fill="#3d2810"/><circle cx="14" cy="8" r="3" fill="#3d2810"/>`;
+    case 'bars':
+      return `<rect x="-22" y="10" width="44" height="4" fill="#a8826a"/>
+              <line x1="-18" y1="-14" x2="-18" y2="12" stroke="#3d2810" stroke-width="3"/>
+              <line x1="18" y1="-14" x2="18" y2="12" stroke="#3d2810" stroke-width="3"/>
+              <line x1="-20" y1="-14" x2="20" y2="-14" stroke="#3d2810" stroke-width="3"/>
+              <line x1="-20" y1="-2" x2="20" y2="-2" stroke="#3d2810" stroke-width="3"/>`;
+    case 'climb':
+      return `<polygon points="-20,14 -16,-28 16,-28 20,14" fill="#9e8068" stroke="#5d3825" stroke-width="1"/>
+              <circle cx="-8" cy="-18" r="3" fill="#c8643c"/>
+              <circle cx="8" cy="-12" r="3" fill="#9bb88a"/>
+              <circle cx="-4" cy="-4" r="3" fill="#ffe066"/>
+              <circle cx="6" cy="4" r="3" fill="#5fb3c4"/>
+              <circle cx="-10" cy="8" r="3" fill="#c8643c"/>`;
+    case 'forge':
+      return `<rect x="-20" y="-2" width="40" height="18" fill="#3d2810"/>
+              <polygon points="-22,-2 0,-22 22,-2" fill="#5d3825"/>
+              <ellipse cx="0" cy="6" rx="8" ry="3" fill="#ff7a1e"/>
+              <circle cx="0" cy="4" r="3" fill="#ffe066"/>
+              <rect x="-2" y="-12" width="4" height="10" fill="#1d1410"/>`;
+    case 'dojo':
+      return `<rect x="-24" y="-4" width="48" height="20" fill="#e8d4a0"/>
+              <polygon points="-28,-4 0,-22 28,-4" fill="#5d3825"/>
+              <rect x="-6" y="4" width="12" height="14" fill="#3d2810"/>
+              <line x1="-24" y1="2" x2="24" y2="2" stroke="#9e4828" stroke-width="1.5"/>
+              <rect x="-14" y="-2" width="6" height="8" fill="#c8a86c" opacity="0.6"/>
+              <rect x="10" y="-2" width="6" height="8" fill="#c8a86c" opacity="0.6"/>`;
+    case 'zen':
+      return `<ellipse cx="0" cy="8" rx="20" ry="6" fill="#9bb88a"/>
+              <ellipse cx="0" cy="6" rx="14" ry="4" fill="#7d9a6e"/>
+              <circle cx="0" cy="-2" r="6" fill="#fff5e1" stroke="#7d6850" stroke-width="1"/>
+              <text x="0" y="2" text-anchor="middle" font-size="9">禅</text>`;
+    case 'pavilion':
+      return `<polygon points="-22,-8 0,-24 22,-8" fill="#c8643c"/>
+              <line x1="-18" y1="-8" x2="-18" y2="12" stroke="#7d4828" stroke-width="3"/>
+              <line x1="18" y1="-8" x2="18" y2="12" stroke="#7d4828" stroke-width="3"/>
+              <ellipse cx="0" cy="12" rx="22" ry="3" fill="#a8826a"/>`;
+    case 'pond':
+      return `<ellipse cx="0" cy="6" rx="22" ry="10" fill="#7ab5c4"/>
+              <ellipse cx="0" cy="4" rx="18" ry="7" fill="#5fb3c4"/>
+              <circle cx="-6" cy="4" r="2" fill="#ff7a1e"/>
+              <circle cx="6" cy="6" r="2" fill="#ff7a1e"/>
+              <ellipse cx="-8" cy="2" rx="3" ry="1" fill="#5d8866"/>`;
+    case 'bamboo':
+      return `<line x1="-12" y1="-22" x2="-12" y2="14" stroke="#7d9a6e" stroke-width="3"/>
+              <line x1="-4" y1="-26" x2="-4" y2="14" stroke="#9bb88a" stroke-width="3"/>
+              <line x1="6" y1="-24" x2="6" y2="14" stroke="#7d9a6e" stroke-width="3"/>
+              <line x1="14" y1="-22" x2="14" y2="14" stroke="#9bb88a" stroke-width="3"/>
+              <line x1="-14" y1="-10" x2="16" y2="-10" stroke="#5d8866" stroke-width="1" opacity="0.6"/>`;
+    case 'tea':
+      return `<rect x="-20" y="-4" width="40" height="16" fill="#e8d4a0"/>
+              <polygon points="-24,-4 0,-20 24,-4" fill="#9e4828"/>
+              <rect x="-4" y="4" width="8" height="10" fill="#3d2810"/>
+              <rect x="-14" y="0" width="6" height="6" fill="#c8a86c"/>
+              <rect x="8" y="0" width="6" height="6" fill="#c8a86c"/>`;
+    case 'bar':
+      return `<rect x="-22" y="-2" width="44" height="16" fill="#e8c896"/>
+              <polygon points="-24,-2 0,-16 24,-2" fill="#9bb88a"/>
+              <rect x="-4" y="2" width="8" height="8" fill="#ff7a1e"/>
+              <rect x="-18" y="2" width="6" height="8" fill="#7ab5c4"/>
+              <rect x="12" y="2" width="6" height="8" fill="#c8643c"/>`;
+    case 'cafe':
+      return `<rect x="-22" y="-4" width="44" height="18" fill="#d9a86a"/>
+              <rect x="-22" y="-12" width="44" height="8" fill="#c8643c"/>
+              <rect x="-8" y="2" width="16" height="12" fill="#3d2810"/>
+              <circle cx="-14" cy="6" r="2" fill="#fff"/>
+              <circle cx="14" cy="6" r="2" fill="#fff"/>
+              <line x1="-22" y1="-7" x2="22" y2="-7" stroke="#fff" stroke-width="1" stroke-dasharray="3,2"/>`;
+    case 'market':
+      return `<polygon points="-26,-2 -22,-14 -10,-14 -10,-2" fill="#c8643c"/>
+              <polygon points="-10,-2 -8,-16 8,-16 10,-2" fill="#9bb88a"/>
+              <polygon points="10,-2 12,-14 24,-14 26,-2" fill="#d9a86a"/>
+              <rect x="-26" y="-2" width="52" height="16" fill="#e8d4a0"/>
+              <rect x="-22" y="2" width="8" height="6" fill="#ff7a1e"/>
+              <rect x="-6" y="2" width="8" height="6" fill="#c8643c"/>
+              <rect x="10" y="2" width="8" height="6" fill="#ffe066"/>`;
+    case 'amphi':
+      return `<ellipse cx="0" cy="12" rx="28" ry="6" fill="#a8826a"/>
+              <path d="M-26,12 A26,16 0 0 1 26,12" fill="#c8a86c" stroke="#7d6850" stroke-width="1"/>
+              <path d="M-20,12 A20,12 0 0 1 20,12" fill="#a8826a"/>
+              <path d="M-14,12 A14,8 0 0 1 14,12" fill="#7d6850"/>
+              <rect x="-3" y="6" width="6" height="6" fill="#3d2810"/>`;
+    case 'pools':
+      return `<ellipse cx="-10" cy="6" rx="12" ry="6" fill="#7ab5c4"/>
+              <ellipse cx="10" cy="6" rx="12" ry="6" fill="#5fb3c4"/>
+              <ellipse cx="-10" cy="4" rx="9" ry="4" fill="#a8d4dd"/>
+              <ellipse cx="10" cy="4" rx="9" ry="4" fill="#a8d4dd"/>
+              <path d="M-20,12 Q-20,18 -14,18 L14,18 Q20,18 20,12" fill="none" stroke="#7d6850" stroke-width="2"/>`;
+    case 'sauna':
+      return `<rect x="-20" y="-4" width="40" height="18" fill="#9e6e3c"/>
+              <polygon points="-22,-4 0,-18 22,-4" fill="#7d4828"/>
+              <rect x="-6" y="4" width="12" height="10" fill="#3d2810"/>
+              <path d="M-12,-8 Q-10,-12 -8,-8" stroke="#fff" stroke-width="1.5" fill="none" opacity="0.7"/>
+              <path d="M8,-8 Q10,-12 12,-8" stroke="#fff" stroke-width="1.5" fill="none" opacity="0.7"/>`;
+    case 'massage':
+      return `<rect x="-22" y="0" width="44" height="6" rx="3" fill="#e8c896"/>
+              <rect x="-22" y="-2" width="44" height="3" fill="#fff"/>
+              <polygon points="-24,0 0,-14 24,0" fill="#d4a8b8"/>
+              <circle cx="14" cy="3" r="2" fill="#ffe066"/>
+              <circle cx="-14" cy="3" r="2" fill="#ffe066"/>`;
+    case 'hammam':
+      return `<rect x="-22" y="-4" width="44" height="18" fill="#a8c4cf"/>
+              <ellipse cx="0" cy="-6" rx="14" ry="10" fill="#7ab5c4"/>
+              <circle cx="0" cy="-8" r="4" fill="#fff5e1"/>
+              <rect x="-22" y="10" width="44" height="4" fill="#7d6850"/>`;
+    case 'trail':
+      return `<polygon points="-3,-12 3,-12 3,12 -3,12" fill="#a8826a"/>
+              <polygon points="3,-10 12,-6 3,-2" fill="#c8643c"/>
+              <text x="8" y="-3" font-size="6" fill="#fff" font-weight="700">↑</text>`;
+    case 'outpost':
+      return `<rect x="-18" y="-2" width="36" height="14" fill="#7d4828"/>
+              <polygon points="-20,-2 0,-16 20,-2" fill="#5d3825"/>
+              <rect x="-4" y="2" width="8" height="10" fill="#3d2810"/>
+              <rect x="-12" y="0" width="4" height="4" fill="#ffe066"/>
+              <rect x="8" y="0" width="4" height="4" fill="#ffe066"/>`;
+    case 'summit':
+      return `<polygon points="-24,12 0,-22 24,12" fill="#b8a89c"/>
+              <polygon points="-12,-2 0,-22 12,-2" fill="#e8e0d8"/>
+              <polygon points="-6,-10 0,-22 6,-10" fill="#fff"/>
+              <rect x="-1" y="-26" width="2" height="6" fill="#9e4828"/>
+              <polygon points="1,-26 8,-23 1,-20" fill="#c8643c"/>`;
+    case 'observ':
+      return `<rect x="-12" y="0" width="24" height="14" fill="#a8826a"/>
+              <ellipse cx="0" cy="-6" rx="18" ry="10" fill="#e8e0d8"/>
+              <path d="M-4,-12 L0,-18 L4,-12" stroke="#3d2810" stroke-width="2" fill="none"/>
+              <rect x="-3" y="-16" width="6" height="4" fill="#3d2810"/>
+              <line x1="-18" y1="-6" x2="18" y2="-6" stroke="#7d6850" stroke-width="1"/>`;
+    default:
+      return `<rect x="-18" y="-12" width="36" height="24" fill="${zCol}" stroke="#7d4828" stroke-width="1.5"/>`;
+  }
+}
+
+// === DECORAZIONI ===
+function svgDecoration(decorId) {
+  switch(decorId) {
+    case 'palm':
+      return `<g><line x1="0" y1="0" x2="0" y2="-22" stroke="#7d4828" stroke-width="3"/>
+              <path d="M0,-22 Q-12,-22 -16,-14" stroke="#5d8866" stroke-width="3" fill="none"/>
+              <path d="M0,-22 Q12,-22 16,-14" stroke="#5d8866" stroke-width="3" fill="none"/>
+              <path d="M0,-22 Q-8,-30 -14,-26" stroke="#7d9a6e" stroke-width="3" fill="none"/>
+              <path d="M0,-22 Q8,-30 14,-26" stroke="#7d9a6e" stroke-width="3" fill="none"/></g>`;
+    case 'rock':
+      return `<ellipse cx="0" cy="0" rx="14" ry="8" fill="#9e8068" stroke="#5d3825" stroke-width="1"/>
+              <ellipse cx="-3" cy="-2" rx="6" ry="3" fill="#a89888" opacity="0.7"/>`;
+    case 'flowers':
+      return `<g><circle cx="-6" cy="0" r="3" fill="#c8643c"/>
+              <circle cx="0" cy="-2" r="3" fill="#ffe066"/>
+              <circle cx="6" cy="0" r="3" fill="#d4a8b8"/>
+              <line x1="-6" y1="2" x2="-6" y2="6" stroke="#5d8866" stroke-width="1"/>
+              <line x1="0" y1="0" x2="0" y2="6" stroke="#5d8866" stroke-width="1"/>
+              <line x1="6" y1="2" x2="6" y2="6" stroke="#5d8866" stroke-width="1"/></g>`;
+    case 'fountain':
+      return `<circle cx="0" cy="2" r="12" fill="#a8c4cf"/>
+              <circle cx="0" cy="2" r="9" fill="#5fb3c4"/>
+              <rect x="-2" y="-8" width="4" height="10" fill="#e8e0d8"/>
+              <path d="M0,-8 Q-4,-12 -3,-6 M0,-8 Q4,-12 3,-6" stroke="#a8c4cf" stroke-width="1.5" fill="none"/>`;
+    case 'statue':
+      return `<rect x="-4" y="0" width="8" height="6" fill="#a8a098"/>
+              <circle cx="0" cy="-4" r="3" fill="#e8e0d8"/>
+              <rect x="-3" y="-2" width="6" height="6" fill="#d8d0c8"/>
+              <rect x="-8" y="4" width="16" height="4" fill="#7d6850"/>`;
+    case 'lantern':
+      return `<line x1="0" y1="0" x2="0" y2="-16" stroke="#3d2810" stroke-width="2"/>
+              <rect x="-5" y="-22" width="10" height="8" fill="#ffe066" stroke="#9e4828" stroke-width="1"/>
+              <polygon points="-6,-22 6,-22 4,-24 -4,-24" fill="#9e4828"/>`;
+    case 'bench_deco':
+      return `<rect x="-12" y="-2" width="24" height="4" fill="#7d4828"/>
+              <rect x="-12" y="-6" width="24" height="4" fill="#c8643c"/>
+              <line x1="-10" y1="2" x2="-10" y2="8" stroke="#3d2810" stroke-width="2"/>
+              <line x1="10" y1="2" x2="10" y2="8" stroke="#3d2810" stroke-width="2"/>`;
+    case 'topiary':
+      return `<rect x="-2" y="0" width="4" height="4" fill="#9e8068"/>
+              <circle cx="0" cy="-4" r="7" fill="#5d8866"/>
+              <circle cx="0" cy="-12" r="5" fill="#7d9a6e"/>
+              <circle cx="0" cy="-18" r="3" fill="#9bb88a"/>`;
+    case 'totem':
+      return `<rect x="-5" y="-20" width="10" height="22" fill="#7d4828"/>
+              <rect x="-5" y="-18" width="10" height="6" fill="#c8643c"/>
+              <rect x="-5" y="-8" width="10" height="6" fill="#9bb88a"/>
+              <circle cx="0" cy="-15" r="2" fill="#ffe066"/>`;
+    case 'pergola':
+      return `<line x1="-12" y1="-2" x2="-12" y2="-14" stroke="#7d4828" stroke-width="3"/>
+              <line x1="12" y1="-2" x2="12" y2="-14" stroke="#7d4828" stroke-width="3"/>
+              <line x1="-14" y1="-14" x2="14" y2="-14" stroke="#7d4828" stroke-width="2"/>
+              <path d="M-12,-14 Q-6,-18 0,-14 Q6,-18 12,-14" stroke="#9bb88a" stroke-width="2" fill="none"/>
+              <circle cx="-6" cy="-16" r="2" fill="#d4a8b8"/>
+              <circle cx="6" cy="-16" r="2" fill="#d4a8b8"/>`;
+    case 'flagpole':
+      return `<line x1="0" y1="2" x2="0" y2="-22" stroke="#3d2810" stroke-width="2"/>
+              <polygon points="0,-22 12,-20 0,-16" fill="#c8643c"/>`;
+    default:
+      return `<circle cx="0" cy="0" r="6" fill="#888"/>`;
+  }
+}
+
+// === NPC ===
+function svgNpc(npc) {
+  const tdef = NPC_TYPES[npc.type] || NPC_TYPES.jogger;
+  const color = tdef.color;
+  // Animazione bob via attributo
+  const bobY = npc.state === 'visiting' ? 0 : Math.sin(Date.now()/200 + (npc.id.length % 7)) * 1.5;
+  return `<g transform="translate(${npc.x}, ${npc.y + bobY})">
+    <ellipse cx="0" cy="2" rx="4" ry="1.5" fill="rgba(0,0,0,0.2)"/>
+    <circle cx="0" cy="-6" r="3" fill="#f4d4a8"/>
+    <rect x="-3" y="-3" width="6" height="6" rx="1" fill="${color}"/>
+    <rect x="-3" y="2" width="2" height="3" fill="#3d2810"/>
+    <rect x="1" y="2" width="2" height="3" fill="#3d2810"/>
+  </g>`;
+}
+
+// === BARCA ===
+function svgBoat(boat) {
+  const passColors = ['#c8643c','#5fb3c4','#9bb88a','#d4a8b8','#ffe066'];
+  let pax = '';
+  for (let i=0;i<boat.passengers;i++) {
+    const x = -10 + i*8;
+    pax += `<circle cx="${x}" cy="-4" r="2.5" fill="${passColors[i%passColors.length]}"/>`;
+  }
+  return `<g transform="translate(${boat.x}, ${boat.y})">
+    <path d="M-22,0 L22,0 L18,8 L-18,8 Z" fill="#9e4828" stroke="#5d3825" stroke-width="1"/>
+    <rect x="-2" y="-16" width="2" height="16" fill="#3d2810"/>
+    <polygon points="0,-16 14,-2 0,-2" fill="#fff5e1" stroke="#a8826a" stroke-width="1"/>
+    ${pax}
+  </g>`;
+}
+
+// === ISOLE SATELLITE ===
+function svgSatelliteShape(sat) {
+  // Forma stilizzata per ciascuna satellite
+  if (sat.shape === 'sun') {
+    return `<g transform="translate(${sat.centerX}, ${sat.centerY})">
+      <ellipse cx="0" cy="20" rx="120" ry="80" fill="#9bb88a" stroke="#5d8866" stroke-width="2"/>
+      <ellipse cx="0" cy="10" rx="100" ry="60" fill="#a8c878" opacity="0.7"/>
+      <ellipse cx="0" cy="40" rx="110" ry="25" fill="#e8c896" opacity="0.8"/>
+    </g>`;
+  }
+  if (sat.shape === 'forest') {
+    return `<g transform="translate(${sat.centerX}, ${sat.centerY})">
+      <ellipse cx="0" cy="0" rx="130" ry="100" fill="#7d9a6e" stroke="#5d8866" stroke-width="2"/>
+      <ellipse cx="-20" cy="-30" rx="80" ry="50" fill="#5d8866" opacity="0.7"/>
+      <ellipse cx="30" cy="40" rx="60" ry="30" fill="#9bb88a" opacity="0.6"/>
+    </g>`;
+  }
+  if (sat.shape === 'peak') {
+    return `<g transform="translate(${sat.centerX}, ${sat.centerY})">
+      <polygon points="-100,80 0,-60 100,80" fill="#b8a89c" stroke="#7d6850" stroke-width="2"/>
+      <polygon points="-50,30 0,-60 50,30" fill="#e8e0d8" opacity="0.8"/>
+      <polygon points="-25,-5 0,-60 25,-5" fill="#fff" opacity="0.9"/>
+    </g>`;
+  }
+  return '';
+}
+
+function svgBridge(sat) {
+  if (!sat.bridgeFrom || !sat.bridgeTo) return '';
+  return `<line x1="${sat.bridgeFrom.x}" y1="${sat.bridgeFrom.y}" x2="${sat.bridgeTo.x}" y2="${sat.bridgeTo.y}"
+    stroke="#7d4828" stroke-width="6" stroke-linecap="round" opacity="0.85"/>
+    <line x1="${sat.bridgeFrom.x}" y1="${sat.bridgeFrom.y}" x2="${sat.bridgeTo.x}" y2="${sat.bridgeTo.y}"
+    stroke="#a8826a" stroke-width="2" stroke-dasharray="6,4" opacity="0.7"/>`;
+}
+
+function svgSatelliteLocked(sat) {
+  return `<g transform="translate(${sat.centerX}, ${sat.centerY})" opacity="0.4">
+    <ellipse cx="0" cy="0" rx="80" ry="50" fill="#888" stroke="#555" stroke-width="2" stroke-dasharray="6,4"/>
+    <text x="0" y="0" text-anchor="middle" font-size="32" fill="#fff" font-family="Geist Mono">🔒</text>
+    <text x="0" y="24" text-anchor="middle" font-size="14" fill="#fff" font-weight="700" font-family="Fraunces">${sat.name}</text>
+  </g>`;
+}
+
+// === RENDER STATIC ===
+// Renderizza tutti gli elementi "fissi" (isola, slot, edifici, decor, satelliti) — chiamato quando cambia lo stato strutturale
+function renderStatic() {
+  const satLayer = document.getElementById('satelliteLayer');
+  const slotLayer = document.getElementById('slotLayer');
+  const buildingLayer = document.getElementById('buildingLayer');
+  const decorLayer = document.getElementById('decorLayer');
+  const bridgeLayer = document.getElementById('bridgeLayer');
+
+  // Satelliti
+  let satHtml = '';
+  for (const sId in SATELLITE_ISLANDS) {
+    const sat = SATELLITE_ISLANDS[sId];
+    if (state.unlockedSatellites.includes(sId)) {
+      satHtml += svgSatelliteShape(sat);
+    } else {
+      satHtml += svgSatelliteLocked(sat);
+      satHtml += `<g class="sat-hitbox" data-sat="${sId}" style="cursor:pointer">
+        <ellipse cx="${sat.centerX}" cy="${sat.centerY}" rx="100" ry="60" fill="transparent"/>
+      </g>`;
+    }
+  }
+  satLayer.innerHTML = satHtml;
+
+  // Ponti (solo per sbloccati)
+  let bridgeHtml = '';
+  for (const sId of state.unlockedSatellites) {
+    bridgeHtml += svgBridge(SATELLITE_ISLANDS[sId]);
+  }
+  bridgeLayer.innerHTML = bridgeHtml;
+
+  // Slot edifici (vuoti, premium da sbloccare, in costruzione)
+  let slotHtml = '';
+  const allSlots = [...SLOTS_MAIN];
+  for (const sId of state.unlockedSatellites) {
+    allSlots.push(...SATELLITE_ISLANDS[sId].slots);
+  }
+  for (const s of allSlots) {
+    if (state.placed[s.id]) continue;
+    // Slot in costruzione (edificio in build)
+    if (state.construction[s.id] && state.construction[s.id].type === 'build') {
+      const c = state.construction[s.id];
+      const left = Math.max(0, c.endAt - Date.now());
+      const total = c.endAt - c.startAt;
+      const pct = total > 0 ? (1 - left/total) * 100 : 100;
+      slotHtml += `<g class="construction-site" data-slot="${s.id}" transform="translate(${s.x},${s.y})" style="cursor:pointer">
+        <rect x="-18" y="-22" width="36" height="34" fill="#a8826a" stroke="#7d4828" stroke-width="2"/>
+        <rect x="-16" y="-10" width="32" height="3" fill="#7d4828"/>
+        <rect x="-16" y="-2" width="32" height="3" fill="#7d4828"/>
+        <text y="6" text-anchor="middle" font-size="13" font-family="Geist Mono, monospace" fill="#3d2810" font-weight="700">🚧</text>
+        <rect x="-22" y="18" width="44" height="6" fill="rgba(0,0,0,0.3)" rx="3"/>
+        <rect x="-22" y="18" width="${Math.floor(44 * pct/100)}" height="6" fill="#ff7a1e" rx="3"/>
+      </g>`;
+      continue;
+    }
+    const z = ZONES[s.zone];
+    // Slot premium chiuso?
+    if (s.premium && !state.unlockedSlots.includes(s.id)) {
+      const costLabel = s.unlockCost ? `💰${s.unlockCost}` : `💎${s.unlockGems}`;
+      slotHtml += `<g class="slot-premium" data-slot="${s.id}" transform="translate(${s.x},${s.y})" style="cursor:pointer">
+        <circle r="22" fill="rgba(60,40,20,0.2)" stroke="#7d4828" stroke-width="2" stroke-dasharray="2,2"/>
+        <text y="-2" text-anchor="middle" font-size="14">🔒</text>
+        <text y="14" text-anchor="middle" font-size="8" font-family="Geist Mono, monospace" fill="#3d2810" font-weight="700">${costLabel}</text>
+      </g>`;
+    } else {
+      slotHtml += `<g class="slot-empty" data-slot="${s.id}" data-zone="${s.zone}" transform="translate(${s.x},${s.y})" style="cursor:pointer">
+        <circle r="22" fill="${z.color}" opacity="0.25" stroke="${z.color}" stroke-width="2" stroke-dasharray="4,3"/>
+        <text y="4" text-anchor="middle" font-size="14">${z.icon}</text>
+      </g>`;
+    }
+  }
+  slotLayer.innerHTML = slotHtml;
+
+  // Edifici piazzati
+  let bHtml = '';
+  for (const slotId in state.placed) {
+    const b = state.placed[slotId];
+    const slot = findSlotById(slotId);
+    if (!slot) continue;
+    // Indicatore upgrade in corso?
+    const upKey = slotId;
+    const upgrading = state.construction[upKey] && state.construction[upKey].type === 'upgrade';
+    let progressBar = '';
+    if (upgrading) {
+      const c = state.construction[upKey];
+      const left = Math.max(0, c.endAt - Date.now());
+      const total = c.endAt - c.startAt;
+      const pct = total > 0 ? (1 - left/total) * 100 : 100;
+      progressBar = `<rect x="-22" y="20" width="44" height="6" fill="rgba(0,0,0,0.3)" rx="3"/>
+        <rect x="-22" y="20" width="${Math.floor(44 * pct/100)}" height="6" fill="#7ab5c4" rx="3"/>
+        <text y="35" text-anchor="middle" font-size="9" font-family="Geist Mono, monospace" fill="#1e4d5c" font-weight="700">↑Lv${c.targetLevel}</text>`;
+    }
+    bHtml += `<g class="building-placed" data-slot="${slotId}" transform="translate(${slot.x},${slot.y})" style="cursor:pointer">
+      ${svgBuilding({...b, slotId}, true)}
+      ${progressBar}
+    </g>`;
+  }
+  buildingLayer.innerHTML = bHtml;
+
+  // Decorazioni libere (array)
+  let dHtml = '';
+  if (Array.isArray(state.decorPlaced)) {
+    for (const d of state.decorPlaced) {
+      dHtml += `<g class="decor-placed" data-decor-id="${d.id}" transform="translate(${d.x},${d.y})" style="cursor:pointer">
+        ${svgDecoration(d.decorId)}
+      </g>`;
+    }
+  }
+  decorLayer.innerHTML = dHtml;
+
+  // Aggancia event listener
+  attachStaticListeners();
+}
+
+function attachStaticListeners() {
+  // Event delegation sull'SVG root.
+  const svg = document.getElementById('islandSvg');
+  if (!svg) return;
+  svg.onclick = (e) => {
+    // === MODALITA PIAZZAMENTO DECORAZIONE LIBERA ===
+    // Se l'utente sta piazzando una decorazione, qualunque click sull'isola la piazza li (se valido)
+    if (placingDecorId) {
+      // Convert client coords -> SVG viewBox coords
+      const pt = svg.createSVGPoint();
+      pt.x = e.clientX; pt.y = e.clientY;
+      const matrix = svg.getScreenCTM();
+      if (matrix) {
+        const svgP = pt.matrixTransform(matrix.inverse());
+        // Se l'utente ha cliccato su un edificio/slot, non piazzare
+        let isOnGameElement = false;
+        let walk = e.target;
+        while (walk && walk !== svg) {
+          if (walk.classList && (
+            walk.classList.contains('building-placed') ||
+            walk.classList.contains('slot-empty') ||
+            walk.classList.contains('slot-premium') ||
+            walk.classList.contains('construction-site') ||
+            walk.classList.contains('sat-hitbox') ||
+            walk.classList.contains('decor-placed')
+          )) { isOnGameElement = true; break; }
+          walk = walk.parentNode;
+        }
+        if (!isOnGameElement) {
+          e.stopPropagation();
+          placeDecorationAt(svgP.x, svgP.y);
+          return;
+        }
+      }
+    }
+
+    // === DELEGATION NORMALE ===
+    let target = e.target;
+    while (target && target !== svg) {
+      if (target.classList) {
+        if (target.classList.contains('slot-empty')) {
+          e.stopPropagation();
+          openModal('buildFromSlot', {slotId: target.dataset.slot, zone: target.dataset.zone});
+          return;
+        }
+        if (target.classList.contains('slot-premium')) {
+          e.stopPropagation();
+          openModal('unlockSlot', {slotId: target.dataset.slot});
+          return;
+        }
+        if (target.classList.contains('construction-site')) {
+          e.stopPropagation();
+          openModal('constructionDetail', {slotId: target.dataset.slot});
+          return;
+        }
+        if (target.classList.contains('building-placed')) {
+          e.stopPropagation();
+          openModal('buildingDetail', {slotId: target.dataset.slot});
+          return;
+        }
+        if (target.classList.contains('sat-hitbox')) {
+          e.stopPropagation();
+          openModal('satelliteUnlock', {satId: target.dataset.sat});
+          return;
+        }
+        if (target.classList.contains('decor-placed')) {
+          e.stopPropagation();
+          openModal('decorActions', {decorId: target.dataset.decorId});
+          return;
+        }
+      }
+      target = target.parentNode;
+    }
+  };
+}
+
+// === RENDER ENTITIES (NPC + BOAT) — chiamato ogni frame ===
+function renderEntities() {
+  const npcLayer = document.getElementById('npcLayer');
+  const boatLayer = document.getElementById('boatLayer');
+  if (!npcLayer || !boatLayer) return;
+
+  let nHtml = '';
+  for (const npc of state.npcRoster) nHtml += svgNpc(npc);
+  npcLayer.innerHTML = nHtml;
+
+  if (state.boat) {
+    boatLayer.innerHTML = svgBoat(state.boat);
+  } else {
+    boatLayer.innerHTML = '';
+  }
+
+  // Overlay di piazzamento decorazione libera: solo un velo leggero + suggerimento testuale
+  const placementLayer = document.getElementById('placementLayer');
+  if (placementLayer) {
+    if (placingDecorId) {
+      const d = DECORATIONS[placingDecorId];
+      placementLayer.innerHTML = `
+        <rect x="-280" y="-220" width="1480" height="920" fill="rgba(255,224,102,0.08)" pointer-events="none"/>
+        <text x="450" y="-150" text-anchor="middle" font-size="22" font-family="Fraunces, serif" fill="#9e4828" font-weight="700" pointer-events="none">
+          Tocca dove vuoi piazzare ${d ? d.name : 'la decorazione'}
+        </text>`;
+    } else {
+      placementLayer.innerHTML = '';
+    }
+  }
+}
+
+// ============================================================
+// ZOOM & PAN
+// ============================================================
+// Il viewBox di partenza e' "-280 -220 1480 920" (vedi skeleton)
+// Lo manteniamo come "world bounds" e applichiamo zoom/pan modificando il viewBox.
+var ZOOM_DEFAULT_VB = { x: -280, y: -220, w: 1480, h: 920 };
+var ZOOM_MIN_W = 400;     // zoom in max
+var ZOOM_MAX_W = 2000;    // zoom out max
+var zoomVB = Object.assign({}, ZOOM_DEFAULT_VB);
+
+function applyZoomViewBox() {
+  const svg = document.getElementById('islandSvg');
+  if (!svg) return;
+  svg.setAttribute('viewBox', `${zoomVB.x} ${zoomVB.y} ${zoomVB.w} ${zoomVB.h}`);
+}
+
+function clampZoomVB() {
+  // Limita zoom: w in [ZOOM_MIN_W, ZOOM_MAX_W]
+  if (zoomVB.w < ZOOM_MIN_W) { zoomVB.h *= ZOOM_MIN_W / zoomVB.w; zoomVB.w = ZOOM_MIN_W; }
+  if (zoomVB.w > ZOOM_MAX_W) { zoomVB.h *= ZOOM_MAX_W / zoomVB.w; zoomVB.w = ZOOM_MAX_W; }
+  // Limita pan: il centro del viewBox non deve uscire dal "mondo" allargato
+  // Mondo allargato (per permettere di vedere i satelliti): da -400 a 1300 su X, da -300 a 800 su Y
+  const worldMinX = -500, worldMaxX = 1400, worldMinY = -400, worldMaxY = 900;
+  if (zoomVB.x < worldMinX) zoomVB.x = worldMinX;
+  if (zoomVB.y < worldMinY) zoomVB.y = worldMinY;
+  if (zoomVB.x + zoomVB.w > worldMaxX) zoomVB.x = worldMaxX - zoomVB.w;
+  if (zoomVB.y + zoomVB.h > worldMaxY) zoomVB.y = worldMaxY - zoomVB.h;
+}
+
+function zoomBy(factor, anchorClientX, anchorClientY) {
+  const svg = document.getElementById('islandSvg');
+  if (!svg) return;
+  // Converti anchor (coords client) in coords viewBox
+  let anchor;
+  if (anchorClientX != null && anchorClientY != null) {
+    const pt = svg.createSVGPoint();
+    pt.x = anchorClientX; pt.y = anchorClientY;
+    const m = svg.getScreenCTM();
+    if (m) anchor = pt.matrixTransform(m.inverse());
+  }
+  if (!anchor) {
+    anchor = { x: zoomVB.x + zoomVB.w/2, y: zoomVB.y + zoomVB.h/2 };
+  }
+  const newW = zoomVB.w * factor;
+  const newH = zoomVB.h * factor;
+  // Mantieni anchor allo stesso punto sullo schermo
+  zoomVB.x = anchor.x - (anchor.x - zoomVB.x) * (newW / zoomVB.w);
+  zoomVB.y = anchor.y - (anchor.y - zoomVB.y) * (newH / zoomVB.h);
+  zoomVB.w = newW;
+  zoomVB.h = newH;
+  clampZoomVB();
+  applyZoomViewBox();
+}
+
+function resetZoom() {
+  zoomVB = Object.assign({}, ZOOM_DEFAULT_VB);
+  applyZoomViewBox();
+}
+
+// === GESTURE: pan + pinch + wheel ===
+var _panState = null;       // { startClientX, startClientY, startVB }
+var _pinchState = null;     // { startDist, startVB, startCenterClient }
+var _activePointers = new Map(); // pointerId -> {x,y}
+var _isDragging = false;
+
+function initZoomGestures() {
+  const svg = document.getElementById('islandSvg');
+  if (!svg) return;
+
+  // Wheel = zoom (desktop)
+  svg.addEventListener('wheel', (e) => {
+    e.preventDefault();
+    const factor = e.deltaY > 0 ? 1.15 : 1/1.15;
+    zoomBy(factor, e.clientX, e.clientY);
+  }, { passive: false });
+
+  // PointerDown
+  svg.addEventListener('pointerdown', (e) => {
+    // Se sta piazzando una decorazione, niente pan/pinch (passa il click)
+    if (placingDecorId) return;
+    // NB: NON facciamo setPointerCapture qui, altrimenti i click sui figli
+    // (slot, edifici) vengono dirottati al root SVG e e.target diventa l'SVG.
+    // Catturiamo solo se l'utente inizia davvero a trascinare (vedi pointermove).
+    _activePointers.set(e.pointerId, { x: e.clientX, y: e.clientY });
+    if (_activePointers.size === 1) {
+      // Possibile inizio pan: registriamo ma non droppiamo subito il click
+      _panState = {
+        pointerId: e.pointerId,
+        startClientX: e.clientX,
+        startClientY: e.clientY,
+        startVB: Object.assign({}, zoomVB),
+        moved: false,
+      };
+    } else if (_activePointers.size === 2) {
+      // Inizio pinch
+      const pts = [..._activePointers.values()];
+      const dx = pts[0].x - pts[1].x;
+      const dy = pts[0].y - pts[1].y;
+      _pinchState = {
+        startDist: Math.sqrt(dx*dx + dy*dy),
+        startVB: Object.assign({}, zoomVB),
+        startCenterClient: { x: (pts[0].x+pts[1].x)/2, y: (pts[0].y+pts[1].y)/2 },
+      };
+      _panState = null; // annulla pan con due dita
+      // Con due dita ora catturiamo: e' un pinch certo
+      try { svg.setPointerCapture(e.pointerId); } catch(_) {}
+    }
+  });
+
+  // PointerMove
+  svg.addEventListener('pointermove', (e) => {
+    if (!_activePointers.has(e.pointerId)) return;
+    _activePointers.set(e.pointerId, { x: e.clientX, y: e.clientY });
+
+    if (_activePointers.size === 2 && _pinchState) {
+      const pts = [..._activePointers.values()];
+      const dx = pts[0].x - pts[1].x;
+      const dy = pts[0].y - pts[1].y;
+      const dist = Math.sqrt(dx*dx + dy*dy);
+      if (dist > 0 && _pinchState.startDist > 0) {
+        const scale = _pinchState.startDist / dist;
+        // Ripristina viewBox iniziale e applica zoom
+        zoomVB = Object.assign({}, _pinchState.startVB);
+        zoomBy(scale, _pinchState.startCenterClient.x, _pinchState.startCenterClient.y);
+      }
+    } else if (_activePointers.size === 1 && _panState && e.pointerId === _panState.pointerId) {
+      const dx = e.clientX - _panState.startClientX;
+      const dy = e.clientY - _panState.startClientY;
+      if (Math.abs(dx) > 4 || Math.abs(dy) > 4) {
+        if (!_panState.moved) {
+          _panState.moved = true;
+          _isDragging = true;
+          svg.classList.add('dragging');
+          // Solo ora cattura il pointer per non perderlo se esce dall'svg
+          try { svg.setPointerCapture(e.pointerId); } catch(_) {}
+        }
+      }
+      if (_panState.moved) {
+        // Converti delta client -> delta viewBox
+        const rect = svg.getBoundingClientRect();
+        const scaleX = _panState.startVB.w / rect.width;
+        const scaleY = _panState.startVB.h / rect.height;
+        zoomVB.x = _panState.startVB.x - dx * scaleX;
+        zoomVB.y = _panState.startVB.y - dy * scaleY;
+        clampZoomVB();
+        applyZoomViewBox();
+      }
+    }
+  });
+
+  // PointerUp / cancel
+  function endPointer(e) {
+    if (_activePointers.has(e.pointerId)) {
+      _activePointers.delete(e.pointerId);
+    }
+    if (_activePointers.size < 2) _pinchState = null;
+    if (_activePointers.size === 0) {
+      _panState = null;
+      // Se ha mosso, allora era un drag: cancella il click
+      if (_isDragging) {
+        _isDragging = false;
+        svg.classList.remove('dragging');
+        // Sopprime il click che segue: aggiunge un listener one-shot
+        const suppressOnce = (ev) => { ev.stopPropagation(); ev.preventDefault(); };
+        svg.addEventListener('click', suppressOnce, { capture: true, once: true });
+      }
+    }
+  }
+  svg.addEventListener('pointerup', endPointer);
+  svg.addEventListener('pointercancel', endPointer);
+  svg.addEventListener('pointerleave', endPointer);
+
+  // Bottoni
+  const zi = document.getElementById('zoomInBtn');
+  const zo = document.getElementById('zoomOutBtn');
+  const zr = document.getElementById('zoomResetBtn');
+  if (zi) zi.onclick = () => zoomBy(1/1.25);
+  if (zo) zo.onclick = () => zoomBy(1.25);
+  if (zr) zr.onclick = () => resetZoom();
+}
+
+</script>
+<script id="uiScript">
+// ============================================================
+// FIT ISLAND v2 — UI / MODAL / INTERACTIONS
+// ============================================================
+
+var currentModal = null;
+var currentModalData = null;
+var placingDecorId = null;
+
+// === MODAL OPEN/CLOSE ===
+function openModal(type, data) {
+  // Se stiamo piazzando una decorazione e si apre un altro modal, annulla
+  if (type !== 'decorate') placingDecorId = null;
+  currentModal = type;
+  currentModalData = data || {};
+  document.getElementById('modalOverlay').style.display = 'flex';
+  renderModal();
+}
+
+function closeAllModals() {
+  currentModal = null;
+  currentModalData = null;
+  document.getElementById('modalOverlay').style.display = 'none';
+}
+
+function renderModal() {
+  const body = document.getElementById('modalBody');
+  if (!body) return;
+  switch (currentModal) {
+    case 'workout':           body.innerHTML = renderWorkoutModal(); break;
+    case 'workoutDetail':     body.innerHTML = renderWorkoutDetailModal(); break;
+    case 'buildFromSlot':     body.innerHTML = renderBuildFromSlot(); break;
+    case 'buildingDetail':    body.innerHTML = renderBuildingDetail(); break;
+    case 'constructionDetail':body.innerHTML = renderConstructionDetail(); break;
+    case 'interior':          body.innerHTML = renderInteriorModal(); break;
+    case 'decorate':          body.innerHTML = renderDecorateModal(); break;
+    case 'decorActions':      body.innerHTML = renderDecorActionsModal(); break;
+    case 'quests':            body.innerHTML = renderQuestsModal(); break;
+    case 'achievements':      body.innerHTML = renderAchievementsModal(); break;
+    case 'population':        body.innerHTML = renderPopulationModal(); break;
+    case 'satellites':        body.innerHTML = renderSatellitesModal(); break;
+    case 'satelliteUnlock':   body.innerHTML = renderSatelliteUnlockModal(); break;
+    case 'unlockSlot':        body.innerHTML = renderUnlockSlotModal(); break;
+    case 'more':              body.innerHTML = renderMoreModal(); break;
+    case 'stats':             body.innerHTML = renderStatsModal(); break;
+    case 'event':             body.innerHTML = renderEventModal(); break;
+    case 'intro':             body.innerHTML = renderIntroModal(); break;
+    case 'settings':          body.innerHTML = renderSettingsModal(); break;
+    case 'helpDiamonds':      body.innerHTML = renderHelpDiamondsModal(); break;
+    case 'gemShop':           body.innerHTML = renderGemShopModal(); break;
+    default: body.innerHTML = '';
+  }
+  attachModalListeners();
+  // Riapplica listener per <input>/<select> nel modal
+  if (currentModal === 'workoutDetail') attachWorkoutDetailInputs();
+}
+
+function attachModalListeners() {
+  document.querySelectorAll('[data-action]').forEach(el => {
+    el.onclick = (e) => {
+      e.stopPropagation();
+      const action = el.dataset.action;
+      handleAction(action, el.dataset);
+    };
+  });
+}
+
+// === HANDLER CENTRALE AZIONI ===
+function handleAction(action, data) {
+  switch(action) {
+    case 'closeModal':      closeAllModals(); break;
+    case 'openWorkout':     openModal('workout'); break;
+    case 'openWorkoutDetail': openModal('workoutDetail', {workoutId: data.workoutId}); break;
+    case 'openQuests':      openModal('quests'); break;
+    case 'openAchievements':openModal('achievements'); break;
+    case 'openMore':        openModal('more'); break;
+    case 'openPopulation':  openModal('population'); break;
+    case 'openSatellites':  openModal('satellites'); break;
+    case 'openStats':       openModal('stats'); break;
+    case 'openEvent':       openModal('event'); break;
+    case 'openSettings':    openModal('settings'); break;
+    case 'openHelpDiamonds':openModal('helpDiamonds'); break;
+    case 'openGemShop':     openModal('gemShop'); break;
+    case 'completeWorkoutNow': completeWorkoutFromForm(); break;
+    case 'startBuild':      startBuild(data.slotId, data.bId); break;
+    case 'startUpgrade':    startUpgrade(data.slotId); break;
+    case 'demolish':        demolishBuilding(data.slotId); break;
+    case 'enterInterior':   openModal('interior', {slotId: data.slotId}); break;
+    case 'backFromInterior':openModal('buildingDetail', {slotId: data.slotId}); break;
+    case 'startStationUpgrade': startInteriorStationUpgrade(data.slotId, data.stationId); break;
+    case 'openDecorate':    openModal('decorate'); break;
+    case 'buyDecor':        buyDecor(data.decorId); break;
+    case 'startPlacing':    startPlacingDecor(data.decorId); break;
+    case 'cancelPlacing':   cancelPlacingDecor(); break;
+    case 'expandDecorCap':  expandDecorCap(); break;
+    case 'removeDecor':     removeDecoration(data.decorId); break;
+    case 'claimAch':        claimAchievement(data.id); break;
+    case 'claimQ':          claimDailyQuest(data.id); break;
+    case 'unlockSat':       tryUnlockSatellite(data.satId); break;
+    case 'unlockSlot':      tryUnlockSlot(data.slotId); break;
+    case 'skipConstruction':doSkipConstruction(data.key); break;
+    case 'buyGemPack':      buyGemPack(data.packId); break;
+    case 'dismissHint':     handleDismissHint(data.id); break;
+    case 'introNext':       advanceIntro(); break;
+    case 'tutorialDismiss': dismissTutorial(); break;
+    case 'reset':           if (confirm('Azzerare il salvataggio? Tutti i progressi andranno persi.')) resetGame(); break;
+    case 'debugAdvance':    debugAdvanceDay(); break;
+    case 'debugCoins':      state.coins += 10000; updateUI(); saveGame(); break;
+    case 'debugGems':       state.gems += 50; updateUI(); saveGame(); break;
+    case 'debugMaxStats':   state.stats={vitalita:90,armonia:90,forza:90,comunita:90}; saveGame(); break;
+    case 'debugForceBoat':  forceBoatArrival(); break;
+    case 'startGame':       startGameFromIntro(); break;
+  }
+}
+
+// === WORKOUT (v1 style con parametri) ===
+function renderWorkoutModal() {
+  let html = `<div class="modal-head"><h2>Workout</h2><button class="close-btn" data-action="closeModal">×</button></div>
+    <div class="modal-content">
+      <p class="muted">Scegli il tipo di allenamento. I diamanti si guadagnano SOLO dai workout!</p>`;
+  for (const w of WORKOUT_TYPES) {
+    const statIcon = w.statType==='vitalita'?'⚡':w.statType==='forza'?'💪':w.statType==='armonia'?'🧘':'🤝';
+    html += `<button class="workout-card" data-action="openWorkoutDetail" data-workout-id="${w.id}">
+      <div class="w-icon">${w.icon}</div>
+      <div class="w-info">
+        <div class="w-name">${w.name}</div>
+        <div class="w-meta">${w.desc} ${statIcon}</div>
+      </div>
+    </button>`;
+  }
+  html += `</div>`;
+  return html;
+}
+
+// Stato locale del form workout (per re-render senza perdere valori)
+var workoutForm = { duration:null, intensity:'medium', form:85 };
+
+function computeWorkoutRewards(w, durationMin, intensity, formScore) {
+  const intDef = INTENSITY_LEVELS[intensity];
+  const durRatio = durationMin / w.durataBase;
+  const formMult = formScore / 100;
+  const streak = streakMultiplier();
+  const coins = Math.floor(w.coinsBase * durRatio * intDef.coinsMult * formMult * streak);
+  const gems = Math.floor((durationMin / 10) * intDef.gemMult * formMult);
+  const xp = Math.floor(w.xpBase * durRatio * intDef.xpMult);
+  return { coins, gems, xp, streak };
+}
+
+function renderWorkoutDetailModal() {
+  const {workoutId} = currentModalData;
+  const w = WORKOUT_TYPES.find(x=>x.id===workoutId);
+  if (!w) return '';
+  if (workoutForm.duration == null) workoutForm.duration = w.durataBase;
+  const r = computeWorkoutRewards(w, workoutForm.duration, workoutForm.intensity, workoutForm.form);
+  const statIcon = w.statType==='vitalita'?'⚡':w.statType==='forza'?'💪':w.statType==='armonia'?'🧘':'🤝';
+
+  return `<div class="modal-head">
+    <h2>${w.icon} ${w.name}</h2>
+    <button class="close-btn" data-action="closeModal">×</button>
+  </div>
+  <div class="modal-content">
+    <p class="muted">${w.desc}. Personalizza i parametri per simulare la sessione.</p>
+
+    <div class="param-row">
+      <label class="param-label">Durata: <b id="wDurDisplay">${workoutForm.duration} min</b></label>
+      <input type="range" id="wDur" min="5" max="120" step="5" value="${workoutForm.duration}" class="slider"/>
+    </div>
+
+    <div class="param-row">
+      <label class="param-label">Intensita</label>
+      <div class="seg-control" id="wIntensity">
+        <button class="seg ${workoutForm.intensity==='low'?'active':''}" data-int="low">Bassa</button>
+        <button class="seg ${workoutForm.intensity==='medium'?'active':''}" data-int="medium">Media</button>
+        <button class="seg ${workoutForm.intensity==='high'?'active':''}" data-int="high">Alta</button>
+      </div>
+    </div>
+
+    <div class="param-row">
+      <label class="param-label">Form score: <b id="wFormDisplay">${workoutForm.form}%</b> <span class="muted small">(AI motion tracking)</span></label>
+      <input type="range" id="wForm" min="50" max="100" step="5" value="${workoutForm.form}" class="slider"/>
+    </div>
+
+    <div class="reward-preview">
+      <div class="reward-row"><span>💰 Coins</span><b id="rewCoins">+${r.coins}</b></div>
+      <div class="reward-row"><span>💎 Diamanti</span><b id="rewGems">+${r.gems}</b></div>
+      <div class="reward-row"><span>⭐ XP</span><b id="rewXp">+${r.xp}</b></div>
+      <div class="reward-row muted small"><span>Streak attivo</span><span id="rewStreak">x${r.streak.toFixed(2)}</span></div>
+      <div class="reward-row muted small"><span>${statIcon} Boost stat</span><span id="rewStat">+${w.statType}</span></div>
+    </div>
+
+    <button class="primary-btn" data-action="completeWorkoutNow">Completa Workout</button>
+    <button class="ghost-btn" data-action="openWorkout">← Cambia tipo</button>
+  </div>`;
+}
+
+function attachWorkoutDetailInputs() {
+  const w = WORKOUT_TYPES.find(x=>x.id===currentModalData.workoutId);
+  if (!w) return;
+  const refresh = () => {
+    const r = computeWorkoutRewards(w, workoutForm.duration, workoutForm.intensity, workoutForm.form);
+    const dispDur = document.getElementById('wDurDisplay');
+    const dispForm = document.getElementById('wFormDisplay');
+    const rc = document.getElementById('rewCoins');
+    const rg = document.getElementById('rewGems');
+    const rx = document.getElementById('rewXp');
+    const rs = document.getElementById('rewStreak');
+    if (dispDur) dispDur.textContent = workoutForm.duration + ' min';
+    if (dispForm) dispForm.textContent = workoutForm.form + '%';
+    if (rc) rc.textContent = '+' + r.coins;
+    if (rg) rg.textContent = '+' + r.gems;
+    if (rx) rx.textContent = '+' + r.xp;
+    if (rs) rs.textContent = 'x' + r.streak.toFixed(2);
+  };
+  const dur = document.getElementById('wDur');
+  if (dur) dur.oninput = (e) => { workoutForm.duration = parseInt(e.target.value); refresh(); };
+  const form = document.getElementById('wForm');
+  if (form) form.oninput = (e) => { workoutForm.form = parseInt(e.target.value); refresh(); };
+  document.querySelectorAll('#wIntensity .seg').forEach(btn => {
+    btn.onclick = (e) => {
+      e.stopPropagation();
+      workoutForm.intensity = btn.dataset.int;
+      document.querySelectorAll('#wIntensity .seg').forEach(b => b.classList.toggle('active', b===btn));
+      refresh();
+    };
+  });
+}
+
+function completeWorkoutFromForm() {
+  const w = WORKOUT_TYPES.find(x=>x.id===currentModalData.workoutId);
+  if (!w) return;
+  const r = computeWorkoutRewards(w, workoutForm.duration, workoutForm.intensity, workoutForm.form);
+
+  state.coins += r.coins;
+  state.gems += r.gems;
+  state.totalCoinsEarned += r.coins;
+  state.totalGemsEarned += r.gems;
+  addXp(r.xp);
+  state.totalWorkouts++;
+  state.lastWorkoutAt = Date.now();
+
+  applyWorkoutBoost(w, workoutForm.intensity, workoutForm.form, workoutForm.duration);
+
+  const today = getToday();
+  if (state.lastWorkoutDate !== today) {
+    state.streak++;
+    state.lastWorkoutDate = today;
+  }
+  state.workoutHistory.unshift({date: today, name: w.name, coins: r.coins, gems: r.gems, dur: workoutForm.duration, int: workoutForm.intensity, form: workoutForm.form});
+  if (state.workoutHistory.length > 30) state.workoutHistory.pop();
+
+  progressQuest('workout_count', 1);
+
+  // Tutorial
+  if (state.tutorialIdx === 2) state.tutorialIdx = 3;
+
+  showToast(`+${r.coins}💰 +${r.gems}💎 +${r.xp}XP`, 'good');
+  saveGame();
+  updateUI();
+  // Reset form per il prossimo
+  workoutForm = { duration:null, intensity:'medium', form:85 };
+  closeAllModals();
+}
+
+// === BUILD ===
+function countBuildingInstances(bId) {
+  let n = 0;
+  for (const slotId in state.placed) if (state.placed[slotId].id === bId) n++;
+  return n;
+}
+
+function formatDuration(sec) {
+  sec = Math.max(0, Math.floor(sec));
+  if (sec < 60) return sec + 's';
+  const m = Math.floor(sec/60);
+  const s = sec % 60;
+  if (m < 60) return s > 0 ? `${m}m ${s}s` : `${m}m`;
+  const h = Math.floor(m/60);
+  const mm = m % 60;
+  return mm > 0 ? `${h}h ${mm}m` : `${h}h`;
+}
+
+function renderBuildFromSlot() {
+  const {slotId, zone} = currentModalData;
+  const z = ZONES[zone];
+  const candidates = Object.values(BUILDINGS).filter(b => b.zone === zone);
+  const cantStart = activeConstructions() >= MAX_CONCURRENT_BUILDS;
+  let html = `<div class="modal-head">
+    <h2>${z.icon} ${z.name}</h2>
+    <button class="close-btn" data-action="closeModal">×</button>
+  </div>
+  <div class="modal-content">
+    <p class="muted">${z.desc}. Scegli un edificio da costruire.</p>
+    ${cantStart ? '<div class="warn-banner">⚠️ Max 3 cantieri attivi! Aspetta che ne finisca uno o skippa con 💎.</div>' : ''}`;
+  for (const b of candidates) {
+    const owned = countBuildingInstances(b.id);
+    const canCoins = state.coins >= b.cost;
+    const can = canCoins && !cantStart;
+    const time = buildTimeSeconds(b.cost);
+    html += `<button class="build-card${can?'':' disabled'}" ${can?`data-action="startBuild" data-slot-id="${slotId}" data-b-id="${b.id}"`:''}>
+      <div class="b-svg"><svg viewBox="-30 -30 60 60" width="48" height="48">${svgBuildingShape(b.icon, b.zone)}</svg></div>
+      <div class="b-info">
+        <div class="b-name">${b.name}${b.hasInterior?' <span class="badge-interior">interno</span>':''}${owned>0?` <span class="badge-owned">× ${owned}</span>`:''}</div>
+        <div class="b-desc">${b.desc}</div>
+        <div class="b-stats">
+          <span>💰 ${b.cost}</span>
+          <span>+${b.rate}/s</span>
+          <span>👤 ${b.capacity}</span>
+          <span>⏱️ ${formatDuration(time)}</span>
+        </div>
+      </div>
+    </button>`;
+  }
+  html += `</div>`;
+  return html;
+}
+
+function startBuild(slotId, bId) {
+  const def = BUILDINGS[bId];
+  if (!def) return;
+  if (state.coins < def.cost) { showToast('Coins insufficienti', 'warn'); return; }
+  if (activeConstructions() >= MAX_CONCURRENT_BUILDS) { showToast('Max 3 cantieri attivi', 'warn'); return; }
+  if (state.construction[slotId]) { showToast('Slot occupato', 'warn'); return; }
+  state.coins -= def.cost;
+  state.totalCoinsSpent += def.cost;
+  const dur = buildTimeSeconds(def.cost);
+  startConstruction(slotId, 'build', { bId, targetLevel:1, durationSec:dur });
+  progressQuest('spend', def.cost);
+  // Tutorial
+  if (state.tutorialIdx === 1) state.tutorialIdx = 2;
+  showToast(`Cantiere aperto (${formatDuration(dur)})`, 'info');
+  saveGame();
+  renderStatic();
+  updateUI();
+  closeAllModals();
+}
+
+function renderBuildingDetail() {
+  const {slotId} = currentModalData;
+  const b = state.placed[slotId];
+  if (!b) { closeAllModals(); return ''; }
+  const def = BUILDINGS[b.id];
+  const nextLevel = b.level + 1;
+  const upCost = Math.floor(def.cost * Math.pow(1.6, b.level));
+  const upTime = upgradeTimeSeconds(def.cost, nextLevel);
+  const upInProgress = !!state.construction[slotId];
+  const canUp = !upInProgress && state.coins >= upCost && b.level < 10 && activeConstructions() < MAX_CONCURRENT_BUILDS;
+  const visiting = state.npcRoster.filter(n => n.targetSlot === slotId).length;
+
+  let html = `<div class="modal-head">
+    <h2>${def.name}</h2>
+    <button class="close-btn" data-action="closeModal">×</button>
+  </div>
+  <div class="modal-content">
+    <div class="bd-icon"><svg viewBox="-30 -30 60 60" width="80" height="80">${svgBuildingShape(def.icon, def.zone)}</svg></div>
+    <div class="bd-meta">
+      <div><span class="muted">Livello</span> <b>${b.level}/10</b></div>
+      <div><span class="muted">Produzione</span> <b>+${(def.rate * b.level).toFixed(1)}/s</b></div>
+      <div><span class="muted">Capacita</span> <b>${def.capacity * b.level}</b></div>
+      <div><span class="muted">Visitatori ora</span> <b>${visiting}</b></div>
+    </div>
+    <div class="bd-stats-box">
+      ${Object.entries(def.stats).map(([k,v])=>{
+        const ic = k==='vitalita'?'⚡':k==='forza'?'💪':k==='armonia'?'🧘':'🤝';
+        return `<span>${ic} ${k}: +${v*b.level}</span>`;
+      }).join('')}
+    </div>
+    ${upInProgress ? `
+      <div class="warn-banner">⚙️ Upgrade in corso. Tap sull'edificio per skippare.</div>
+    ` : b.level < 10 ? `
+      <button class="primary-btn${canUp?'':' disabled'}" ${canUp?`data-action="startUpgrade" data-slot-id="${slotId}"`:''}>
+        Potenzia a Lv${nextLevel} — 💰 ${upCost} • ⏱️ ${formatDuration(upTime)}
+      </button>` : '<div class="muted center">Livello massimo raggiunto</div>'}
+    ${def.hasInterior ? `
+      <button class="secondary-btn" data-action="enterInterior" data-slot-id="${slotId}">
+        🏠 Entra all'interno
+      </button>` : ''}
+    <button class="ghost-btn" data-action="demolish" data-slot-id="${slotId}">Demolisci</button>
+  </div>`;
+  return html;
+}
+
+function startUpgrade(slotId) {
+  const b = state.placed[slotId];
+  if (!b || b.level >= 10) return;
+  const def = BUILDINGS[b.id];
+  const nextLevel = b.level + 1;
+  const cost = Math.floor(def.cost * Math.pow(1.6, b.level));
+  if (state.coins < cost) { showToast('Coins insufficienti', 'warn'); return; }
+  if (activeConstructions() >= MAX_CONCURRENT_BUILDS) { showToast('Max 3 cantieri attivi', 'warn'); return; }
+  if (state.construction[slotId]) { showToast('Gia in corso', 'warn'); return; }
+  state.coins -= cost;
+  state.totalCoinsSpent += cost;
+  const dur = upgradeTimeSeconds(def.cost, nextLevel);
+  startConstruction(slotId, 'upgrade', { targetLevel:nextLevel, durationSec:dur });
+  progressQuest('spend', cost);
+  if (state.tutorialIdx === 4) state.tutorialIdx = 5;
+  showToast(`Upgrade avviato (${formatDuration(dur)})`, 'info');
+  saveGame();
+  renderStatic();
+  updateUI();
+  closeAllModals();
+}
+
+function demolishBuilding(slotId) {
+  const b = state.placed[slotId];
+  if (!b) return;
+  const def = BUILDINGS[b.id];
+  if (!confirm(`Demolire ${def.name}? Recupererai il 50% del costo.`)) return;
+  const refund = Math.floor(def.cost * 0.5);
+  state.coins += refund;
+  delete state.placed[slotId];
+  showToast(`+${refund} 💰 rimborso`, 'good');
+  saveGame();
+  renderStatic();
+  updateUI();
+  closeAllModals();
+}
+
+// === INTERIOR ===
+function renderInteriorModal() {
+  const {slotId} = currentModalData;
+  const b = state.placed[slotId];
+  if (!b) { closeAllModals(); return ''; }
+  const def = BUILDINGS[b.id];
+  const interior = INTERIORS[b.id];
+  if (!interior) { return '<div class="modal-head"><h2>Niente da vedere</h2></div>'; }
+
+  // Tracking visite
+  if (!state.visitedInteriors.includes(b.id)) {
+    state.visitedInteriors.push(b.id);
+    saveGame();
+  }
+
+  // Calcola NPC che visitano questo edificio
+  const visitingNpcs = state.npcRoster.filter(n => n.targetSlot === slotId && n.state === 'visiting');
+
+  let html = `<div class="modal-head">
+    <h2>${def.name} — Interno</h2>
+    <button class="close-btn" data-action="closeModal">×</button>
+  </div>
+  <div class="modal-content interior-modal">`;
+
+  // Vista interna SVG
+  html += `<div class="interior-view">
+    <svg viewBox="0 0 700 460" style="width:100%;height:auto;background:${interior.bgColor};border-radius:12px">
+      <rect x="0" y="350" width="700" height="110" fill="${interior.floorColor}"/>
+      <rect x="0" y="0" width="700" height="350" fill="${interior.bgColor}"/>`;
+
+  // Elementi statici interni
+  for (const el of interior.elements) {
+    html += renderInteriorElement(el);
+  }
+
+  // NPC nei spot
+  for (let i=0;i<interior.npcSpots.length && i<visitingNpcs.length;i++) {
+    const spot = interior.npcSpots[i];
+    const npc = visitingNpcs[i];
+    const tdef = NPC_TYPES[npc.type];
+    html += `<g transform="translate(${spot.x},${spot.y})">
+      <ellipse cx="0" cy="36" rx="8" ry="3" fill="rgba(0,0,0,0.18)"/>
+      <rect x="-10" y="0" width="20" height="22" rx="3" fill="${tdef.color}"/>
+      <circle cx="0" cy="-6" r="9" fill="#f4d4a8"/>
+      <rect x="-7" y="22" width="5" height="10" fill="#3d2810"/>
+      <rect x="2" y="22" width="5" height="10" fill="#3d2810"/>
+    </g>`;
+  }
+
+  if (interior.isPanorama) {
+    // Vista panoramica speciale per faro: mostra mini mappa
+    html += `<text x="350" y="180" text-anchor="middle" font-size="22" fill="#9e4828" font-family="Fraunces" font-weight="700">Vista dal Faro</text>
+      <text x="350" y="210" text-anchor="middle" font-size="14" fill="#7d6850">Popolazione: ${state.population} • Edifici: ${Object.keys(state.placed).length}</text>`;
+  }
+
+  html += `</svg></div>`;
+
+  html += `<div class="interior-info">
+    <span>👤 ${visitingNpcs.length} visitatori ora</span>
+    <span>💰 +${(def.rate * b.level).toFixed(1)}/s</span>
+  </div>`;
+
+  // STAZIONI INTERNE A LIVELLI
+  const stations = INTERIOR_STATIONS[b.id] || [];
+  html += `<h3 class="section-title">Stazioni Interne</h3>
+    <p class="muted small">Cap stazione = livello edificio (Lv${b.level}). Potenzia l'edificio per sbloccare livelli stazione piu alti.</p>`;
+  for (const st of stations) {
+    const curLvl = (b.interiorStations && b.interiorStations[st.id]) || 0;
+    const maxLvl = Math.min(5, b.level);
+    const atMaxForBuilding = curLvl >= maxLvl;
+    const inProgress = !!state.construction[slotId + '@' + st.id];
+    const nextLvl = curLvl + 1;
+    const nextCost = curLvl < 5 ? interiorStationCost(st.baseCost, nextLvl) : 0;
+    const nextTime = curLvl < 5 ? interiorUpgradeTimeSeconds(nextCost) : 0;
+    const canBuy = !inProgress && !atMaxForBuilding && curLvl < 5 && state.coins >= nextCost && activeConstructions() < MAX_CONCURRENT_BUILDS;
+    html += `<div class="upgrade-card ${curLvl>0?'applied':''}">
+      <div class="up-info">
+        <div class="up-name">${st.name} <span class="muted small">Lv ${curLvl}/5</span></div>
+        <div class="up-desc">${st.desc}</div>
+      </div>
+      ${inProgress
+        ? '<span class="up-applied">In corso…</span>'
+        : curLvl >= 5
+          ? '<span class="up-applied">MAX ✓</span>'
+          : atMaxForBuilding
+            ? `<span class="up-applied muted">Cap Lv${maxLvl}</span>`
+            : `<button class="primary-btn small${canBuy?'':' disabled'}" ${canBuy?`data-action="startStationUpgrade" data-slot-id="${slotId}" data-station-id="${st.id}"`:''}>
+                Lv${nextLvl} • 💰${nextCost} • ⏱️${formatDuration(nextTime)}
+              </button>`
+      }
+    </div>`;
+  }
+
+  html += `<button class="secondary-btn" data-action="backFromInterior" data-slot-id="${slotId}">← Indietro</button>`;
+  html += `</div>`;
+  return html;
+}
+
+function renderInteriorElement(el) {
+  switch(el.type) {
+    case 'counter': return `<rect x="${el.x}" y="${el.y}" width="${el.w}" height="${el.h}" fill="#9e4828" stroke="#5d3825" stroke-width="2"/>
+                            <rect x="${el.x}" y="${el.y}" width="${el.w}" height="6" fill="#c8643c"/>`;
+    case 'shelf':   return `<rect x="${el.x}" y="${el.y}" width="${el.w}" height="${el.h}" fill="#7d4828"/>
+                            <line x1="${el.x}" y1="${el.y+el.h/2}" x2="${el.x+el.w}" y2="${el.y+el.h/2}" stroke="#5d3825" stroke-width="1"/>`;
+    case 'sign':    return `<rect x="${el.x-10}" y="${el.y-20}" width="180" height="36" fill="#9e4828" stroke="#3d2810" stroke-width="2"/>
+                            <text x="${el.x+80}" y="${el.y+5}" text-anchor="middle" font-size="18" fill="#fff5e1" font-family="Fraunces" font-weight="800">${el.text}</text>`;
+    case 'stool':   return `<rect x="${el.x-12}" y="${el.y}" width="24" height="6" fill="#3d2810"/>
+                            <line x1="${el.x-8}" y1="${el.y+6}" x2="${el.x-8}" y2="${el.y+30}" stroke="#3d2810" stroke-width="3"/>
+                            <line x1="${el.x+8}" y1="${el.y+6}" x2="${el.x+8}" y2="${el.y+30}" stroke="#3d2810" stroke-width="3"/>`;
+    case 'bottles': {
+      const colors = ['#c8643c','#5fb3c4','#9bb88a','#ffe066','#d4a8b8','#7d9a6e','#ff7a1e','#a8826a'];
+      let out = '';
+      for (let i=0;i<el.count;i++) {
+        const x = el.x + i*60;
+        out += `<rect x="${x}" y="0" width="20" height="40" rx="3" fill="${colors[i%colors.length]}"/>`;
+      }
+      return out;
+    }
+    case 'pool':    return `<ellipse cx="${el.x+el.w/2}" cy="${el.y+el.h/2}" rx="${el.w/2}" ry="${el.h/2}" fill="${el.color}"/>
+                            <ellipse cx="${el.x+el.w/2}" cy="${el.y+el.h/2-6}" rx="${el.w/2-15}" ry="${el.h/2-12}" fill="${el.color}" opacity="0.7"/>`;
+    case 'towel':   return `<rect x="${el.x}" y="${el.y}" width="40" height="20" fill="#fff5e1"/>
+                            <line x1="${el.x}" y1="${el.y+10}" x2="${el.x+40}" y2="${el.y+10}" stroke="#d4a8b8" stroke-width="1"/>`;
+    case 'candle':  return `<rect x="${el.x-3}" y="${el.y}" width="6" height="22" fill="#fff5e1"/>
+                            <ellipse cx="${el.x}" cy="${el.y-2}" rx="3" ry="5" fill="#ff7a1e"/>`;
+    case 'rack':    return `<rect x="${el.x}" y="${el.y}" width="${el.w}" height="80" fill="#3d2810"/>
+                            <circle cx="${el.x+20}" cy="${el.y+20}" r="8" fill="#1d1410"/>
+                            <circle cx="${el.x+20}" cy="${el.y+50}" r="8" fill="#1d1410"/>
+                            <circle cx="${el.x+el.w-20}" cy="${el.y+20}" r="6" fill="#1d1410"/>
+                            <circle cx="${el.x+el.w-20}" cy="${el.y+50}" r="6" fill="#1d1410"/>`;
+    case 'bench':   return `<rect x="${el.x}" y="${el.y}" width="${el.w}" height="14" fill="#9e6e3c"/>
+                            <rect x="${el.x}" y="${el.y-4}" width="${el.w}" height="4" fill="#c8643c"/>
+                            <line x1="${el.x+10}" y1="${el.y+14}" x2="${el.x+10}" y2="${el.y+30}" stroke="#3d2810" stroke-width="3"/>
+                            <line x1="${el.x+el.w-10}" y1="${el.y+14}" x2="${el.x+el.w-10}" y2="${el.y+30}" stroke="#3d2810" stroke-width="3"/>`;
+    case 'painting':return `<rect x="${el.x}" y="${el.y}" width="${el.w}" height="${el.h}" fill="${el.color}" stroke="#3d2810" stroke-width="2"/>
+                            <rect x="${el.x+5}" y="${el.y+5}" width="${el.w-10}" height="${el.h-10}" fill="#fff5e1" opacity="0.4"/>`;
+    case 'board':   return `<rect x="${el.x}" y="${el.y}" width="14" height="60" rx="6" fill="${el.color}"/>
+                            <rect x="${el.x+1}" y="${el.y+5}" width="12" height="10" fill="#fff" opacity="0.4"/>`;
+    default: return '';
+  }
+}
+
+function startInteriorStationUpgrade(slotId, stationId) {
+  const b = state.placed[slotId];
+  if (!b) return;
+  const defs = INTERIOR_STATIONS[b.id];
+  if (!defs) return;
+  const st = defs.find(s=>s.id===stationId);
+  if (!st) return;
+  const curLvl = (b.interiorStations && b.interiorStations[stationId]) || 0;
+  if (curLvl >= 5) return;
+  if (curLvl >= b.level) { showToast(`Serve edificio Lv${curLvl+1}`, 'warn'); return; }
+  if (activeConstructions() >= MAX_CONCURRENT_BUILDS) { showToast('Max 3 cantieri attivi', 'warn'); return; }
+  const targetLvl = curLvl + 1;
+  const cost = interiorStationCost(st.baseCost, targetLvl);
+  if (state.coins < cost) { showToast('Coins insufficienti', 'warn'); return; }
+  const key = slotId + '@' + stationId;
+  if (state.construction[key]) { showToast('Gia in corso', 'warn'); return; }
+  state.coins -= cost;
+  state.totalCoinsSpent += cost;
+  const dur = interiorUpgradeTimeSeconds(cost);
+  startConstruction(slotId, 'interior', { stationId, targetLevel:targetLvl, durationSec:dur });
+  progressQuest('spend', cost);
+  showToast(`${st.name} avviato (${formatDuration(dur)})`, 'info');
+  saveGame();
+  updateUI();
+  renderModal();
+}
+
+// === DECORAZIONI (piazzamento libero) ===
+function decorCap() {
+  return DECOR_CAP_BASE + (state.decorCapBonus || 0);
+}
+
+function renderDecorateModal() {
+  const placed = Array.isArray(state.decorPlaced) ? state.decorPlaced.length : 0;
+  const cap = decorCap();
+  const canExpand = state.decorCapBonus < (DECOR_CAP_EXPANDED - DECOR_CAP_BASE) && state.gems >= DECOR_CAP_UPGRADE_GEM_COST;
+  let html = `<div class="modal-head">
+    <h2>Decorazioni</h2>
+    <button class="close-btn" data-action="closeModal">×</button>
+  </div>
+  <div class="modal-content">
+    <div class="decor-cap-info">
+      <span>Piazzate: <b>${placed}/${cap}</b></span>
+      ${state.decorCapBonus === 0
+        ? `<button class="primary-btn small${canExpand?'':' disabled'}" ${canExpand?'data-action="expandDecorCap"':''}>Espandi a ${DECOR_CAP_EXPANDED} • 💎${DECOR_CAP_UPGRADE_GEM_COST}</button>`
+        : '<span class="claimed-tag">MAX ✓</span>'}
+    </div>
+    <p class="muted small">Compra le decorazioni e tocca "Piazza". Poi tocca un punto qualsiasi dell'isola per posizionarle.</p>`;
+
+  for (const d of Object.values(DECORATIONS)) {
+    const owned = state.decorInventory[d.id] || 0;
+    const can = state.coins >= d.cost;
+    html += `<div class="decor-card">
+      <div class="d-svg"><svg viewBox="-20 -28 40 36" width="48" height="48">${svgDecoration(d.id)}</svg></div>
+      <div class="d-info">
+        <div class="d-name">${d.name}</div>
+        <div class="d-desc">+${d.happiness} felicita</div>
+        <div class="d-owned">In magazzino: ${owned}</div>
+      </div>
+      <div class="d-actions">
+        <button class="primary-btn small${can?'':' disabled'}" ${can?`data-action="buyDecor" data-decor-id="${d.id}"`:''}>💰 ${d.cost}</button>
+        ${owned > 0 ? `<button class="secondary-btn small" data-action="startPlacing" data-decor-id="${d.id}">Piazza (${owned})</button>` : ''}
+      </div>
+    </div>`;
+  }
+  html += `</div>`;
+  return html;
+}
+
+function expandDecorCap() {
+  if (state.decorCapBonus >= (DECOR_CAP_EXPANDED - DECOR_CAP_BASE)) return;
+  if (state.gems < DECOR_CAP_UPGRADE_GEM_COST) { showToast('Gemme insufficienti', 'warn'); return; }
+  state.gems -= DECOR_CAP_UPGRADE_GEM_COST;
+  state.totalGemsSpent += DECOR_CAP_UPGRADE_GEM_COST;
+  state.decorCapBonus = DECOR_CAP_EXPANDED - DECOR_CAP_BASE;
+  showToast(`Capacita decorazioni: ${DECOR_CAP_EXPANDED}!`, 'good');
+  saveGame();
+  updateUI();
+  renderModal();
+}
+
+function buyDecor(decorId) {
+  const d = DECORATIONS[decorId];
+  if (!d) return;
+  if (state.coins < d.cost) { showToast('Coins insufficienti', 'warn'); return; }
+  state.coins -= d.cost;
+  state.totalCoinsSpent += d.cost;
+  state.decorInventory[decorId] = (state.decorInventory[decorId] || 0) + 1;
+  progressQuest('spend', d.cost);
+  showToast(`${d.name} nel magazzino`, 'good');
+  saveGame();
+  updateUI();
+  renderModal();
+}
+
+function startPlacingDecor(decorId) {
+  if (!state.decorInventory[decorId] || state.decorInventory[decorId] <= 0) {
+    showToast('Magazzino vuoto', 'warn'); return;
+  }
+  // Verifica cap
+  const placed = Array.isArray(state.decorPlaced) ? state.decorPlaced.length : 0;
+  if (placed >= decorCap()) {
+    showToast(`Limite raggiunto (${decorCap()}). Rimuovi qualcosa o espandi.`, 'warn');
+    return;
+  }
+  placingDecorId = decorId;
+  closeAllModals();
+  showPlacementBar();
+  renderEntities();
+}
+
+// Piazzamento LIBERO: chiamata con coordinate viewBox dell'SVG
+function placeDecorationAt(x, y) {
+  if (!placingDecorId) return;
+  if (!state.decorInventory[placingDecorId] || state.decorInventory[placingDecorId] <= 0) {
+    cancelPlacingDecor();
+    return;
+  }
+  // Verifica zona valida: solo dentro l'isola principale o satellite sbloccata
+  // Test approssimativo: isola principale = ellisse cx=450 cy=400 rx=430 ry=330
+  const inMain = ((x-450)*(x-450))/(430*430) + ((y-400)*(y-400))/(330*330) <= 1;
+  let inSatellite = false;
+  for (const sId of state.unlockedSatellites) {
+    const sat = SATELLITE_ISLANDS[sId];
+    // Approssimazione: ellisse 130x100 centrata su sat.centerX/Y
+    const dx = x - sat.centerX, dy = y - sat.centerY;
+    if ((dx*dx)/(140*140) + (dy*dy)/(110*110) <= 1) { inSatellite = true; break; }
+  }
+  if (!inMain && !inSatellite) {
+    showToast('Devi piazzare sull\'isola, non in mare', 'warn');
+    return;
+  }
+  // Verifica cap
+  if (state.decorPlaced.length >= decorCap()) {
+    showToast(`Limite ${decorCap()} raggiunto`, 'warn');
+    cancelPlacingDecor();
+    return;
+  }
+  const newId = 'd_' + Date.now() + '_' + Math.floor(Math.random()*9999);
+  state.decorPlaced.push({ id: newId, decorId: placingDecorId, x, y, placedAt: Date.now() });
+  state.decorInventory[placingDecorId]--;
+  progressQuest('decor_count', 1);
+  const d = DECORATIONS[placingDecorId];
+  showToast(`${d.name} piazzata!`, 'good');
+  saveGame();
+  renderStatic();
+  if (state.decorInventory[placingDecorId] > 0) {
+    updatePlacementBar();
+  } else {
+    cancelPlacingDecor();
+  }
+}
+
+function cancelPlacingDecor() {
+  placingDecorId = null;
+  hidePlacementBar();
+  renderEntities();
+}
+
+function showPlacementBar() {
+  const bar = document.getElementById('placementBar');
+  if (!bar) return;
+  bar.style.display = 'flex';
+  updatePlacementBar();
+}
+function hidePlacementBar() {
+  const bar = document.getElementById('placementBar');
+  if (bar) bar.style.display = 'none';
+}
+function updatePlacementBar() {
+  if (!placingDecorId) return;
+  const d = DECORATIONS[placingDecorId];
+  const owned = state.decorInventory[placingDecorId] || 0;
+  const el = document.getElementById('placementText');
+  if (el) el.textContent = `Tocca l'isola per piazzare ${d.name} (${owned} restanti)`;
+}
+
+// Modal "azioni su decorazione piazzata"
+function renderDecorActionsModal() {
+  const {decorId} = currentModalData;
+  const d = Array.isArray(state.decorPlaced) ? state.decorPlaced.find(x=>x.id===decorId) : null;
+  if (!d) { closeAllModals(); return ''; }
+  const def = DECORATIONS[d.decorId];
+  return `<div class="modal-head">
+    <h2>${def.name}</h2>
+    <button class="close-btn" data-action="closeModal">×</button>
+  </div>
+  <div class="modal-content">
+    <div class="d-svg-big"><svg viewBox="-20 -30 40 40" width="80" height="80">${svgDecoration(d.decorId)}</svg></div>
+    <p class="muted center">+${def.happiness} felicita all'isola</p>
+    <button class="secondary-btn" data-action="removeDecor" data-decor-id="${d.id}">Rimuovi (rimborso 50%)</button>
+    <button class="ghost-btn" data-action="closeModal">Chiudi</button>
+  </div>`;
+}
+
+function removeDecoration(decorId) {
+  if (!Array.isArray(state.decorPlaced)) return;
+  const idx = state.decorPlaced.findIndex(x=>x.id===decorId);
+  if (idx < 0) return;
+  const d = state.decorPlaced[idx];
+  const def = DECORATIONS[d.decorId];
+  const refund = Math.floor((def.cost || 0) * 0.5);
+  state.decorPlaced.splice(idx, 1);
+  state.coins += refund;
+  state.totalCoinsEarned += refund;
+  showToast(`Rimossa. +${refund}💰`, 'info');
+  saveGame();
+  renderStatic();
+  updateUI();
+  closeAllModals();
+}
+
+// === QUEST GIORNALIERE ===
+function renderQuestsModal() {
+  let html = `<div class="modal-head">
+    <h2>Quest Giornaliere</h2>
+    <button class="close-btn" data-action="closeModal">×</button>
+  </div>
+  <div class="modal-content">
+    <p class="muted">Nuove quest ogni giorno. Reset alla mezzanotte.</p>`;
+  if (state.dailyQuests.length === 0) html += `<p>Nessuna quest oggi.</p>`;
+  for (const q of state.dailyQuests) {
+    const done = q.progress >= q.target;
+    const cls = q.claimed ? 'claimed' : done ? 'ready' : '';
+    html += `<div class="quest-card ${cls}">
+      <div class="q-info">
+        <div class="q-name">${q.name}</div>
+        <div class="q-desc">${q.desc}</div>
+        <div class="q-progress">
+          <div class="q-bar"><div class="q-bar-fill" style="width:${Math.min(100, q.progress/q.target*100)}%"></div></div>
+          <span>${Math.floor(q.progress)}/${q.target}</span>
+        </div>
+      </div>
+      <div class="q-action">
+        ${q.claimed
+          ? '<span class="claimed-tag">Ritirato ✓</span>'
+          : done
+            ? `<button class="primary-btn small" data-action="claimQ" data-id="${q.id}">+${q.reward} 💰</button>`
+            : `<span class="muted">+${q.reward} 💰</span>`}
+      </div>
+    </div>`;
+  }
+  html += `</div>`;
+  return html;
+}
+
+// === ACHIEVEMENT ===
+function renderAchievementsModal() {
+  let html = `<div class="modal-head">
+    <h2>Obiettivi</h2>
+    <button class="close-btn" data-action="closeModal">×</button>
+  </div>
+  <div class="modal-content">`;
+  for (const a of ACHIEVEMENTS) {
+    const claimed = state.achievementsClaimed.includes(a.id);
+    const ready = !claimed && a.condition(state);
+    const cls = claimed ? 'claimed' : ready ? 'ready' : 'locked';
+    html += `<div class="ach-card ${cls}">
+      <div class="a-info">
+        <div class="a-name">${a.name}</div>
+        <div class="a-desc">${a.desc}</div>
+        <div class="a-reward">+${a.reward} 💰${a.gems?` +${a.gems} 💎`:''}</div>
+      </div>
+      <div class="a-action">
+        ${claimed
+          ? '<span class="claimed-tag">✓</span>'
+          : ready
+            ? `<button class="primary-btn small" data-action="claimAch" data-id="${a.id}">Ritira</button>`
+            : '<span class="muted">🔒</span>'}
+      </div>
+    </div>`;
+  }
+  html += `</div>`;
+  return html;
+}
+
+// === POPOLAZIONE ===
+function renderPopulationModal() {
+  const {capacity} = computeBuildingStats();
+  const avgStat = (state.stats.vitalita + state.stats.armonia + state.stats.forza + state.stats.comunita) / 4;
+  let trend = '→';
+  if (avgStat >= 70) trend = '↑↑ Boom';
+  else if (avgStat >= 50) trend = '↑ Crescita';
+  else if (avgStat >= 40) trend = '→ Stabile';
+  else if (avgStat >= 25) trend = '↓ Calo';
+  else trend = '↓↓ Emigrazione';
+
+  // Conteggio per tipo NPC visibili
+  const byType = {};
+  for (const n of state.npcRoster) byType[n.type] = (byType[n.type]||0) + 1;
+
+  let html = `<div class="modal-head">
+    <h2>Popolazione</h2>
+    <button class="close-btn" data-action="closeModal">×</button>
+  </div>
+  <div class="modal-content">
+    <div class="pop-overview">
+      <div class="pop-big">${state.population}<span class="muted">/${capacity}</span></div>
+      <div class="pop-trend">${trend}</div>
+    </div>
+    <p class="muted small">Le statistiche sotto influenzano quanto la tua isola attrae e trattiene abitanti. Tieni la media sopra 40 per non perdere gente, sopra 70 per il boom.</p>
+
+    <h3 class="section-title">Statistiche dell'Isola</h3>`;
+
+  html += statBar('⚡ Vitalità', state.stats.vitalita, '#c8643c', 'Energia dell\'isola. Sale con cardio e workout.');
+  html += statBar('🧘 Armonia', state.stats.armonia, '#9bb88a', 'Equilibrio. Sale con yoga, spa, decorazioni.');
+  html += statBar('💪 Forza Collettiva', state.stats.forza, '#9e4828', 'Fitness fisica. Determina capacità max.');
+  html += statBar('🤝 Comunità', state.stats.comunita, '#d9a86a', 'Coesione sociale. Influenza produzione coins.');
+
+  html += `<h3 class="section-title">Abitanti Visibili</h3>
+    <div class="archetype-list">`;
+  for (const t of NPC_TYPE_LIST) {
+    const tdef = NPC_TYPES[t];
+    const count = byType[t] || 0;
+    html += `<div class="arch-row">
+      <span class="arch-color" style="background:${tdef.color}"></span>
+      <span class="arch-name">${tdef.icon} ${tdef.name}</span>
+      <span class="arch-count">${count}</span>
+    </div>`;
+  }
+  html += `</div></div>`;
+  return html;
+}
+
+function statBar(label, value, color, hint) {
+  const v = Math.floor(value);
+  return `<div class="stat-row">
+    <div class="stat-head">
+      <span>${label}</span>
+      <span class="stat-val">${v}/100</span>
+    </div>
+    <div class="stat-bar"><div class="stat-fill" style="width:${v}%;background:${color}"></div></div>
+    <div class="stat-hint">${hint}</div>
+  </div>`;
+}
+
+// === SATELLITE ===
+function renderSatellitesModal() {
+  let html = `<div class="modal-head">
+    <h2>Isole Satellite</h2>
+    <button class="close-btn" data-action="closeModal">×</button>
+  </div>
+  <div class="modal-content">
+    <p class="muted">Espandi il tuo arcipelago sbloccando nuove isole collegate da ponti.</p>`;
+  for (const sId in SATELLITE_ISLANDS) {
+    const sat = SATELLITE_ISLANDS[sId];
+    const unlocked = state.unlockedSatellites.includes(sId);
+    const costStr = sat.costCoins > 0 ? `💰 ${sat.costCoins}` : `💎 ${sat.costGems}`;
+    html += `<div class="sat-card ${unlocked?'unlocked':''}">
+      <div class="sat-info">
+        <div class="sat-name">${sat.name}</div>
+        <div class="sat-desc">+${sat.slots.length} slot edifici, +${sat.decorSlots.length} decor</div>
+        <div class="sat-req">${unlocked?'Sbloccata ✓':`Liv ${sat.unlockLevel} • ${costStr}`}</div>
+      </div>
+      ${unlocked ? '<span class="claimed-tag">✓</span>'
+        : `<button class="primary-btn small" data-action="unlockSat" data-sat-id="${sId}">Sblocca</button>`}
+    </div>`;
+  }
+  html += `</div>`;
+  return html;
+}
+
+function renderSatelliteUnlockModal() {
+  const {satId} = currentModalData;
+  const sat = SATELLITE_ISLANDS[satId];
+  if (!sat) return '';
+  const meetsLevel = state.level >= sat.unlockLevel;
+  const meetsCoins = sat.costCoins === 0 || state.coins >= sat.costCoins;
+  const meetsGems = sat.costGems === 0 || state.gems >= sat.costGems;
+  const canUnlock = meetsLevel && meetsCoins && meetsGems;
+  return `<div class="modal-head">
+    <h2>${sat.name}</h2>
+    <button class="close-btn" data-action="closeModal">×</button>
+  </div>
+  <div class="modal-content">
+    <div class="sat-preview">
+      <svg viewBox="-160 -120 320 240" width="240" height="180">${svgSatelliteShape({...sat, centerX:0, centerY:0})}</svg>
+    </div>
+    <div class="sat-detail">
+      <div>+${sat.slots.length} slot edifici</div>
+      <div>+${sat.decorSlots.length} slot decorazioni</div>
+      <div class="${meetsLevel?'ok':'no'}">Livello richiesto: ${sat.unlockLevel} ${meetsLevel?'✓':'✗'}</div>
+      <div class="${meetsCoins&&meetsGems?'ok':'no'}">Costo: ${sat.costCoins>0?`💰 ${sat.costCoins}`:`💎 ${sat.costGems}`} ${meetsCoins&&meetsGems?'✓':'✗'}</div>
+    </div>
+    <button class="primary-btn${canUnlock?'':' disabled'}" ${canUnlock?`data-action="unlockSat" data-sat-id="${satId}"`:''}>
+      ${canUnlock?'Sblocca':'Requisiti non soddisfatti'}
+    </button>
+  </div>`;
+}
+
+function tryUnlockSatellite(satId) {
+  const sat = SATELLITE_ISLANDS[satId];
+  if (!sat) return;
+  if (state.unlockedSatellites.includes(satId)) return;
+  if (state.level < sat.unlockLevel) { showToast(`Serve liv ${sat.unlockLevel}`, 'warn'); return; }
+  if (sat.costCoins > 0 && state.coins < sat.costCoins) { showToast('Coins insufficienti', 'warn'); return; }
+  if (sat.costGems > 0 && state.gems < sat.costGems) { showToast('Gemme insufficienti', 'warn'); return; }
+  state.coins -= sat.costCoins;
+  state.gems -= sat.costGems;
+  state.totalCoinsSpent += sat.costCoins;
+  state.unlockedSatellites.push(satId);
+  showToast(`${sat.name} sbloccata! 🎉`, 'good');
+  addXp(50);
+  saveGame();
+  renderStatic();
+  updateUI();
+  closeAllModals();
+}
+
+// === MORE / STATS / EVENT ===
+function renderMoreModal() {
+  return `<div class="modal-head">
+    <h2>Altro</h2>
+    <button class="close-btn" data-action="closeModal">×</button>
+  </div>
+  <div class="modal-content">
+    <button class="menu-btn" data-action="openPopulation">👥 Popolazione</button>
+    <button class="menu-btn" data-action="openSatellites">🏝️ Isole Satellite</button>
+    <button class="menu-btn" data-action="openDecorate">🌴 Decorazioni</button>
+    <button class="menu-btn" data-action="openStats">📊 Statistiche</button>
+    <button class="menu-btn" data-action="openEvent">${state.activeEvent?state.activeEvent.icon:'☀️'} Evento</button>
+    <button class="menu-btn" data-action="openSettings">⚙️ Impostazioni</button>
+  </div>`;
+}
+
+function renderStatsModal() {
+  const idle = computeIdleRate();
+  return `<div class="modal-head">
+    <h2>Statistiche</h2>
+    <button class="close-btn" data-action="closeModal">×</button>
+  </div>
+  <div class="modal-content">
+    <div class="stat-line"><span>Workout totali</span><b>${state.totalWorkouts}</b></div>
+    <div class="stat-line"><span>Streak</span><b>${state.streak} (x${streakMultiplier().toFixed(2)})</b></div>
+    <div class="stat-line"><span>Coins guadagnati</span><b>${formatNumber(state.totalCoinsEarned)}</b></div>
+    <div class="stat-line"><span>Coins spesi</span><b>${formatNumber(state.totalCoinsSpent)}</b></div>
+    <div class="stat-line"><span>Idle/secondo</span><b>${idle.toFixed(2)}</b></div>
+    <div class="stat-line"><span>Edifici</span><b>${Object.keys(state.placed).length}</b></div>
+    <div class="stat-line"><span>Decorazioni</span><b>${Object.keys(state.decorPlaced).length}</b></div>
+    <div class="stat-line"><span>Popolazione</span><b>${state.population}</b></div>
+    <div class="stat-line"><span>Livello</span><b>${state.level}</b></div>
+    <h3 class="section-title">Cronologia Workout</h3>
+    ${state.workoutHistory.length === 0 ? '<p class="muted">Nessun workout ancora.</p>' : state.workoutHistory.slice(0,10).map(w => `
+      <div class="hist-row"><span>${w.name}</span><span class="muted">+${w.coins}💰</span></div>
+    `).join('')}
+  </div>`;
+}
+
+function renderEventModal() {
+  const ev = state.activeEvent;
+  if (!ev) return '<div class="modal-head"><h2>Nessun evento</h2></div>';
+  const left = Math.max(0, state.eventEndsAt - Date.now());
+  const hh = Math.floor(left/3600000);
+  return `<div class="modal-head">
+    <h2>${ev.icon} ${ev.name}</h2>
+    <button class="close-btn" data-action="closeModal">×</button>
+  </div>
+  <div class="modal-content">
+    <p>${ev.desc}</p>
+    <p class="muted">Tempo rimanente: ${hh}h</p>
+  </div>`;
+}
+
+function renderSettingsModal() {
+  return `<div class="modal-head">
+    <h2>Impostazioni</h2>
+    <button class="close-btn" data-action="closeModal">×</button>
+  </div>
+  <div class="modal-content">
+    <p class="muted">Isola: <b>${state.islandName || 'Senza nome'}</b></p>
+    <p class="muted">Versione: ${VERSION}</p>
+    <button class="menu-btn" data-action="openHelpDiamonds">💎 A cosa servono i Diamanti?</button>
+    <h3 class="section-title">Debug</h3>
+    <button class="secondary-btn" data-action="debugCoins">+10.000 💰</button>
+    <button class="secondary-btn" data-action="debugGems">+50 💎</button>
+    <button class="secondary-btn" data-action="debugMaxStats">Max Stats</button>
+    <button class="secondary-btn" data-action="debugAdvance">Avanza Giorno</button>
+    <button class="secondary-btn" data-action="debugForceBoat">Forza Barca</button>
+    <button class="ghost-btn" data-action="reset">🗑️ Reset salvataggio</button>
+  </div>`;
+}
+
+function debugAdvanceDay() {
+  state.lastDailyReset = 'never';
+  state.lastWorkoutDate = null;
+  checkDailyReset();
+  showToast('Nuovo giorno', 'good');
+  closeAllModals();
+}
+
+// === INTRO NARRATIVA (3 schermate) ===
+const INTRO_SCREENS = [
+  {
+    title: 'Una lettera dalla Nonna',
+    body: `<p>"Cara nipote, caro nipote,</p>
+           <p>se stai leggendo questo, vuol dire che hai accettato. La mia <b>isola</b> e' tua adesso. So che e' un po' spoglia — io me ne sono presa cura finche' ho potuto correre la mia maratona quotidiana lungo la spiaggia.</p>
+           <p>Falla rifiorire con il <b>movimento</b>, come ho fatto io. — Nonna Adele"</p>`,
+    icon: '✉️'
+  },
+  {
+    title: 'Come funziona',
+    body: `<p>Ogni volta che ti alleni nella vita reale, l'isola <b>rinasce</b>:</p>
+           <ul style="padding-left:20px;line-height:1.6">
+             <li><b>💰 Coins</b> dai workout e dagli edifici (passivi)</li>
+             <li><b>💎 Diamanti</b> SOLO dai workout (e basta!)</li>
+             <li><b>Edifici</b> producono di piu' se sono di livello alto</li>
+             <li><b>Abitanti</b> arrivano in barca se le stat sono buone</li>
+           </ul>`,
+    icon: '🏝️'
+  },
+  {
+    title: 'Dai un nome all\'isola',
+    body: `<p class="muted">L'isola ha bisogno di un nome. Scegli con cura.</p>
+           <input type="text" id="islandNameInput" maxlength="20" placeholder="Es. Isola del Sole" style="width:100%;padding:12px;border:2px solid var(--terracotta);border-radius:8px;font-size:16px;margin:12px 0;font-family:inherit;box-sizing:border-box"/>`,
+    icon: '🏷️'
+  },
+];
+
+function renderIntroModal() {
+  const idx = Math.min(state.introStep || 0, INTRO_SCREENS.length - 1);
+  const screen = INTRO_SCREENS[idx];
+  const isLast = idx === INTRO_SCREENS.length - 1;
+  return `<div class="modal-head">
+    <h2>${screen.icon} ${screen.title}</h2>
+  </div>
+  <div class="modal-content intro">
+    ${screen.body}
+    <div style="display:flex;gap:8px;margin-top:12px">
+      ${INTRO_SCREENS.map((_, i) => `<span style="width:8px;height:8px;border-radius:50%;background:${i===idx?'var(--terracotta)':'rgba(157,72,40,0.25)'}"></span>`).join('')}
+    </div>
+    ${isLast
+      ? `<button class="primary-btn" data-action="startGame">Inizia</button>`
+      : `<button class="primary-btn" data-action="introNext">Continua</button>`}
+  </div>`;
+}
+
+function advanceIntro() {
+  state.introStep = (state.introStep || 0) + 1;
+  renderModal();
+}
+
+function startGameFromIntro() {
+  const v = document.getElementById('islandNameInput');
+  state.islandName = (v && v.value.trim()) || 'La Mia Isola';
+  state.onboardingDone = true;
+  state.tutorialIdx = 1;
+  saveGame();
+  closeAllModals();
+  updateUI();
+}
+
+// === NUOVI MODAL ===
+
+function renderConstructionDetail() {
+  const {slotId} = currentModalData;
+  // Trova la costruzione: slotId o slotId@station
+  let key = slotId;
+  let c = state.construction[key];
+  if (!c) {
+    // Cerca con @
+    for (const k in state.construction) {
+      if (k.split('@')[0] === slotId) { key = k; c = state.construction[k]; break; }
+    }
+  }
+  if (!c) { closeAllModals(); return ''; }
+  const left = Math.max(0, c.endAt - Date.now()) / 1000;
+  const total = (c.endAt - c.startAt) / 1000;
+  const pct = total > 0 ? Math.min(100, (1 - left/total) * 100) : 100;
+  let title = 'Cantiere';
+  if (c.type === 'build') title = `Costruzione: ${BUILDINGS[c.bId].name}`;
+  if (c.type === 'upgrade') title = `Upgrade a Lv${c.targetLevel}`;
+  if (c.type === 'interior') {
+    const b = state.placed[c.slotId];
+    const defs = b ? INTERIOR_STATIONS[b.id] : null;
+    const st = defs ? defs.find(s=>s.id===c.stationId) : null;
+    title = `${st ? st.name : 'Stazione'} -> Lv${c.targetLevel}`;
+  }
+  const skipCost = skipCostGems(left);
+  return `<div class="modal-head">
+    <h2>🚧 ${title}</h2>
+    <button class="close-btn" data-action="closeModal">×</button>
+  </div>
+  <div class="modal-content">
+    <div class="construction-progress">
+      <div class="cp-bar"><div class="cp-fill" style="width:${pct}%"></div></div>
+      <div class="cp-time">⏱️ ${formatDuration(left)} rimanenti</div>
+    </div>
+    <button class="primary-btn ${state.gems >= skipCost ? '' : 'disabled'}" ${state.gems >= skipCost ? `data-action="skipConstruction" data-key="${key}"` : ''}>
+      ⚡ Salta per 💎 ${skipCost}
+    </button>
+    <p class="muted small center">Hai ${state.gems} 💎 (i diamanti si guadagnano dai workout)</p>
+  </div>`;
+}
+
+function doSkipConstruction(key) {
+  if (skipConstruction(key)) {
+    saveGame();
+    // Il loop li processera ma forziamo subito
+    processCompletedConstructions();
+    renderStatic();
+    updateUI();
+    closeAllModals();
+  }
+}
+
+function renderUnlockSlotModal() {
+  const {slotId} = currentModalData;
+  const slot = SLOTS_MAIN.find(s=>s.id===slotId);
+  if (!slot || !slot.premium) { closeAllModals(); return ''; }
+  if (state.unlockedSlots.includes(slotId)) { closeAllModals(); return ''; }
+  const z = ZONES[slot.zone];
+  const useCoins = slot.unlockCost > 0;
+  const can = useCoins ? state.coins >= slot.unlockCost : state.gems >= slot.unlockGems;
+  return `<div class="modal-head">
+    <h2>🔒 Slot Premium</h2>
+    <button class="close-btn" data-action="closeModal">×</button>
+  </div>
+  <div class="modal-content">
+    <p>Sblocca questo slot extra in zona <b>${z.icon} ${z.name}</b> per costruirci un edificio.</p>
+    <div class="unlock-cost-box">
+      <div class="big-cost">
+        ${useCoins ? `💰 ${slot.unlockCost}` : `💎 ${slot.unlockGems}`}
+      </div>
+    </div>
+    <button class="primary-btn${can?'':' disabled'}" ${can?`data-action="unlockSlot" data-slot-id="${slotId}"`:''}>Sblocca</button>
+  </div>`;
+}
+
+function tryUnlockSlot(slotId) {
+  const slot = SLOTS_MAIN.find(s=>s.id===slotId);
+  if (!slot || !slot.premium) return;
+  if (state.unlockedSlots.includes(slotId)) return;
+  if (slot.unlockCost > 0) {
+    if (state.coins < slot.unlockCost) { showToast('Coins insufficienti', 'warn'); return; }
+    state.coins -= slot.unlockCost;
+    state.totalCoinsSpent += slot.unlockCost;
+  } else {
+    if (state.gems < slot.unlockGems) { showToast('Gemme insufficienti', 'warn'); return; }
+    state.gems -= slot.unlockGems;
+    state.totalGemsSpent += slot.unlockGems;
+  }
+  state.unlockedSlots.push(slotId);
+  showToast(`Slot premium sbloccato!`, 'good');
+  addXp(20);
+  saveGame();
+  renderStatic();
+  updateUI();
+  closeAllModals();
+}
+
+function renderHelpDiamondsModal() {
+  return `<div class="modal-head">
+    <h2>💎 I Diamanti</h2>
+    <button class="close-btn" data-action="closeModal">×</button>
+  </div>
+  <div class="modal-content">
+    <p class="muted">I diamanti sono la valuta rara e si guadagnano <b>SOLO con i workout</b>. Piu' intenso e lungo e' l'allenamento, piu' diamanti ricevi.</p>
+    <h3 class="section-title">Come usarli</h3>
+    <div class="diamond-use">
+      <div class="du-icon">⚡</div>
+      <div class="du-text"><b>Saltare timer di costruzione</b><br><span class="muted small">1 💎 ogni 5 minuti residui</span></div>
+    </div>
+    <div class="diamond-use">
+      <div class="du-icon">🔒</div>
+      <div class="du-text"><b>Sbloccare slot premium</b><br><span class="muted small">Posizioni speciali per costruire</span></div>
+    </div>
+    <div class="diamond-use">
+      <div class="du-icon">💰</div>
+      <div class="du-text"><b>Convertire in coins</b><br><span class="muted small">Pacchetti nel Negozio Diamanti</span></div>
+    </div>
+    <div class="diamond-use">
+      <div class="du-icon">🌴</div>
+      <div class="du-text"><b>Espandere capacita decorazioni</b><br><span class="muted small">Da 30 a 50 decor piazzate</span></div>
+    </div>
+    <button class="primary-btn" data-action="openGemShop">Vai al Negozio 💎</button>
+  </div>`;
+}
+
+function renderGemShopModal() {
+  let html = `<div class="modal-head">
+    <h2>💎 Negozio Diamanti</h2>
+    <button class="close-btn" data-action="closeModal">×</button>
+  </div>
+  <div class="modal-content">
+    <p class="muted">Converti i tuoi diamanti in coins. Hai ${state.gems} 💎.</p>`;
+  for (const pack of GEM_SHOP) {
+    const can = state.gems >= pack.gems;
+    html += `<div class="gem-pack">
+      <div class="gp-info">
+        <div class="gp-name">${pack.label}</div>
+        <div class="gp-detail">💎 ${pack.gems} → 💰 ${pack.coins}</div>
+      </div>
+      <button class="primary-btn small${can?'':' disabled'}" ${can?`data-action="buyGemPack" data-pack-id="${pack.id}"`:''}>Compra</button>
+    </div>`;
+  }
+  html += `</div>`;
+  return html;
+}
+
+function buyGemPack(packId) {
+  const pack = GEM_SHOP.find(p=>p.id===packId);
+  if (!pack) return;
+  if (state.gems < pack.gems) { showToast('Gemme insufficienti', 'warn'); return; }
+  state.gems -= pack.gems;
+  state.coins += pack.coins;
+  state.totalGemsSpent += pack.gems;
+  state.totalCoinsEarned += pack.coins;
+  showToast(`-${pack.gems}💎 +${pack.coins}💰`, 'good');
+  saveGame();
+  updateUI();
+  renderModal();
+}
+
+// === HINTS ===
+var currentHint = null;
+function handleHintCheck() {
+  const h = maybeShowHint();
+  if (h) {
+    currentHint = h;
+    showHintBanner(h);
+  }
+}
+function showHintBanner(h) {
+  const banner = document.getElementById('hintBanner');
+  if (!banner) return;
+  banner.style.display = 'flex';
+  const text = document.getElementById('hintText');
+  if (text) text.textContent = h.text;
+  banner.dataset.hintId = h.id;
+}
+function hideHintBanner() {
+  const banner = document.getElementById('hintBanner');
+  if (banner) banner.style.display = 'none';
+  currentHint = null;
+}
+function handleDismissHint(id) {
+  if (id) dismissHint(id);
+  hideHintBanner();
+  saveGame();
+}
+
+// === TUTORIAL ===
+function dismissTutorial() {
+  state.tutorialIdx = 99; // skip all
+  hideTutorialBanner();
+  saveGame();
+}
+function showTutorialBanner() {
+  const banner = document.getElementById('tutorialBanner');
+  if (!banner) return;
+  if (!state.tutorialIdx || state.tutorialIdx <= 0 || state.tutorialIdx >= TUTORIAL_STEPS.length-1) {
+    banner.style.display = 'none';
+    return;
+  }
+  const step = TUTORIAL_STEPS[state.tutorialIdx];
+  if (!step || !step.text) {
+    banner.style.display = 'none';
+    return;
+  }
+  banner.style.display = 'flex';
+  const text = document.getElementById('tutorialText');
+  if (text) text.textContent = step.text;
+}
+function hideTutorialBanner() {
+  const banner = document.getElementById('tutorialBanner');
+  if (banner) banner.style.display = 'none';
+}
+
+// === TOAST ===
+var toastQueue = [];
+function showToast(text, kind) {
+  const c = document.getElementById('toastContainer');
+  if (!c) return;
+  const t = document.createElement('div');
+  t.className = 'toast toast-' + (kind||'info');
+  t.textContent = text;
+  c.appendChild(t);
+  setTimeout(() => t.classList.add('show'), 10);
+  setTimeout(() => {
+    t.classList.remove('show');
+    setTimeout(() => t.remove(), 400);
+  }, 2500);
+}
+
+// === UI TOP BAR / NAV UPDATE ===
+var lastUiUpdate = 0;
+var lastTutorialIdxShown = -1;
+function updateUI() {
+  const now = Date.now();
+  if (now - lastUiUpdate < 100) return;
+  lastUiUpdate = now;
+  document.getElementById('coinsText').textContent = formatNumber(state.coins);
+  document.getElementById('gemsText').textContent = formatNumber(state.gems);
+  document.getElementById('levelText').textContent = 'Lv' + state.level;
+  document.getElementById('xpBarFill').style.width = ((state.xp / xpForLevel(state.level)) * 100) + '%';
+  document.getElementById('popText').textContent = `👥 ${state.population}`;
+  document.getElementById('streakText').textContent = state.streak > 0 ? `🔥${state.streak}` : '';
+  const idle = computeIdleRate();
+  document.getElementById('rateText').textContent = `+${idle.toFixed(1)}/s`;
+  const avg = (state.stats.vitalita+state.stats.armonia+state.stats.forza+state.stats.comunita)/4;
+  let mood = '😊';
+  if (avg < 25) mood = '😟';
+  else if (avg < 40) mood = '😐';
+  else if (avg < 70) mood = '🙂';
+  else mood = '🤩';
+  document.getElementById('moodText').textContent = mood;
+  // Tutorial banner refresh quando cambia step
+  if (state.tutorialIdx !== lastTutorialIdxShown) {
+    lastTutorialIdxShown = state.tutorialIdx;
+    showTutorialBanner();
+  }
+}
+
+// === BOOT ===
+function boot() {
+  loadGame();
+  checkStreak();
+  checkDailyReset();
+  initEvent();
+  if (!state.boat) scheduleBoat();
+
+  if (!state.onboardingDone) {
+    openModal('intro');
+  }
+
+  const offline = applyOfflineProgress();
+  if (offline > 0) {
+    setTimeout(() => showToast(`Offline: +${formatNumber(offline)} 💰`, 'good'), 800);
+  }
+
+  renderStatic();
+  updateUI();
+  checkAchievements();
+  showTutorialBanner();
+
+  lastFrameTime = performance.now();
+  lastPopUpdate = performance.now();
+  requestAnimationFrame(gameLoop);
+
+  // Listener globali
+  document.getElementById('modalOverlay').onclick = (e) => {
+    if (e.target.id === 'modalOverlay') closeAllModals();
+  };
+
+  // Bottom nav
+  document.getElementById('navWorkout').onclick = () => openModal('workout');
+  document.getElementById('navQuests').onclick = () => openModal('quests');
+  document.getElementById('navAch').onclick = () => openModal('achievements');
+  document.getElementById('navMore').onclick = () => openModal('more');
+
+  // Placement cancel
+  document.getElementById('cancelPlacementBtn').onclick = () => cancelPlacingDecor();
+
+  // Hint banner close
+  const hintClose = document.getElementById('hintCloseBtn');
+  if (hintClose) hintClose.onclick = () => {
+    const banner = document.getElementById('hintBanner');
+    handleDismissHint(banner && banner.dataset.hintId);
+  };
+
+  // Tutorial banner close
+  const tutClose = document.getElementById('tutorialCloseBtn');
+  if (tutClose) tutClose.onclick = () => dismissTutorial();
+
+  // Zoom & pan gestures
+  initZoomGestures();
+}
+
+window.addEventListener('DOMContentLoaded', boot);
+
+</script>
+
+</body>
+</html>
